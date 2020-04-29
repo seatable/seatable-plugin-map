@@ -4,7 +4,9 @@ const es = {
   "Table": "Forma",
   "View": "Vista",
   "Address_field": "Campo de dirección",
-  "Settings": "Configurar"
+  "Settings": "Configurar",
+  "Your_Google_Maps_key_has_exceeded_quota": "Su clave de Google Maps ha excedido la cuota.",
+  "address_not_be_found": "{address} no fue encontrado."
 };
 
 export default es; 

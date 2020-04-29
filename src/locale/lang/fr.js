@@ -4,7 +4,9 @@ const fr = {
   "Table": "Formulaire",
   "View": "Afficher",
   "Address_field": "Champ d'adresse",
-  "Settings": "Mettre en place"
+  "Settings": "Mettre en place",
+  "Your_Google_Maps_key_has_exceeded_quota": "Votre clé Google Maps a dépassé le quota.",
+  "address_not_be_found": "{address} est introuvable."
 };
 
 export default fr; 

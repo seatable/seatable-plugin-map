@@ -4,7 +4,9 @@ const it = {
   "Table": "tavolo",
   "View": "vista",
   "Address_field": "Campo indirizzo",
-  "Settings": "Impostare"
+  "Settings": "Impostare",
+  "Your_Google_Maps_key_has_exceeded_quota": "La tua chiave di Google Maps ha superato la quota.",
+  "address_not_be_found": "{address} non trovato."
 };
 
 export default it; 

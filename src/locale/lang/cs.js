@@ -4,7 +4,9 @@ const cs = {
   "Table": "Form",
   "View": "Zobrazit",
   "Address_field": "Pole adresy",
-  "Settings": "Nastavit"
+  "Settings": "Nastavit",
+  "Your_Google_Maps_key_has_exceeded_quota": "Váš klíč Google Maps překročil kvótu.",
+  "address_not_be_found": "{address} nebyl nalezen."
 };
 
 export default cs;

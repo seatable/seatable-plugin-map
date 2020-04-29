@@ -4,7 +4,9 @@ const de = {
   "Table": "Formular",
   "View": "Anzeigen",
   "Address_field": "Adressfeld",
-  "Settings": "Einrichten"
+  "Settings": "Einrichten",
+  "Your_Google_Maps_key_has_exceeded_quota": "Ihr Google Maps-Schlüssel hat das Kontingent überschritten.",
+  "address_not_be_found": "{address} wurde nicht gefunden."
 };
 
 export default de; 

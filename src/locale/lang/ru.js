@@ -4,7 +4,9 @@ const ru = {
   "Table": "таблица",
   "View": "вид",
   "Address_field": "Адресное поле",
-  "Settings": "Настроить"
+  "Settings": "Настроить",
+  "Your_Google_Maps_key_has_exceeded_quota": "Ваш ключ Google Maps превысил квоту.",
+  "address_not_be_found": "{address} не был найден."
 };
 
 export default ru; 

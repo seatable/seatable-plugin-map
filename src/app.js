@@ -406,7 +406,7 @@ class App extends React.Component  {
             break;
           }
           case window.google.maps.GeocoderStatus.OVER_QUERY_LIMIT: {
-            console.log('Your Google Maps key has exceeded quota.');
+            console.log(intl.get('Your_Google_Maps_key_has_exceeded_quota'));
             break;
           }
           case window.google.maps.GeocoderStatus.UNKNOWN_ERROR:
@@ -422,7 +422,7 @@ class App extends React.Component  {
             break;
           }
           default: {
-            console.log(`${address} not be found.`);
+            console.log(intl.get('address_not_be_found', {address: address}));
             break;
           }
         }

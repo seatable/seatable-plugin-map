@@ -4,7 +4,9 @@ const en = {
   "Table": "Table",
   "View": "View",
   "Address_field": "Address field",
-  "Settings": "Settings"
+  "Settings": "Settings",
+  "Your_Google_Maps_key_has_exceeded_quota": "Your Google Maps key has exceeded quota.",
+  "address_not_be_found": "{address} not be found."
 };
 
 export default en; 
