@@ -6,12 +6,10 @@
     "de": "Karten",
     "en": "Map",
     "es": "Mapas",
-    "es-AR": "Mapas",
-    "es-MX": "Mapas",
     "fr": "Les cartes",
     "it": "mappa",
     "ru": "карта",
-    "zh-CN": "地图"
+    "zh-cn": "地图"
   },
   "description": "Map plugin can display records on the map."
 }

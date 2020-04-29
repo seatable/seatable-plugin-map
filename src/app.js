@@ -4,6 +4,8 @@ import { Modal, ModalBody } from 'reactstrap';
 import LocationSettings from './components/location-settings';
 import Loading from './components/loading';
 import L from 'leaflet';
+import intl from 'react-intl-universal';
+import './locale/index.js';
 
 import './css/common.css';
 import './app.css';
@@ -167,8 +169,7 @@ class App extends React.Component  {
   // plugin_settings: {tableName: '', viewName: '', columnName: ''}
   initPluginSettings = () => {
     let pluginSettings = this.dtable.getPluginSettings(PLUGIN_NAME);
-    let isValidPluginSettings = this.isValidPluginSettings(pluginSettings);
-    if (pluginSettings && isValidPluginSettings) {
+    if (pluginSettings && this.isValidPluginSettings(pluginSettings)) {
       return pluginSettings;
     }
 
@@ -245,7 +246,7 @@ class App extends React.Component  {
       return {id: table._id, name: table.name};
     });
     let active = activeTable ? activeTable.name : tables[0].name;
-    return {type: CONFIG_TYPE.TTABLE, name: 'Table', active: active, settings: tableSettings}
+    return {type: CONFIG_TYPE.TTABLE, name: intl.get('Table'), active: active, settings: tableSettings}
   }
 
   getViewSettings = (currentTable, activeView = null) => {
@@ -254,7 +255,7 @@ class App extends React.Component  {
       return {id: view._id, name: view.name};
     });
     let active = activeView ? activeView.name : views[0].name;
-    return {type: CONFIG_TYPE.VIEW, name: 'View', active: active, settings: viewSettings};
+    return {type: CONFIG_TYPE.VIEW, name: intl.get('View'), active: active, settings: viewSettings};
   }
 
   getColumnSettings = (currentTable, currentView, activeColumn = null) => {
@@ -270,7 +271,7 @@ class App extends React.Component  {
     
     // need options: checkout map column
     let active = activeColumn ? activeColumn.name : columns[0].name;
-    return {type: CONFIG_TYPE.COLUMN, name: 'Address field', active: active, settings: columnSettings};
+    return {type: CONFIG_TYPE.COLUMN, name: intl.get('Address_field'), active: active, settings: columnSettings};
   }
 
   onSelectChange = (type, option) => {
@@ -445,7 +446,7 @@ class App extends React.Component  {
     return (
       <Modal isOpen={this.state.showDialog} toggle={this.toggle} className="plugin-map-dialog" style={{ maxWidth: 1180 }}>
         <div className={'modal-header dtable-map-plugin-title'}>
-          <h5 className="modal-title dtable-map-plugin-name">{'Map plugin'}</h5>
+          <h5 className="modal-title dtable-map-plugin-name">{intl.get('Map_plugin')}</h5>
           <div>
             <button className="close" onClick={this.toggle}><i className={'dtable-font dtable-icon-x'}></i></button>
             <button onClick={this.toggleSettingDialog} className="close"><i className={'dtable-font dtable-icon-settings'}></i></button>
@@ -455,7 +456,7 @@ class App extends React.Component  {
           {!isDataLoaded && <Loading />}
           {(isDataLoaded && !mapKey) && (
             <div className='d-flex justify-content-center mt-9'>
-              <span className="alert-danger">{'You have not configured the map application, please contact the administrator for related configuration.'}</span>
+              <span className="alert-danger">{intl.get('You_have_not_configured_the_map_application_please_contact_the_administrator_for_related_configuration')}</span>
             </div>
           )}
           {(isDataLoaded && mapKey) && (
