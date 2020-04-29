@@ -1,6 +1,17 @@
 {
   "name": "map-en",
   "version": "0.0.1",
-  "display_name": "地图",
-  "description": "地图插件能把记录显示到地图上"
+  "display_name": {
+    "cs": "Mapy",
+    "de": "Karten",
+    "en": "Map",
+    "es": "Mapas",
+    "es-AR": "Mapas",
+    "es-MX": "Mapas",
+    "fr": "Les cartes",
+    "it": "mappa",
+    "ru": "карта",
+    "zh-CN": "地图"
+  },
+  "description": "Map plugin can display records on the map."
 }
