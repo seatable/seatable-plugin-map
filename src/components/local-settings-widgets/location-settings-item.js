@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import Select from './select';
+import DTableSelect from './dtable-select';
 
 const propTypes = {
   configSetting: PropTypes.object,
   onSelectChange: PropTypes.func,
 };
 
-class LocationSettingItem extends Component {
+class LocationSettingsItem extends Component {
 
   createOptions = () => {
     let { configSetting } = this.props;
@@ -25,7 +25,7 @@ class LocationSettingItem extends Component {
 
   onSelectChange = (option) => {
     let { configSetting } = this.props;
-    this.props.onSelectChange(configSetting.type, option);
+    this.props.onSelectChange(option.value, configSetting.type);
   }
 
   render() {
@@ -35,17 +35,16 @@ class LocationSettingItem extends Component {
     return (
       <div className={'dtable-plugin-location-settings-item'}>
         <div className="dtable-plugin-location-settings-title">{name}</div>
-        <Select
-          className="dtable-plugin-location-select"
+        <DTableSelect
           value={this.createOption(activeOption)}
+          onChange={this.onSelectChange}
           options={this.createOptions()}
-          onSelectOption={this.onSelectChange}
         />
       </div>
     );
   }
 }
 
-LocationSettingItem.propTypes = propTypes;
+LocationSettingsItem.propTypes = propTypes;
 
-export default LocationSettingItem;
+export default LocationSettingsItem;

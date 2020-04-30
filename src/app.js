@@ -274,7 +274,7 @@ class App extends React.Component  {
     return {type: CONFIG_TYPE.COLUMN, name: intl.get('Address_field'), active: active, settings: columnSettings};
   }
 
-  onSelectChange = (type, option) => {
+  onSelectChange = (option, type) => {
     let tableName, viewName, columnName, settings;
     let configSettings = this.updateSelectedSettings(type, option);
     switch(type) {

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import LocationSettingItem from './location-setting-item';
+import LocationSettingsItem from './local-settings-widgets/location-settings-item';
 import intl from 'react-intl-universal';
 import '../locale/index.js';
 
@@ -23,7 +23,7 @@ class LocationSettings extends Component {
         <div className="dtable-plugin-location-settings-parameter">
           {configSettings && configSettings.map(configSetting => {
             return (
-              <LocationSettingItem
+              <LocationSettingsItem
                 key={configSetting.type}
                 configSetting={configSetting}
                 onSelectChange={this.onSelectChange}
