@@ -1,0 +1,107 @@
+.plugin-map-dialog .map-plugin-modal-body {
+  padding: 0;
+  min-height: 500px;
+}
+
+.dtable-map-plugin .map-container {
+  height: 500px;
+}
+
+.BMap_Marker img {
+  min-width: fit-content;
+}
+
+.dtable-map-plugin {
+  position: relative;
+}
+
+.dtable-plugin-location-settings {
+  position: absolute;
+  z-index: 1000;
+  height: 100%;
+  width: 300px;
+  background-color: #ffffff;
+  right: 0;
+  top: 0;
+  padding: 0 20px;
+  color: #000000;
+  overflow: auto;
+  box-shadow: 0 10px 10px 3px rgba(0,0,0,.2);
+}
+
+.dtable-plugin-location-settings-header {
+  border-bottom: 1px solid #e4e4e4;
+  padding: 14px 0 14px 0;
+}
+
+.dtable-plugin-location-settings-parameter {
+  font-size: 13px;
+  margin-top: 14px;
+  border-bottom: 1px solid #e4e4e4;
+}
+
+.dtable-plugin-location-settings-parameter:last-child {
+  border-bottom: none;
+}
+
+.dtable-plugin-location-settings-title {
+  margin-bottom: 3px;
+}
+
+.dtable-plugin-location-select {
+  margin-bottom: 5px;
+}
+
+.dtable-plugin-location-settings-item {
+  margin-bottom: 14px;
+}
+
+.plugin-label-name {
+  margin-top: 5px; 
+}
+
+.BMapLabel p {
+  margin-top: 10px;
+}
+
+.plugin-label-arrow {
+  position: absolute;
+  bottom: 3px;
+  transform: translate( -50%, 100%);
+  left: 50%;
+  color: #ffffff;
+  display: inline-block;
+  height: 9px;
+  line-height: 9px;
+}
+
+.map-container .leaflet-bottom.leaflet-right .leaflet-control-attribution.leaflet-control {
+  display: none;
+}
+
+.map-container .leaflet-popup-content-wrapper {
+  border-radius: 3px;
+  box-shadow: rgba(0, 0, 0, 0.15) 1px 2px 1px;
+  display: block;
+  cursor: inherit;
+  border: none;
+  background-color: rgb(255, 255, 255);
+  font: 500 12px arial, sans-serif;
+  z-index: 80;
+  user-select: none;
+}
+
+.map-container .leaflet-popup-content-wrapper .leaflet-popup-content {
+  margin: 0;
+  padding: 3px 10px;
+}
+
+.map-container .leaflet-popup-close-button {
+  display: none;
+}
+
+.map-container .leaflet-popup-content p {
+  margin: 8px 0;
+  font-weight: 600;
+  line-height: 1.5;
+}

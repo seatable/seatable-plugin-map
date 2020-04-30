@@ -1,0 +1,15 @@
+{
+  "name": "map-en",
+  "version": "0.0.1",
+  "display_name": {
+    "cs": "Mapy",
+    "de": "Karten",
+    "en": "Map",
+    "es": "Mapas",
+    "fr": "Les cartes",
+    "it": "mappa",
+    "ru": "карта",
+    "zh-cn": "地图"
+  },
+  "description": "Map plugin can display records on the map."
+}
