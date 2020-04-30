@@ -444,7 +444,6 @@ class App extends React.Component  {
   
   render() {
     const { isDataLoaded,  mapKey, showSettingDialog, configSettings } = this.state;
-    console.log(isDataLoaded, mapKey);
     return (
       <Modal isOpen={this.state.showDialog} toggle={this.toggle} className="plugin-map-dialog" style={{ maxWidth: 1180 }}>
         <div className={'modal-header dtable-map-plugin-title'}>
