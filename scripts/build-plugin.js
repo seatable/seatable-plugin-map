@@ -4,50 +4,51 @@ const path = require('path');
 const moment = require('moment');
 const paths = require('../config/paths');
 
-const moduleFileExtensions = ['js', 'css'];
-
 const config = {
   dir: paths.appBuild + '/static/'
 }
 
 const zip = new JSZip();
 
+// build file
 const jsFilePath = getFullFileName(config.dir + 'js');
-const jsonFilePath = path.join(paths.pluginConfigPath, 'info.json');
+const cssFilePath = getFullFileName(config.dir + 'css');
 
-zip.folder('task').file('main.js', getFileContent(jsFilePath));
-zip.folder('task/media')
+zip.folder('task');
+zip.folder('task/media');
 
-let imgFilePath, cardImagePath, cssFilePath;
-if (isPluginConfigFile(paths.pluginConfigPath, 'icon.png')) {
-  imgFilePath = path.join(paths.pluginConfigPath, 'icon.png'); 
-  zip.file('task/media/icon.png', fs.readFileSync(imgFilePath));
-}
-
-if (isPluginConfigFile(paths.pluginConfigPath, 'crad-image.png')) {
-  cardImagePath = path.join(paths.pluginConfigPath, 'crad-image.png'); 
-  zip.file('task/media/crad-image.png', fs.readFileSync(cardImagePath));
-}
-
-if (getFullFileName(config.dir + 'css')) {
-  cssFilePath = getFullFileName(config.dir + 'css');
+zip.file('task/main.js', getFileContent(jsFilePath));
+if (isDirExist(paths.appBuild + '/static/css') && cssFilePath) {
   zip.file('task/media/main.css', getFileContent(cssFilePath));
 }
 
-const pluginConfigJson = {
-  "last_modified": moment().format(),
-  "has_icon": isPluginConfigFile(paths.pluginConfigPath, 'icon.png'),
-  "has_css": getFullFileName(config.dir + 'css') ? true : false,
-  "has_card_image": isPluginConfigFile(paths.pluginConfigPath, 'crad-image.png')
+if (isFileExist(paths.pluginConfigPath, 'icon.png')) {
+  const iconPath = path.join(paths.pluginConfigPath, 'icon.png');
+  zip.file('task/media/icon.png', fs.readFileSync(iconPath));
 }
 
-const pluginInfoContent = JSON.parse(getFileContent(jsonFilePath));
-let jsonFileContent = Object.assign({}, pluginInfoContent, pluginConfigJson);
+if (isFileExist(paths.pluginConfigPath, 'card_image.png')) {
+  const cardImagePath = path.join(paths.pluginConfigPath, 'card_image.png'); 
+  zip.file('task/media/card_image.png', fs.readFileSync(cardImagePath));
+}
+
+// info file
+const pluginInfoFilePath = path.join(paths.pluginConfigPath, 'info.json');
+const pluginInfoContent = JSON.parse(getFileContent(pluginInfoFilePath));
+
+const pluginInfoContentExpand = {
+  "last_modified": moment().format(),
+  "has_css": (isDirExist(paths.appBuild + '/static/css') && cssFilePath) ? true : false,
+  "has_icon": isFileExist(paths.pluginConfigPath, 'icon.png'),
+  "has_card_image": isFileExist(paths.pluginConfigPath, 'card_image.png')
+}
+
+let jsonFileContent = Object.assign({}, pluginInfoContent, pluginInfoContentExpand);
 
 zip.file('task/info.json', JSON.stringify(jsonFileContent, null, '  '));
 
-zip.generateAsync({type:"nodebuffer"}).then(function(content) { 
-  const zip = `${pluginInfoContent.name}-${pluginInfoContent.version}.zip`;
+zip.generateAsync({type: "nodebuffer"}).then(function(content) { 
+  let zip = `${pluginInfoContent.name}-${pluginInfoContent.version}.zip`;
   fs.writeFile(paths.zipPath + '/' + zip, content, function(err) {
     if (err) {
       console.log(zip + ' failed');
@@ -58,7 +59,11 @@ zip.generateAsync({type:"nodebuffer"}).then(function(content) {
   })
 });
 
-function isPluginConfigFile(overallPath, fileName) {
+function isDirExist(path) {
+  return fs.existsSync(path);
+}
+
+function isFileExist(overallPath, fileName) {
   return fs.readdirSync(overallPath).includes(fileName);
 }
 
@@ -67,6 +72,10 @@ function isPluginConfigFile(overallPath, fileName) {
  * @param  {string} overallPath File parent path 
  */
 function getFullFileName(overallPath) {
+  if (!isDirExist(overallPath)) {
+    return false;
+  }
+  const moduleFileExtensions = ['js', 'css'];
   const fileName = fs.readdirSync(overallPath).find(fileItem => {
     let extension = fileItem.substring(fileItem.lastIndexOf('.') + 1);
     if (moduleFileExtensions.includes(extension)) {
