@@ -15,7 +15,7 @@ L.Icon.Default.imagePath = '//cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.4/image
 
 const PLUGIN_NAME = 'map-en';
 const CONFIG_TYPE = {
-  TTABLE: 'table',
+  TABLE: 'table',
   VIEW: 'view',
   COLUMN: 'column'
 }
@@ -207,7 +207,7 @@ class App extends React.Component  {
 
   updateSelectedSettings = (type, option) => {
     switch(type) {
-      case CONFIG_TYPE.TTABLE: {
+      case CONFIG_TYPE.TABLE: {
         let currentTable = this.dtable.getTableByName(option.name);
         let currentView = this.dtable.getViews(currentTable)[0];
         let tableSettings = this.getTableSettings(currentTable);
@@ -246,7 +246,7 @@ class App extends React.Component  {
       return {id: table._id, name: table.name};
     });
     let active = activeTable ? activeTable.name : tables[0].name;
-    return {type: CONFIG_TYPE.TTABLE, name: intl.get('Table'), active: active, settings: tableSettings}
+    return {type: CONFIG_TYPE.TABLE, name: intl.get('Table'), active: active, settings: tableSettings}
   }
 
   getViewSettings = (currentTable, activeView = null) => {
@@ -278,7 +278,7 @@ class App extends React.Component  {
     let tableName, viewName, columnName, settings;
     let configSettings = this.updateSelectedSettings(type, option);
     switch(type) {
-      case CONFIG_TYPE.TTABLE: {
+      case CONFIG_TYPE.TABLE: {
         tableName = option.name;
         viewName = configSettings[1].settings[0].name;
         columnName = configSettings[2].settings[0].name;
