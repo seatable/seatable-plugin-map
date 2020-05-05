@@ -83,7 +83,6 @@ class App extends React.Component  {
         isDataLoaded: true
       }, () => {
         this.getLocations();
-        this.loadMapScript();
       });
     } else {
       let map_key = window.dtable.dtableGoogleMapKey;
@@ -93,8 +92,6 @@ class App extends React.Component  {
       this.setState({
         mapKey: map_key,
         isDataLoaded: true
-      }, () => {
-        this.loadMapScript();
       });
     }
     this.unsubscribeLocalDtableChanged = this.dtable.subscribe('local-dtable-changed', () => { this.onDTableChanged(); });
@@ -462,7 +459,9 @@ class App extends React.Component  {
           )}
           {(isDataLoaded && mapKey) && (
             <div className="App dtable-map-plugin">
-              <div id="map-container" className="map-container"></div>
+              <div id="map-container" className="map-container">
+                {this.loadMapScript()}
+              </div>
               {showSettingDialog && (
                 <LocationSettings 
                   configSettings={configSettings} 
