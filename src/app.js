@@ -33,7 +33,6 @@ class App extends React.Component  {
       columnName: null,
       showSettingDialog: false,
       isDataLoaded: false,
-      mapKey: '',
       configSettings: null,
     };
     this.map = null;
@@ -70,27 +69,23 @@ class App extends React.Component  {
 
   async initPluginDTableData() {
     if (window.app !== undefined) {
-      let map_key = window.dtable.dtableGoogleMapKey;
       this.dtable.initInBrowser(window.app.dtableStore);
       const { tableName, viewName, columnName } = this.initPluginSettings();
       const configSettings = this.initSelectedSettings(tableName, viewName, columnName);
+      const locations = this.getLocations({tableName, viewName, columnName});
       this.setState({
-        tableName: tableName,
-        viewName: viewName,
-        columnName: columnName,
-        configSettings: configSettings,
-        mapKey: map_key,
-        isDataLoaded: true
-      }, () => {
-        this.getLocations();
+        tableName,
+        viewName,
+        columnName,
+        configSettings,
+        isDataLoaded: true,
+        locations
       });
     } else {
-      let map_key = window.dtable.dtableGoogleMapKey;
       await this.dtable.init(window.dtablePluginConfig);
       await this.dtable.syncWithServer();
       this.dtable.subscribe('dtable-connect', () => { this.onDTableConnect(); });
       this.setState({
-        mapKey: map_key,
         isDataLoaded: true
       });
     }
@@ -101,36 +96,35 @@ class App extends React.Component  {
   onDTableConnect() {
     const { tableName, viewName, columnName } = this.initPluginSettings();
     const configSettings = this.initSelectedSettings(tableName, viewName, columnName);
+    const locations = this.getLocations({tableName, viewName, columnName});
     this.setState({
-      tableName: tableName,
-      viewName: viewName,
-      columnName: columnName,
-      configSettings: configSettings,
-    }, () => {
-      this.getLocations();
+      tableName,
+      viewName,
+      columnName,
+      configSettings,
+      locations
     });
   }
 
   onDTableChanged() {
-    this.getLocations();
+    let { tableName, viewName, columnName } = this.state;
+    const locations = this.getLocations({tableName, viewName, columnName});
+    this.setState({locations});
   }
 
-  getLocations() {
+  getLocations({ tableName, viewName, columnName }) {
     let locations = [];
-    let { tableName, viewName, columnName } = this.state;
     let currentTable = this.dtable.getTableByName(tableName);
     let currentView = this.dtable.getViewByName(currentTable, viewName);
     let currentColumn = this.dtable.getColumnByName(currentTable, columnName);
     // current view has none column
     if (!currentColumn) {
-      this.setState({locations: locations});
-      return;
+      return locations;
     }
     
     // table's rows length is 0
     if (currentTable.rows.length === 0) {
-      this.setState({locations: locations});
-      return;
+      return locations;
     }
 
     let locationNameKey = currentTable.columns[0].key;
@@ -160,7 +154,7 @@ class App extends React.Component  {
         }
       });
     }
-    this.setState({locations: locations});
+    return locations;
   }
 
   // plugin_settings: {tableName: '', viewName: '', columnName: ''}
@@ -300,10 +294,8 @@ class App extends React.Component  {
       }
     }
     this.dtable.updatePluginSettings(PLUGIN_NAME, settings);
-    this.setState({...settings, configSettings}, () => {
-      this.getLocations();
-    });
-    
+    let locations = this.getLocations(settings);
+    this.setState({...settings, configSettings, locations});
   }
 
   toggle = () => {
@@ -311,27 +303,28 @@ class App extends React.Component  {
     this.setState({showDialog: false});
   }
 
-  loadMapScript() {
-    if (!this.state.mapKey) {
+  loadMapScript(locations) {
+    if (!window.dtable.dtableGoogleMapKey) {
       return;
     }
     if (!window.google) {
-      let AUTH_KEY = this.state.mapKey;
+      let AUTH_KEY = window.dtable.dtableGoogleMapKey;
       var script = document.createElement('script');
 
       // register global render function of map
       script.type = 'text/javascript';
       script.src = `https://maps.googleapis.com/maps/api/js?key=${AUTH_KEY}&libraries=places`;
       document.body.appendChild(script);
-      this.renderMap(this.state.locations)
+      setTimeout(() => {
+        this.renderMap(locations);
+      }, 1000);
     }
   }
   
   renderMap = (locations) => {
     if (window.google && window.google.maps) {
       if (!this.map) {
-        const LAUGUAGE = 'en';
-        let lang = (window.dtable && window.dtable.lang) ? window.dtable.lang : LAUGUAGE;
+        let lang = (window.dtable && window.dtable.lang) ? window.dtable.lang : 'en';
         let url = `http://mt0.google.cn/vt/lyrs=m@160000000&hl=${lang}&gl=${lang}&src=app&y={y}&x={x}&z={z}&s=Ga`;
         if (!document.getElementById('map-container')) return;
         this.map = L.map('map-container').setView([20, 123], 5);
@@ -440,7 +433,8 @@ class App extends React.Component  {
   }
   
   render() {
-    const { isDataLoaded,  mapKey, showSettingDialog, configSettings } = this.state;
+    const { isDataLoaded, showSettingDialog, configSettings, locations } = this.state;
+    const mapKey = window.dtable.dtableGoogleMapKey;
     return (
       <Modal isOpen={this.state.showDialog} toggle={this.toggle} className="plugin-map-dialog" style={{ maxWidth: 1180 }}>
         <div className={'modal-header dtable-map-plugin-title'}>
@@ -460,7 +454,7 @@ class App extends React.Component  {
           {(isDataLoaded && mapKey) && (
             <div className="App dtable-map-plugin">
               <div id="map-container" className="map-container">
-                {this.loadMapScript()}
+                {this.loadMapScript(locations)}
               </div>
               {showSettingDialog && (
                 <LocationSettings 
