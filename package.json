@@ -1,24 +1,28 @@
 {
-  "name": "seatable-plugin-template",
+  "name": "seatable-plugin-map",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "dtable-sdk": "0.0.16",
+    "dtable-sdk": "0.0.25",
+    "dtable-web-api": "^1.0.19",
     "jszip": "^3.2.2",
+    "leaflet": "^1.6.0",
     "moment": "^2.24.0",
     "react": "^16.12.0",
-    "react-app-polyfill": "^1.0.6",
-    "react-dev-utils": "^10.1.0",
+    "react-app-polyfill": "^1.0.5",
+    "react-dev-utils": "^10.0.0",
     "react-dom": "^16.12.0",
-    "react-intl-universal": "^2.2.2",
-    "reactstrap": "^8.4.1"
+    "react-i18next": "^11.3.5",
+    "react-intl-universal": "^2.2.5",
+    "react-select": "^3.1.0",
+    "reactstrap": "^8.0.0"
   },
   "scripts": {
     "clean": "rm -rf plugin-zip && mkdir plugin-zip",
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
     "test": "node scripts/test.js",
-    "build-plugin": "export GENERATE_SOURCEMAP=false && npm run clean && npm run build && node scripts/build-plugin.js"
+    "build-plugin": "npm run build && npm run clean && node scripts/build-plugin.js"
   },
   "browserslist": {
     "production": [
@@ -83,6 +87,7 @@
     ]
   },
   "devDependencies": {
+    "@babel/core": "7.7.4",
     "@svgr/webpack": "4.3.3",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.4.0",
