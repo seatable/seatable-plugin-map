@@ -366,7 +366,9 @@ class App extends React.Component  {
       } else {
         address = location.location;
       }
-      this.addMarker(address, locationName)
+      if (address) {
+        this.addMarker(address, locationName)
+      }
     });
   }
 
