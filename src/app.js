@@ -42,7 +42,10 @@ class App extends React.Component  {
 
   componentDidMount() {
     this.dtable = new DTable();
-    this.initPluginDTableData(); 
+    this.loadMapScript();
+    setTimeout(() => {
+      this.initPluginDTableData();
+    }, 100);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -50,10 +53,7 @@ class App extends React.Component  {
   }
 
   componentDidUpdate(preProps, preState) {
-    if (this.state.showSettingDialog !== preState.showSettingDialog) {
-      return;
-    }
-
+    if (this.state.showSettingDialog !== preState.showSettingDialog) return;
     if (window.google && this.state.showDialog) {
       // render locations after the container rendered in the dom tree
       requestAnimationFrame(() => {
@@ -80,6 +80,8 @@ class App extends React.Component  {
         configSettings,
         isDataLoaded: true,
         locations
+      }, () => {
+        this.renderMap(locations);
       });
     } else {
       await this.dtable.init(window.dtablePluginConfig);
@@ -91,6 +93,37 @@ class App extends React.Component  {
     }
     this.unsubscribeLocalDtableChanged = this.dtable.subscribe('local-dtable-changed', () => { this.onDTableChanged(); });
     this.unsubscribeRemoteDtableChanged = this.dtable.subscribe('remote-dtable-changed', () => { this.onDTableChanged(); });
+  }
+
+  async loadMapScript() {
+    let AUTH_KEY = window.dtable.dtableGoogleMapKey;
+    if (!AUTH_KEY) {
+      return;
+    }
+    if (!window.google) {
+      var script = document.createElement('script');
+      // register global render function of map
+      script.type = 'text/javascript';
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${AUTH_KEY}&libraries=places`;
+      document.body.appendChild(script);
+      this.loadLeafletScript();
+    }
+  }
+
+  loadLeafletScript() {
+    let lang = (window.dtable && window.dtable.lang) ? window.dtable.lang : 'en';
+    let url = `http://mt0.google.cn/vt/lyrs=m@160000000&hl=${lang}&gl=${lang}&src=app&y={y}&x={x}&z={z}&s=Ga`;
+    if (!document.getElementById('map-container')) return;
+    this.map = L.map('map-container').setView([20, 123], 5);
+    L.tileLayer(url, {
+      maxZoom: 18,
+      minZoom: 2
+    }).addTo(this.map);
+    // Map showing current location area
+    this.map.locate({
+      setView: true,
+      zoom: 2
+    });
   }
 
   onDTableConnect() {
@@ -302,43 +335,12 @@ class App extends React.Component  {
     this.map = null;
     this.setState({showDialog: false});
   }
-
-  loadMapScript(locations) {
-    if (!window.dtable.dtableGoogleMapKey) {
-      return;
-    }
-    if (!window.google) {
-      let AUTH_KEY = window.dtable.dtableGoogleMapKey;
-      var script = document.createElement('script');
-
-      // register global render function of map
-      script.type = 'text/javascript';
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${AUTH_KEY}&libraries=places`;
-      document.body.appendChild(script);
-      setTimeout(() => {
-        this.renderMap(locations);
-      }, 1000);
-    }
-  }
   
   renderMap = (locations) => {
     if (window.google && window.google.maps) {
       if (!this.map) {
-        let lang = (window.dtable && window.dtable.lang) ? window.dtable.lang : 'en';
-        let url = `http://mt0.google.cn/vt/lyrs=m@160000000&hl=${lang}&gl=${lang}&src=app&y={y}&x={x}&z={z}&s=Ga`;
-        if (!document.getElementById('map-container')) return;
-        this.map = L.map('map-container').setView([20, 123], 5);
-        L.tileLayer(url, {
-          maxZoom: 18,
-          minZoom: 2
-        }).addTo(this.map);
+        this.loadLeafletScript();
       }
-
-      // Map showing current location area
-      this.map.locate({
-        setView: true,
-        zoom: 2
-      });
       this.renderLocations(locations);
     }
   }
@@ -456,7 +458,7 @@ class App extends React.Component  {
           {(isDataLoaded && mapKey) && (
             <div className="App dtable-map-plugin">
               <div id="map-container" className="map-container">
-                {this.loadMapScript(locations)}
+                {/* {this.renderMap(locations)} */}
               </div>
               {showSettingDialog && (
                 <LocationSettings 
