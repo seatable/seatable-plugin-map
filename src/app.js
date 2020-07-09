@@ -437,7 +437,7 @@ class App extends React.Component  {
   }
   
   render() {
-    const { isDataLoaded, showSettingDialog, configSettings, locations } = this.state;
+    const { isDataLoaded, showSettingDialog, configSettings } = this.state;
     const mapKey = window.dtable.dtableGoogleMapKey;
     return (
       <Modal isOpen={this.state.showDialog} toggle={this.toggle} className="plugin-map-dialog" style={{ maxWidth: 1180 }}>
@@ -457,9 +457,7 @@ class App extends React.Component  {
           )}
           {(isDataLoaded && mapKey) && (
             <div className="App dtable-map-plugin">
-              <div id="map-container" className="map-container">
-                {/* {this.renderMap(locations)} */}
-              </div>
+              <div id="map-container" className="map-container"></div>
               {showSettingDialog && (
                 <LocationSettings 
                   configSettings={configSettings} 
