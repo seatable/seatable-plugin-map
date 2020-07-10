@@ -25,6 +25,9 @@ class LocationSettingsItem extends Component {
 
   onSelectChange = (option) => {
     let { configSetting } = this.props;
+    let { active, settings } = configSetting;
+    let activeOption = settings.find(setting => setting.name === active);
+    if (activeOption.name === option.value.name) return;
     this.props.onSelectChange(option.value, configSetting.type);
   }
 

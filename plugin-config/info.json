@@ -12,9 +12,9 @@
     "zh-cn": "地图"
   },
   "description": {
-    "de": "Das Karten-Plugin kann Datensätze auf der Karte anzeigen.",
-    "en": "Map plugin can display records on the map.",
-    "fr": "Le plugin de carte peut afficher des enregistrements sur la carte.",
-    "zh-cn": "地图插件能把记录显示到地图上。"
+    "de": "Das Karten-Plugin kann Datensätze auf der Karte anzeigen",
+    "en": "Map plugin can display records on the map",
+    "fr": "Le plugin de carte peut afficher des enregistrements sur la carte",
+    "zh-cn": "地图插件能把记录显示到地图上"
   }
 }
