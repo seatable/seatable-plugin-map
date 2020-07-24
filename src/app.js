@@ -334,6 +334,7 @@ class App extends React.Component  {
   toggle = () => {
     this.map = null;
     this.setState({showDialog: false});
+    window.app.onClosePlugin();
   }
   
   renderMap = (locations) => {
