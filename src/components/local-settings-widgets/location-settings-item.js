@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import DTableSelect from './dtable-select';
+import Select from '../select';
 
 const propTypes = {
   configSetting: PropTypes.object,
@@ -27,8 +27,8 @@ class LocationSettingsItem extends Component {
     let { configSetting } = this.props;
     let { active, settings } = configSetting;
     let activeOption = settings.find(setting => setting.name === active);
-    if (activeOption.name === option.value.name) return;
-    this.props.onSelectChange(option.value, configSetting.type);
+    if (activeOption.name === option.name) return;
+    this.props.onSelectChange(option, configSetting.type);
   }
 
   render() {
@@ -38,9 +38,10 @@ class LocationSettingsItem extends Component {
     return (
       <div className={'dtable-plugin-location-settings-item'}>
         <div className="dtable-plugin-location-settings-title">{name}</div>
-        <DTableSelect
+        <Select
+          className="dtable-plugin-location-select"
           value={this.createOption(activeOption)}
-          onChange={this.onSelectChange}
+          onSelectOption={this.onSelectChange}
           options={this.createOptions()}
         />
       </div>

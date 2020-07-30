@@ -462,7 +462,8 @@ class App extends React.Component  {
               {showSettingDialog && (
                 <LocationSettings 
                   configSettings={configSettings} 
-                  onSelectChange={this.onSelectChange} 
+                  onSelectChange={this.onSelectChange}
+                  toggleSettingDialog={this.toggleSettingDialog}
                 /> 
               )}
             </div>

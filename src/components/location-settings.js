@@ -7,6 +7,7 @@ import '../locale/index.js';
 const propTypes = {
   configSettings: PropTypes.array,
   onSelectChange: PropTypes.func,
+  toggleSettingDialog: PropTypes.func,
 };
 
 class LocationSettings extends Component {
@@ -16,10 +17,15 @@ class LocationSettings extends Component {
   }
 
   render() {
-    const { configSettings } = this.props;
+    const { configSettings, toggleSettingDialog } = this.props;
     return (
       <div className="dtable-plugin-location-settings">
-        <div className="dtable-plugin-location-settings-header">{intl.get('Settings')}</div>
+        <div className="dtable-plugin-location-settings-header">
+          <span>{intl.get('Settings')}</span>
+          <button onClick={toggleSettingDialog} className="close">
+            <i className="dtable-font dtable-icon-x"></i>
+          </button>
+        </div>
         <div className="dtable-plugin-location-settings-parameter">
           {configSettings && configSettings.map(configSetting => {
             return (
