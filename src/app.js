@@ -82,6 +82,7 @@ class App extends React.Component  {
         isDataLoaded: true,
         locations
       }, () => {
+        this.loadLeafletScript();
         this.renderMap(locations);
       });
     } else {
@@ -486,7 +487,6 @@ class App extends React.Component  {
           {(isDataLoaded && mapKey) && (
             <div className="App dtable-map-plugin">
               <div id="map-container" className="map-container"></div>
-              
             </div>
           )}
           {showSettingDialog && (
