@@ -34,6 +34,7 @@ class App extends React.Component  {
       showSettingDialog: false,
       isDataLoaded: false,
       configSettings: null,
+      isFullScreen: false
     };
     this.map = null;
     this.geocoder = null;
@@ -96,7 +97,7 @@ class App extends React.Component  {
   }
 
   async loadMapScript() {
-    let AUTH_KEY = window.dtable.dtableGoogleMapKey;
+    let AUTH_KEY = 'AIzaSyDJW4jsPlNKgv6jFm3B5Edp5ywgdqLWdmc';
     if (!AUTH_KEY) {
       return;
     }
@@ -436,20 +437,46 @@ class App extends React.Component  {
   toggleSettingDialog = () => {
     this.setState({showSettingDialog: !this.state.showSettingDialog});
   }
+
+  toggleFullScreen = () => {
+    this.setState({
+      isFullScreen: !this.state.isFullScreen
+    });
+  }
+
+  getDialogStyle = () => {
+    const { isFullScreen } = this.state;
+    if (isFullScreen) {
+      return {
+        maxWidth: '100%',
+        height: '100%',
+        margin: 0
+      } 
+    } else {
+      return {
+        maxWidth: 1180
+      }
+    }
+  }
   
   render() {
-    const { isDataLoaded, showSettingDialog, configSettings } = this.state;
-    const mapKey = window.dtable.dtableGoogleMapKey;
+    const { isDataLoaded, showSettingDialog, configSettings, isFullScreen } = this.state;
+    const mapKey = 'AIzaSyDJW4jsPlNKgv6jFm3B5Edp5ywgdqLWdmc';
     return (
-      <Modal isOpen={this.state.showDialog} toggle={this.toggle} className="plugin-map-dialog" style={{ maxWidth: 1180 }}>
+      <Modal isOpen={this.state.showDialog} toggle={this.toggle} className="plugin-map-dialog" style={this.getDialogStyle()}>
         <div className={'modal-header dtable-map-plugin-title'}>
           <h5 className="modal-title dtable-map-plugin-name">{intl.get('Map_plugin')}</h5>
           <div>
             <button className="close" onClick={this.toggle}><i className={'dtable-font dtable-icon-x'}></i></button>
             <button onClick={this.toggleSettingDialog} className="close"><i className={'dtable-font dtable-icon-settings'}></i></button>
+            <button className={"close " + (isFullScreen ? 'active-full-screen' : '')} onClick={this.toggleFullScreen}>
+              <span className={(isFullScreen ? 'full-screen-active ' : '') + 'icon-container'}>
+                <i className={'dtable-font dtable-icon-full-screen'}></i>
+              </span>
+            </button>
           </div>
         </div>
-        <ModalBody className="map-plugin-modal-body">
+        <ModalBody className={"map-plugin-modal-body " + (isFullScreen ? 'map-plugin-modal-body-full-screen' : '')}>
           {!isDataLoaded && <Loading />}
           {(isDataLoaded && !mapKey) && (
             <div className='d-flex justify-content-center mt-9'>
@@ -459,13 +486,15 @@ class App extends React.Component  {
           {(isDataLoaded && mapKey) && (
             <div className="App dtable-map-plugin">
               <div id="map-container" className="map-container"></div>
-              {showSettingDialog && (
-                <LocationSettings 
-                  configSettings={configSettings} 
-                  onSelectChange={this.onSelectChange} 
-                /> 
-              )}
+              
             </div>
+          )}
+          {showSettingDialog && (
+            <LocationSettings 
+              configSettings={configSettings} 
+              onSelectChange={this.onSelectChange} 
+              onHideMapSettings={this.toggleSettingDialog}
+            /> 
           )}
         </ModalBody>
       </Modal>

@@ -16,10 +16,13 @@ class LocationSettings extends Component {
   }
 
   render() {
-    const { configSettings } = this.props;
+    const { configSettings, onHideMapSettings } = this.props;
     return (
       <div className="dtable-plugin-location-settings">
-        <div className="dtable-plugin-location-settings-header">{intl.get('Settings')}</div>
+        <div className="dtable-plugin-location-settings-header">
+          <div className="setting-header-title">{intl.get('Settings')}</div>
+          <div className="dtable-font dtable-icon-x btn-close" onClick={onHideMapSettings}></div>
+        </div>
         <div className="dtable-plugin-location-settings-parameter">
           {configSettings && configSettings.map(configSetting => {
             return (
