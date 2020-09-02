@@ -97,7 +97,7 @@ class App extends React.Component  {
   }
 
   async loadMapScript() {
-    let AUTH_KEY = 'AIzaSyDJW4jsPlNKgv6jFm3B5Edp5ywgdqLWdmc';
+    let AUTH_KEY = window.dtable.dtableGoogleMapKey;
     if (!AUTH_KEY) {
       return;
     }
@@ -461,7 +461,7 @@ class App extends React.Component  {
   
   render() {
     const { isDataLoaded, showSettingDialog, configSettings, isFullScreen } = this.state;
-    const mapKey = 'AIzaSyDJW4jsPlNKgv6jFm3B5Edp5ywgdqLWdmc';
+    const mapKey = window.dtable.dtableGoogleMapKey;
     return (
       <Modal isOpen={this.state.showDialog} toggle={this.toggle} className="plugin-map-dialog" style={this.getDialogStyle()}>
         <div className={'modal-header dtable-map-plugin-title'}>
