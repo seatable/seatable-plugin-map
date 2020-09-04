@@ -68,6 +68,7 @@ class DTableSelect extends React.Component {
         menuShouldBlockScroll={true}
         menuShouldScrollIntoView
         menuPortalTarget={this.getMenuPortalTarget()}
+        captureMenuScroll={false}
       />
     ); 
   }
