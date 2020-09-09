@@ -1,8 +1,8 @@
-.plugin-map-dialog .map-plugin-modal-body-full-screen, .plugin-map-dialog .modal-content {
+.plugin-map-dialog.plugin-map-en .map-plugin-modal-body-full-screen, .plugin-map-dialog.plugin-map-en .modal-content {
   height: 100%;
 }
 
-.plugin-map-dialog .map-plugin-modal-body {
+.plugin-map-dialog.plugin-map-en .map-plugin-modal-body {
   padding: 0;
   min-height: 500px;
 }
@@ -11,20 +11,16 @@
   height: 500px;
 }
 
-.plugin-map-dialog .dtable-map-plugin {
+.plugin-map-dialog.plugin-map-en .dtable-map-plugin {
   position: relative;
   height: 100%;
 }
 
-.plugin-map-dialog .map-plugin-modal-body-full-screen .map-container {
+.plugin-map-dialog.plugin-map-en .map-plugin-modal-body-full-screen .map-container {
   height: calc(100% - 0px);
 }
 
-.BMap_Marker img {
-  min-width: fit-content;
-}
-
-.dtable-map-plugin {
+.plugin-map-dialog.plugin-map-en {
   position: relative;
 }
 

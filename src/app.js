@@ -1,11 +1,14 @@
 import React from 'react';
 import DTable from 'dtable-sdk';
 import { Modal, ModalBody } from 'reactstrap';
+import html2canvas from 'html2canvas';
+import L from 'leaflet';
 import LocationSettings from './components/location-settings';
 import Loading from './components/loading';
-import L from 'leaflet';
 import intl from 'react-intl-universal';
 import './locale/index.js';
+import  * as image  from './image/index';
+import COLORS from './marker-color';
 
 import './css/common.css';
 import './app.css';
@@ -17,10 +20,11 @@ const PLUGIN_NAME = 'map-en';
 const CONFIG_TYPE = {
   TABLE: 'table',
   VIEW: 'view',
-  COLUMN: 'column'
-}
+  COLUMN: 'column',
+  MARK_COLUMN: 'mark_column'
+};
 
-class App extends React.Component  {
+class App extends React.Component {
 
   constructor(props) {
     super(props);
@@ -31,6 +35,7 @@ class App extends React.Component  {
       tableName: null,
       viewName: null,
       columnName: null,
+      markColumnName: null,
       showSettingDialog: false,
       isDataLoaded: false,
       configSettings: null,
@@ -71,13 +76,14 @@ class App extends React.Component  {
   async initPluginDTableData() {
     if (window.app !== undefined) {
       this.dtable.initInBrowser(window.app.dtableStore);
-      const { tableName, viewName, columnName } = this.initPluginSettings();
-      const configSettings = this.initSelectedSettings(tableName, viewName, columnName);
-      const locations = this.getLocations({tableName, viewName, columnName});
+      const { tableName, viewName, columnName, markColumnName } = this.initPluginSettings();
+      const configSettings = this.initSelectedSettings(tableName, viewName, columnName, markColumnName);
+      const locations = this.getLocations({tableName, viewName, columnName, markColumnName});
       this.setState({
         tableName,
         viewName,
         columnName,
+        markColumnName,
         configSettings,
         isDataLoaded: true,
         locations
@@ -98,7 +104,7 @@ class App extends React.Component  {
   }
 
   async loadMapScript() {
-    let AUTH_KEY = window.dtable.dtableGoogleMapKey;
+    let AUTH_KEY = 'AIzaSyDJW4jsPlNKgv6jFm3B5Edp5ywgdqLWdmc';
     if (!AUTH_KEY) {
       return;
     }
@@ -129,29 +135,31 @@ class App extends React.Component  {
   }
 
   onDTableConnect() {
-    const { tableName, viewName, columnName } = this.initPluginSettings();
-    const configSettings = this.initSelectedSettings(tableName, viewName, columnName);
-    const locations = this.getLocations({tableName, viewName, columnName});
+    const { tableName, viewName, columnName, markColumnName } = this.initPluginSettings();
+    const configSettings = this.initSelectedSettings(tableName, viewName, columnName, markColumnName);
+    const locations = this.getLocations({tableName, viewName, columnName, markColumnName});
     this.setState({
       tableName,
       viewName,
       columnName,
+      markColumnName,
       configSettings,
       locations
     });
   }
 
   onDTableChanged() {
-    let { tableName, viewName, columnName } = this.state;
-    const locations = this.getLocations({tableName, viewName, columnName});
+    let { tableName, viewName, columnName, markColumnName } = this.state;
+    const locations = this.getLocations({tableName, viewName, columnName, markColumnName});
     this.setState({locations});
   }
 
-  getLocations({ tableName, viewName, columnName }) {
+  getLocations({ tableName, viewName, columnName, markColumnName }) {
     let locations = [];
     let currentTable = this.dtable.getTableByName(tableName);
     let currentView = this.dtable.getViewByName(currentTable, viewName);
     let currentColumn = this.dtable.getColumnByName(currentTable, columnName);
+    const currentMarkColumn = this.dtable.getColumnByName(currentTable, markColumnName);
     // current view has none column
     if (!currentColumn) {
       return locations;
@@ -168,12 +176,16 @@ class App extends React.Component  {
     if (currentView.rows.length === 0) { // table rows
       const rows = currentTable.rows;
       rows.forEach(row => {
+        let color = '';
+        if (currentMarkColumn) {
+          color = this.getMarkColor(currentMarkColumn, row);
+        }
         if (locationColumnType === 'geolocation') {
           const value = row[locationValueKey] || {};
-          locations.push({name: row[locationNameKey] || '', type: locationColumnType, ...value});
+          locations.push({name: row[locationNameKey] || '', color, type: locationColumnType, ...value});
         } else {
           const value = row[locationValueKey] || '';
-          locations.push({name: row[locationNameKey] || '', type: locationColumnType, location: value});
+          locations.push({name: row[locationNameKey] || '', color, type: locationColumnType, location: value});
         }
       });
     } else {  // view rows
@@ -205,7 +217,7 @@ class App extends React.Component  {
     let columns = this.dtable.getShownColumns(activeTable, activeView);
 
     // need option, get the column type is map
-    pluginSettings = {tableName: activeTable.name, viewName: activeView.name, columnName: columns[0].name};
+    pluginSettings = {tableName: activeTable.name, viewName: activeView.name, columnName: columns[0].name, markColumnName: null};
     this.dtable.updatePluginSettings(PLUGIN_NAME, pluginSettings);
     return pluginSettings;
   }
@@ -221,14 +233,17 @@ class App extends React.Component  {
     return true;
   }
 
-  initSelectedSettings = (tableName, viewName, columnName) => {
+  initSelectedSettings = (tableName, viewName, columnName, markColumnName) => {
     let activeTable = this.dtable.getTableByName(tableName);
     let tableSettings = this.getTableSettings(activeTable);
     let activeView = this.dtable.getViewByName(activeTable, viewName);
     let viewSettings = this.getViewSettings(activeTable, activeView);
     let activeColumn = this.dtable.getColumnByName(activeTable, columnName);
     let columnSettings = this.getColumnSettings(activeTable, activeView, activeColumn);
-    return [tableSettings, viewSettings, columnSettings];
+
+    let activeMarkColumn = this.dtable.getColumnByName(activeTable, markColumnName);
+    let markColumnSettings = this.getMarkColumnSetting(activeTable, activeView, activeMarkColumn);
+    return [tableSettings, viewSettings, columnSettings, markColumnSettings];
   }
 
   updateSelectedSettings = (type, option) => {
@@ -258,6 +273,16 @@ class App extends React.Component  {
         let currentColumn = this.dtable.getColumnByName(currentTable, option.name);
         let columnSettings = this.getColumnSettings(currentTable, currentView, currentColumn);
         configSettings.splice(2, 1, columnSettings);
+        return configSettings;
+      }
+      case CONFIG_TYPE.MARK_COLUMN: {
+        let { tableName, viewName, configSettings } = this.state;
+        let currentTable = this.dtable.getTableByName(tableName);
+        let currentView = this.dtable.getViewByName(currentTable, viewName);
+        let currentColumn = this.dtable.getColumnByName(currentTable, option.name);
+        let columnSettings = this.getMarkColumnSetting(currentTable, currentView, currentColumn);
+        console.log(configSettings)
+        configSettings.splice(3, 1, columnSettings);
         return configSettings;
       }
       default: {
@@ -300,6 +325,24 @@ class App extends React.Component  {
     return {type: CONFIG_TYPE.COLUMN, name: intl.get('Address_field'), active: active, settings: columnSettings};
   }
 
+  getMarkColumnSetting = (currentTable, currentView, activeColumn = null) => {
+    let columns = this.dtable.getShownColumns(currentTable, currentView);
+    // n\ed options: checkout map column
+    columns = columns.filter(column => {
+      return column.type === 'single-select';
+    });
+    
+    let columnSettings = columns.map(column => {
+      return {id: column.key, name: column.name};
+    });
+
+    columnSettings.unshift({id: '', name: 'Impractical label column'});
+
+    // need options: checkout map column
+    let active = activeColumn ? activeColumn.name : columnSettings[0].name;
+    return {type: 'mark_column', name: 'Color field', active: active, settings: columnSettings};
+  }
+
   onSelectChange = (option, type) => {
     let tableName, viewName, columnName, settings;
     let configSettings = this.updateSelectedSettings(type, option);
@@ -322,6 +365,12 @@ class App extends React.Component  {
         columnName = option.name;
         let plugin_settings = this.dtable.getPluginSettings(PLUGIN_NAME);
         settings = Object.assign({}, plugin_settings, {columnName});
+        break;
+      }
+      case CONFIG_TYPE.MARK_COLUMN: {
+        columnName = option.name;
+        let plugin_settings = this.dtable.getPluginSettings(PLUGIN_NAME);
+        settings = Object.assign({}, plugin_settings, {markColumnName: columnName});
         break;
       }
       default: {
@@ -372,12 +421,25 @@ class App extends React.Component  {
         address = location.location;
       }
       if (address) {
-        this.addMarker(address, locationName)
+        this.addMarker(address, locationName, location.color)
       }
     });
   }
 
-  addMarker = (address, locationName, time = 0) => {
+  getMarkColor = (markColumn, row) => {
+    const key = markColumn.key;
+    if (!markColumn.data) return '';
+    const options = markColumn.data.options;
+    if (!options) return '';
+    
+    const currentOption = options.find((option) => {
+      return option.id === row[key];
+    });
+    if (!currentOption) return ''
+    return currentOption.color;
+  }
+
+  addMarker = (address, locationName, color, time = 0) => {
     // The query is too fast and will not be found
     setTimeout(() => {
       this.geocoder.geocode({'address': address}, (points, status) => {
@@ -387,7 +449,21 @@ class App extends React.Component  {
             let lng = points[0].geometry.location.lng();
             if (!this.markers.find(marker => marker._latlng.lat === lat && marker._latlng.lng === lng)) {
               let describe = `<p>${address}</p><p>${locationName}</p>`;
-              let marker = new L.Marker([lat, lng]);
+              let myIcon = L.icon({
+                iconUrl: [image['marker']],
+                iconSize: [25, 41],
+              });
+              if (color) {
+                const colorIndex = COLORS.findIndex((item) => color === item.COLOR);
+                if (colorIndex) {
+                  myIcon = L.icon({
+                    iconUrl: [image['image' + (colorIndex + 1)]],
+                    iconSize: [25, 41],
+                  });
+                }
+              }
+              let marker = new L.Marker([lat, lng], {icon: myIcon});
+
               marker.bindPopup(describe);
               marker.on('mouseover', () => {
                 marker.openPopup();
@@ -411,7 +487,7 @@ class App extends React.Component  {
           case window.google.maps.GeocoderStatus.ERROR: {
             if (time < 5) {
               time += 1;
-              this.addMarker(address, locationName, time);
+              this.addMarker(address, locationName, color, time);
             }
             break;
           }
@@ -461,12 +537,45 @@ class App extends React.Component  {
       }
     }
   }
+
+  convertCanvasToImage = (canvas) => {
+    const src = canvas.toDataURL("image/png", 1);
+    const link = document.querySelector('.download-link');
+    link.href = src;
+    link.download = 'map.png';
+    link.click();
+    document.querySelector('.map-capture').remove();
+  }
+
+  onCapture = () => {
+    html2canvas(document.querySelector("#map-container"), {
+      allowTaint: true,
+      taintTest: true,
+      useCORS: true,
+      ignoreElements: (element) => {
+        if (element.className === 'leaflet-top leaflet-left') {
+          return true;
+        }
+      }
+    }).then(canvas => {
+      const captureContainer = document.createElement('div');
+      captureContainer.className = 'map-capture';
+      const downLoadLink = document.createElement('a');
+      downLoadLink.className = 'download-link';
+      captureContainer.appendChild(downLoadLink);
+      captureContainer.appendChild(canvas);
+      document.querySelector('.dtable-map-plugin').appendChild(captureContainer);
+
+      document.querySelector('.map-capture').appendChild(canvas);
+      this.convertCanvasToImage(canvas);
+    });
+  }
   
   render() {
     const { isDataLoaded, showSettingDialog, configSettings, isFullScreen } = this.state;
-    const mapKey = window.dtable.dtableGoogleMapKey;
+    const mapKey = 'AIzaSyDJW4jsPlNKgv6jFm3B5Edp5ywgdqLWdmc';
     return (
-      <Modal isOpen={this.state.showDialog} toggle={this.toggle} className="plugin-map-dialog" style={this.getDialogStyle()}>
+      <Modal isOpen={this.state.showDialog} toggle={this.toggle} className="plugin-map-dialog plugin-map-en" style={this.getDialogStyle()}>
         <div className={'modal-header dtable-map-plugin-title'}>
           <h5 className="modal-title dtable-map-plugin-name">{intl.get('Map_plugin')}</h5>
           <div>
@@ -477,6 +586,7 @@ class App extends React.Component  {
                 <i className={'dtable-font dtable-icon-full-screen'}></i>
               </span>
             </button>
+            <button className="close" onClick={this.onCapture}><i className={'dtable-font dtable-icon-download'}></i></button> 
           </div>
         </div>
         <ModalBody className={"map-plugin-modal-body " + (isFullScreen ? 'map-plugin-modal-body-full-screen' : '')}>
