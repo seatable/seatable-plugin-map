@@ -88,7 +88,6 @@ class App extends React.Component {
         isDataLoaded: true,
         locations
       }, () => {
-        this.loadLeafletScript();
         this.renderMap(locations);
       });
     } else {
@@ -103,7 +102,7 @@ class App extends React.Component {
     this.unsubscribeRemoteDtableChanged = this.dtable.subscribe('remote-dtable-changed', () => { this.onDTableChanged(); });
   }
 
-  async loadMapScript() {
+  loadMapScript = () => {
     let AUTH_KEY = window.dtable.dtableGoogleMapKey;
     if (!AUTH_KEY) {
       return;
@@ -192,12 +191,16 @@ class App extends React.Component {
       const rows = currentView.rows;
       rows.forEach(rowId => {
         let row = currentTable['id_row_map'][rowId];
+        let color = '';
+        if (currentMarkColumn) {
+          color = this.getMarkColor(currentMarkColumn, row);
+        }
         if (locationColumnType === 'geolocation') {
           const value = row[locationValueKey] || {};
-          locations.push({name: row[locationNameKey] || '', type: locationColumnType, ...value});
+          locations.push({name: row[locationNameKey] || '', color, type: locationColumnType, ...value});
         } else {
           const value = row[locationValueKey] || '';
-          locations.push({name: row[locationNameKey] || '', type: locationColumnType, location: value});
+          locations.push({name: row[locationNameKey] || '', color, type: locationColumnType, location: value});
         }
       });
     }
