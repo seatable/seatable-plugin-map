@@ -104,7 +104,7 @@ class App extends React.Component {
   }
 
   async loadMapScript() {
-    let AUTH_KEY = 'AIzaSyDJW4jsPlNKgv6jFm3B5Edp5ywgdqLWdmc';
+    let AUTH_KEY = window.dtable.dtableGoogleMapKey;
     if (!AUTH_KEY) {
       return;
     }
@@ -254,7 +254,8 @@ class App extends React.Component {
         let tableSettings = this.getTableSettings(currentTable);
         let viewSettings = this.getViewSettings(currentTable);
         let columnSettings = this.getColumnSettings(currentTable, currentView);
-        let configSettings = [tableSettings, viewSettings, columnSettings];
+        let markColumnSettings = this.getMarkColumnSetting(currentTable, currentView);
+        let configSettings = [tableSettings, viewSettings, columnSettings, markColumnSettings];
         return configSettings;
       }
       case CONFIG_TYPE.VIEW: {
@@ -263,7 +264,8 @@ class App extends React.Component {
         let currentView = this.dtable.getViewByName(currentTable, option.name);
         let viewSettings = this.getViewSettings(currentTable, currentView);
         let columnSettings = this.getColumnSettings(currentTable, currentView);
-        configSettings.splice(1, 2, viewSettings, columnSettings);
+        let markColumnSettings = this.getMarkColumnSetting(currentTable, currentView);
+        configSettings.splice(1, 3, viewSettings, columnSettings, markColumnSettings);
         return configSettings;
       }
       case CONFIG_TYPE.COLUMN: {
@@ -281,7 +283,6 @@ class App extends React.Component {
         let currentView = this.dtable.getViewByName(currentTable, viewName);
         let currentColumn = this.dtable.getColumnByName(currentTable, option.name);
         let columnSettings = this.getMarkColumnSetting(currentTable, currentView, currentColumn);
-        console.log(configSettings)
         configSettings.splice(3, 1, columnSettings);
         return configSettings;
       }
@@ -573,7 +574,7 @@ class App extends React.Component {
   
   render() {
     const { isDataLoaded, showSettingDialog, configSettings, isFullScreen } = this.state;
-    const mapKey = 'AIzaSyDJW4jsPlNKgv6jFm3B5Edp5ywgdqLWdmc';
+    const mapKey = window.dtable.dtableGoogleMapKey;
     return (
       <Modal isOpen={this.state.showDialog} toggle={this.toggle} className="plugin-map-dialog plugin-map-en" style={this.getDialogStyle()}>
         <div className={'modal-header dtable-map-plugin-title'}>
