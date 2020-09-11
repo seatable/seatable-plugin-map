@@ -36,7 +36,7 @@ class LocationSettingsItem extends Component {
     let { name, active, settings } = configSetting;
     let activeOption = settings.find(setting => setting.name === active);
     return (
-      <div className={'dtable-plugin-location-settings-item'}>
+      <div className="dtable-plugin-location-settings-item">
         <div className="dtable-plugin-location-settings-title">{name}</div>
         <DTableSelect
           value={this.createOption(activeOption)}
