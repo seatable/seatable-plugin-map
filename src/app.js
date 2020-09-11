@@ -88,7 +88,13 @@ class App extends React.Component {
         isDataLoaded: true,
         locations
       }, () => {
-        this.renderMap(locations);
+        this.loadLeafletScript();
+        this.timer = setInterval(() => {
+          if (window.google) {
+            clearInterval(this.timer);
+            this.renderMap(locations);
+          }
+        }, 100)
       });
     } else {
       await this.dtable.init(window.dtablePluginConfig);
@@ -96,13 +102,15 @@ class App extends React.Component {
       this.dtable.subscribe('dtable-connect', () => { this.onDTableConnect(); });
       this.setState({
         isDataLoaded: true
+      }, () => {
+        this.loadLeafletScript();
       });
     }
     this.unsubscribeLocalDtableChanged = this.dtable.subscribe('local-dtable-changed', () => { this.onDTableChanged(); });
     this.unsubscribeRemoteDtableChanged = this.dtable.subscribe('remote-dtable-changed', () => { this.onDTableChanged(); });
   }
 
-  loadMapScript = () => {
+  async loadMapScript () {
     let AUTH_KEY = window.dtable.dtableGoogleMapKey;
     if (!AUTH_KEY) {
       return;
