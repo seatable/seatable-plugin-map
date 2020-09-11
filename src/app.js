@@ -116,7 +116,7 @@ class App extends React.Component  {
     let lang = (window.dtable && window.dtable.lang) ? window.dtable.lang : 'en';
     let url = `http://mt0.google.cn/vt/lyrs=m@160000000&hl=${lang}&gl=${lang}&src=app&y={y}&x={x}&z={z}&s=Ga`;
     if (!document.getElementById('map-container')) return;
-    this.map = L.map('map-container').setView([20, 123], 5);
+    this.map = L.map('map-container').setView([20, 123], 5).invalidateSize();
     L.tileLayer(url, {
       maxZoom: 18,
       minZoom: 2
@@ -442,6 +442,8 @@ class App extends React.Component  {
   toggleFullScreen = () => {
     this.setState({
       isFullScreen: !this.state.isFullScreen
+    }, () => {
+      this.map.invalidateSize();
     });
   }
 
