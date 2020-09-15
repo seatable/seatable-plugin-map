@@ -1,0 +1,8 @@
+[main]
+host = https://www.transifex.com
+
+[seatable_plugins.map-en]
+file_filter = public/locale/<lang>/map-en.json
+source_file = public/locale/en/map-en.json
+source_lang = en_US
+type = KEYVALUEJSON

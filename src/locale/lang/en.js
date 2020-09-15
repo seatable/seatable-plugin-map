@@ -9,4 +9,4 @@ const en = {
   "address_not_be_found": "{address} not be found."
 };
 
-export default en; 
+export default en;
