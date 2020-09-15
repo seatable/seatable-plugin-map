@@ -23,6 +23,9 @@
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
     "test": "node scripts/test.js",
+    "translate": "node scripts/translate.js",
+    "push-translate": "tx push -s",
+    "pull-translate": "tx pull -a && npm run translate",
     "build-plugin": "npm run build && npm run clean && node scripts/build-plugin.js"
   },
   "browserslist": {
