@@ -1,8 +1,26 @@
-.plugin-map-dialog.plugin-map-en .map-plugin-modal-body-full-screen, .plugin-map-dialog.plugin-map-en .modal-content {
+.plugin-map-dialog-en .map-plugin-modal-body-full-screen,
+.plugin-map-dialog-en .modal-content {
   height: 100%;
 }
 
-.plugin-map-dialog.plugin-map-en .map-plugin-modal-body {
+.plugin-map-dialog-en .dtable-map-plugin-title .modal-title {
+  line-height: 23px;
+  display: flex;
+  height: 23px;
+}
+
+.dtable-map-plugin-title .dtable-map-plugin-name {
+  line-height: 23px;
+  font-weight: 600;
+}
+
+.dtable-map-plugin-title .dtable-map-plugin-logo {
+  width: 23px;
+  height: 23px;
+  margin-right: 8px;
+} 
+
+.plugin-map-dialog-en .map-plugin-modal-body {
   padding: 0;
   min-height: 500px;
 }
@@ -11,16 +29,16 @@
   height: 500px;
 }
 
-.plugin-map-dialog.plugin-map-en .dtable-map-plugin {
+.plugin-map-dialog-en .dtable-map-plugin {
   position: relative;
   height: 100%;
 }
 
-.plugin-map-dialog.plugin-map-en .map-plugin-modal-body-full-screen .map-container {
+.plugin-map-dialog-en .map-plugin-modal-body-full-screen .map-container {
   height: calc(100% - 0px);
 }
 
-.plugin-map-dialog.plugin-map-en {
+.plugin-map-dialog-en {
   position: relative;
 }
 
@@ -32,17 +50,22 @@
   background-color: #ffffff;
   right: 0;
   top: 0;
-  padding: 0 20px;
   color: #000000;
-  overflow: auto;
   box-shadow: 0 10px 10px 3px rgba(0,0,0,.2);
+  display: flex;
+  flex-direction: column;
 }
 
 .dtable-plugin-location-settings-header {
-  border-bottom: 1px solid #e4e4e4;
-  padding: 10px 0;
+  padding: 0 20px;
+}
+
+.dtable-plugin-location-settings-header .location-settings-header-container {
   display: flex;
-  justify-content: space-between
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px 0;
+  border-bottom: 1px solid #e4e4e4;
 }
 
 .dtable-plugin-location-settings-header .setting-header-title {
@@ -67,8 +90,10 @@
 
 .dtable-plugin-location-settings-parameter {
   font-size: 13px;
-  margin-top: 14px;
   border-bottom: 1px solid #e4e4e4;
+  height: 100%;
+  overflow: auto;
+  padding: 14px 20px;
 }
 
 .dtable-plugin-location-settings-parameter:last-child {
