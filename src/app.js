@@ -350,7 +350,7 @@ class App extends React.Component {
       return {id: column.key, name: column.name};
     });
 
-    columnSettings.unshift({id: '', name: intl.get('Not_used')});
+    columnSettings.unshift({id: 'not_used', name: intl.get('Not_used')});
 
     // need options: checkout map column
     let active = activeColumn ? activeColumn.name : columnSettings[0].name;

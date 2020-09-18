@@ -17,6 +17,13 @@ class LocationSettingsItem extends Component {
   }
 
   createOption = (option) => {
+    if (option.id === 'not_used') {
+      return ({
+        label: (<span className='select-option-name null-option-name'>{option.name}</span>),
+        value: { name: option.name },
+        style: { color: 'rgba(0, 0, 0, .25)' }
+      });
+    }
     return ({
       label: (<span className='select-option-name'>{option.name}</span>),
       value: { name: option.name },
