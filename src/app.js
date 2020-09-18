@@ -10,6 +10,8 @@ import './locale/index.js';
 import  * as image  from './image/index';
 import COLORS from './marker-color';
 
+import logo from './image/map.png';
+
 import './css/common.css';
 import './app.css';
 import 'leaflet/dist/leaflet.css';
@@ -587,9 +589,12 @@ class App extends React.Component {
     const { isDataLoaded, showSettingDialog, configSettings, isFullScreen } = this.state;
     const mapKey = window.dtable.dtableGoogleMapKey;
     return (
-      <Modal isOpen={this.state.showDialog} toggle={this.toggle} className="plugin-map-dialog plugin-map-en" style={this.getDialogStyle()}>
-        <div className={'modal-header dtable-map-plugin-title'}>
-          <h5 className="modal-title dtable-map-plugin-name">{intl.get('Map_plugin')}</h5>
+      <Modal isOpen={this.state.showDialog} toggle={this.toggle} className="plugin-map-dialog-en" style={this.getDialogStyle()}>
+        <div className="modal-header dtable-map-plugin-title">
+          <div className="modal-title">
+            <img className="dtable-map-plugin-logo" src={logo} alt=""/>
+            <span className="dtable-map-plugin-name">{intl.get('Map_plugin')}</span>
+          </div>
           <div>
             <button className="close" onClick={this.toggle}><i className={'dtable-font dtable-icon-x'}></i></button>
             <button onClick={this.toggleSettingDialog} className="close"><i className={'dtable-font dtable-icon-settings'}></i></button>

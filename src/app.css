@@ -1,30 +1,48 @@
-.plugin-map-dialog.plugin-map-en .map-plugin-modal-body-full-screen, .plugin-map-dialog.plugin-map-en .modal-content {
+.plugin-map-dialog-en .map-plugin-modal-body-full-screen,
+.plugin-map-dialog-en .modal-content {
   height: 100%;
 }
 
-.plugin-map-dialog.plugin-map-en .map-plugin-modal-body {
+.plugin-map-dialog-en .dtable-map-plugin-title .modal-title {
+  line-height: 23px;
+  display: flex;
+  height: 23px;
+}
+
+.plugin-map-dialog-en .dtable-map-plugin-title .dtable-map-plugin-name {
+  line-height: 23px;
+  font-weight: 600;
+}
+
+.plugin-map-dialog-en .dtable-map-plugin-title .dtable-map-plugin-logo {
+  width: 23px;
+  height: 23px;
+  margin-right: 8px;
+} 
+
+.plugin-map-dialog-en .map-plugin-modal-body {
   padding: 0;
   min-height: 500px;
 }
 
-.dtable-map-plugin .map-container {
+.plugin-map-dialog-en .dtable-map-plugin .map-container {
   height: 500px;
 }
 
-.plugin-map-dialog.plugin-map-en .dtable-map-plugin {
+.plugin-map-dialog-en .dtable-map-plugin {
   position: relative;
   height: 100%;
 }
 
-.plugin-map-dialog.plugin-map-en .map-plugin-modal-body-full-screen .map-container {
+.plugin-map-dialog-en .map-plugin-modal-body-full-screen .map-container {
   height: calc(100% - 0px);
 }
 
-.plugin-map-dialog.plugin-map-en {
+.plugin-map-dialog-en {
   position: relative;
 }
 
-.dtable-plugin-location-settings {
+.plugin-map-dialog-en .dtable-plugin-location-settings {
   position: absolute;
   z-index: 1000;
   height: 100%;
@@ -32,26 +50,31 @@
   background-color: #ffffff;
   right: 0;
   top: 0;
-  padding: 0 20px;
   color: #000000;
-  overflow: auto;
   box-shadow: 0 10px 10px 3px rgba(0,0,0,.2);
-}
-
-.dtable-plugin-location-settings-header {
-  border-bottom: 1px solid #e4e4e4;
-  padding: 10px 0;
   display: flex;
-  justify-content: space-between
+  flex-direction: column;
 }
 
-.dtable-plugin-location-settings-header .setting-header-title {
+.plugin-map-dialog-en .dtable-plugin-location-settings-header {
+  padding: 0 20px;
+}
+
+.plugin-map-dialog-en .dtable-plugin-location-settings-header .location-settings-header-container {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px 0;
+  border-bottom: 1px solid #e4e4e4;
+}
+
+.plugin-map-dialog-en .dtable-plugin-location-settings-header .setting-header-title {
   flex: 1 1;
   font-size: 1rem;
   font-weight: 700;
 }
 
-.dtable-plugin-location-settings-header .btn-close {
+.plugin-map-dialog-en .dtable-plugin-location-settings-header .btn-close {
   height: 24px;
   width: 24px;
   text-align: center;
@@ -61,49 +84,32 @@
   font-weight: 700;
 }
 
-.dtable-plugin-location-settings-header .btn-close:hover {
+.plugin-map-dialog-en .dtable-plugin-location-settings-header .btn-close:hover {
   opacity: .8;
 }
 
-.dtable-plugin-location-settings-parameter {
+.plugin-map-dialog-en .dtable-plugin-location-settings-parameter {
   font-size: 13px;
-  margin-top: 14px;
   border-bottom: 1px solid #e4e4e4;
+  height: 100%;
+  overflow: auto;
+  padding: 14px 20px;
 }
 
-.dtable-plugin-location-settings-parameter:last-child {
+.plugin-map-dialog-en .dtable-plugin-location-settings-parameter:last-child {
   border-bottom: none;
 }
 
-.dtable-plugin-location-settings-title {
+.plugin-map-dialog-en .dtable-plugin-location-settings-title {
   margin-bottom: 3px;
 }
 
-.dtable-plugin-location-select {
-  margin-bottom: 5px;
-}
-
-.dtable-plugin-location-settings-item {
+.plugin-map-dialog-en .dtable-plugin-location-settings-item {
   margin-bottom: 14px;
 }
 
-.plugin-label-name {
+.plugin-map-dialog-en .plugin-label-name {
   margin-top: 5px; 
-}
-
-.BMapLabel p {
-  margin-top: 10px;
-}
-
-.plugin-label-arrow {
-  position: absolute;
-  bottom: 3px;
-  transform: translate( -50%, 100%);
-  left: 50%;
-  color: #ffffff;
-  display: inline-block;
-  height: 9px;
-  line-height: 9px;
 }
 
 .map-container .leaflet-bottom.leaflet-right .leaflet-control-attribution.leaflet-control {
