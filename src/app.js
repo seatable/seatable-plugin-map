@@ -350,11 +350,11 @@ class App extends React.Component {
       return {id: column.key, name: column.name};
     });
 
-    columnSettings.unshift({id: '', name: 'Impractical label column'});
+    columnSettings.unshift({id: '', name: intl.get('Not_used')});
 
     // need options: checkout map column
     let active = activeColumn ? activeColumn.name : columnSettings[0].name;
-    return {type: 'mark_column', name: 'Color field', active: active, settings: columnSettings};
+    return {type: 'mark_column', name: intl.get('Color_field'), active: active, settings: columnSettings};
   }
 
   onSelectChange = (option, type) => {

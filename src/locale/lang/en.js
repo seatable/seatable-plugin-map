@@ -6,7 +6,9 @@ const en = {
   "Address_field": "Address field",
   "Settings": "Settings",
   "Your_Google_Maps_key_has_exceeded_quota": "Your Google Maps key has exceeded quota.",
-  "address_not_be_found": "{address} not be found."
+  "address_not_be_found": "{address} not be found.",
+  "Not_used": "Not used",
+  "Color_field": "Color filed"
 };
 
 export default en;
