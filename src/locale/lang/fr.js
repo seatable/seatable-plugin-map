@@ -7,8 +7,8 @@ const fr = {
   "Settings": "Paramètres",
   "Your_Google_Maps_key_has_exceeded_quota": "Votre clé Google Maps a épuisé son quota.",
   "address_not_be_found": "{address} ne peut pas être trouvé.",
-  "Not_used": "Not used",
-  "Color_field": "Color filed"
+  "Not_used": "Ne pas utilisé",
+  "Color_field": "Couleur"
 };
 
 export default fr;
