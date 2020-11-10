@@ -101,6 +101,7 @@ class App extends React.Component {
     } else {
       await this.dtable.init(window.dtablePluginConfig);
       await this.dtable.syncWithServer();
+      window.app = {};
       this.dtable.subscribe('dtable-connect', () => { this.onDTableConnect(); });
       this.setState({
         isDataLoaded: true
@@ -131,16 +132,18 @@ class App extends React.Component {
     let lang = (window.dtable && window.dtable.lang) ? window.dtable.lang : 'en';
     let url = `http://mt0.google.cn/vt/lyrs=m@160000000&hl=${lang}&gl=${lang}&src=app&y={y}&x={x}&z={z}&s=Ga`;
     if (!document.getElementById('map-container')) return;
-    this.map = L.map('map-container').setView([20, 123], 5).invalidateSize();
+    let center = localStorage.getItem('dtable-map-plugin-center');
+    let position = [20, 123], zoom = 5;
+    if (center) {
+      center = JSON.parse(center)
+      position = [center.position.lat, center.position.lng];
+      zoom = center.zoom;
+    }
+    this.map = L.map('map-container').setView(position, zoom).invalidateSize();
     L.tileLayer(url, {
       maxZoom: 18,
       minZoom: 2
     }).addTo(this.map);
-    // Map showing current location area
-    this.map.locate({
-      setView: true,
-      zoom: 2
-    });
   }
 
   onDTableConnect() {
@@ -397,9 +400,16 @@ class App extends React.Component {
   }
 
   toggle = () => {
+    const center = {};
+    const position = this.map.getCenter();
+    center.position = {lat: position.lat, lng: position.lng};
+    center.zoom = this.map.getZoom();
+    window.localStorage.setItem('dtable-map-plugin-center', JSON.stringify(center));
     this.map = null;
     this.setState({showDialog: false});
-    window.app.onClosePlugin();
+    if (window.app.onClosePlugin) {
+      window.app.onClosePlugin();
+    }
   }
   
   renderMap = (locations) => {
