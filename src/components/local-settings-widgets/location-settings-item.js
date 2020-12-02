@@ -17,10 +17,20 @@ class LocationSettingsItem extends Component {
   }
 
   createOption = (option) => {
-    if (option.id === 'not_used') {
+    if (!option || !option.id) {
+      const name = !option ? this.props.configSetting.active : option.name;
       return ({
-        label: (<span className='select-option-name null-option-name'>{option.name}</span>),
-        value: { name: option.name },
+        label: (<span className='select-option-name null-select-option-name'>{name}</span>),
+        value: name,
+        style: {color: 'rgba(0, 0, 0, .25)'}
+      });
+    }
+
+    if (!option || option.id === 'not_used') {
+      const name = !option ? this.props.configSetting.active : option.name;
+      return ({
+        label: (<span className='select-option-name null-option-name'>{name}</span>),
+        value: { name },
         style: { color: 'rgba(0, 0, 0, .25)' }
       });
     }
@@ -32,9 +42,8 @@ class LocationSettingsItem extends Component {
 
   onSelectChange = (option) => {
     let { configSetting } = this.props;
-    let { active, settings } = configSetting;
-    let activeOption = settings.find(setting => setting.name === active);
-    if (activeOption.name === option.value.name) return;
+    let { active } = configSetting;
+    if (active === option.value.name) return;
     this.props.onSelectChange(option.value, configSetting.type);
   }
 
