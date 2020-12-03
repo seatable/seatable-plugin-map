@@ -9,6 +9,7 @@ import intl from 'react-intl-universal';
 import './locale/index.js';
 import  * as image  from './image/index';
 import COLORS from './marker-color';
+import { getnerateSettingsByConfig } from './utils/generate-settings-config';
 
 import logo from './image/map.png';
 
@@ -55,7 +56,12 @@ class App extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    this.setState({showDialog: nextProps.showDialog});
+    if (nextProps.showDialog) {
+      this.onDTableConnect();
+    }
+    this.setState({
+      showDialog: nextProps.showDialog
+    });
   }
 
   componentDidUpdate(preProps, preState) {
@@ -232,7 +238,7 @@ class App extends React.Component {
     let columns = this.dtable.getShownColumns(activeTable, activeView);
 
     columns = columns.filter((column) => {
-      return COLUMN_TYPES.includes(column.name);
+      return COLUMN_TYPES.includes(column.type);
     });
 
     // need option, get the column type is map
@@ -373,48 +379,19 @@ class App extends React.Component {
   }
 
   onSelectChange = (option, type) => {
-    let tableName, viewName, columnName, settings;
     let configSettings = this.updateSelectedSettings(type, option);
-    switch(type) {
-      case CONFIG_TYPE.TABLE: {
-        tableName = option.name;
-        viewName = configSettings[1].settings[0].name;
-        columnName = configSettings[2].settings[0].name;
-        settings = { tableName, viewName, columnName };
-        break;
-      }
-      case CONFIG_TYPE.VIEW: {
-        viewName = option.name;
-        columnName = configSettings[2].settings[0].name;
-        let plugin_settings = this.dtable.getPluginSettings(PLUGIN_NAME);
-        settings = Object.assign({}, plugin_settings, {viewName, columnName});
-        break;
-      }
-      case CONFIG_TYPE.COLUMN: {
-        columnName = option.name;
-        let plugin_settings = this.dtable.getPluginSettings(PLUGIN_NAME);
-        settings = Object.assign({}, plugin_settings, {columnName});
-        break;
-      }
-      case CONFIG_TYPE.MARK_COLUMN: {
-        columnName = option.name;
-        let plugin_settings = this.dtable.getPluginSettings(PLUGIN_NAME);
-        settings = Object.assign({}, plugin_settings, {markColumnName: columnName});
-        break;
-      }
-      default: {
-        return;
-      }
-    }
+    let settings = getnerateSettingsByConfig(configSettings);
     this.dtable.updatePluginSettings(PLUGIN_NAME, settings);
   }
 
   toggle = () => {
     const center = {};
-    const position = this.map.getCenter();
-    center.position = {lat: position.lat, lng: position.lng};
-    center.zoom = this.map.getZoom();
-    window.localStorage.setItem('dtable-map-plugin-center', JSON.stringify(center));
+    if (this.map) {
+      const position = this.map.getCenter();
+      center.position = {lat: position.lat, lng: position.lng};
+      center.zoom = this.map.getZoom();
+      window.localStorage.setItem('dtable-map-plugin-center', JSON.stringify(center));
+    }
     this.map = null;
     this.setState({showDialog: false});
     if (window.app.onClosePlugin) {
