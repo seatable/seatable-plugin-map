@@ -5,7 +5,7 @@ const SETTING_MIRROR = {
   mark_column: 'markColumnName',
 }
 
-export const getnerateSettingsByConfig = (configSettings) => {
+export const generateSettingsByConfig = (configSettings) => {
   const settings = {};
   configSettings.forEach((config) => {
     settings[SETTING_MIRROR[config.type]] = config.active;

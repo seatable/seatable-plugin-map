@@ -9,7 +9,7 @@ import intl from 'react-intl-universal';
 import './locale/index.js';
 import  * as image  from './image/index';
 import COLORS from './marker-color';
-import { getnerateSettingsByConfig } from './utils/generate-settings-config';
+import { generateSettingsByConfig } from './utils/generate-settings-config';
 
 import logo from './image/map.png';
 
@@ -380,7 +380,7 @@ class App extends React.Component {
 
   onSelectChange = (option, type) => {
     let configSettings = this.updateSelectedSettings(type, option);
-    let settings = getnerateSettingsByConfig(configSettings);
+    let settings = generateSettingsByConfig(configSettings);
     this.dtable.updatePluginSettings(PLUGIN_NAME, settings);
   }
 
