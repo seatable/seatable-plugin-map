@@ -466,38 +466,60 @@ class App extends React.Component {
     fetch(url).then((res) => {
       return res.json();
     }).then((data) => {
-      if (data.status !== 'OK') return;
-      let lat = data.results[0].geometry.location.lat;
-      let lng = data.results[0].geometry.location.lng;
-      if (!this.markers.find(marker => marker._latlng.lat === lat && marker._latlng.lng === lng)) {
-        let describe = `<p>${address}</p><p>${locationName}</p>`;
-        let myIcon = L.icon({
-          iconUrl: [image['marker']],
-          iconSize: [25, 41],
-        });
-        if (color) {
-          const colorIndex = COLORS.findIndex((item) => color === item.COLOR);
-          if (colorIndex) {
-            myIcon = L.icon({
-              iconUrl: [image['image' + (colorIndex + 1)]],
+      const status = data.status;
+      switch(status) {
+        case window.google.maps.GeocoderStatus.OK: {
+          let lat = data.results[0].geometry.location.lat;
+          let lng = data.results[0].geometry.location.lng;
+          if (!this.markers.find(marker => marker._latlng.lat === lat && marker._latlng.lng === lng)) {
+            let describe = `<p>${address}</p><p>${locationName}</p>`;
+            let myIcon = L.icon({
+              iconUrl: [image['marker']],
               iconSize: [25, 41],
             });
+            if (color) {
+              const colorIndex = COLORS.findIndex((item) => color === item.COLOR);
+              if (colorIndex) {
+                myIcon = L.icon({
+                  iconUrl: [image['image' + (colorIndex + 1)]],
+                  iconSize: [25, 41],
+                });
+              }
+            }
+            let marker = new L.Marker([lat, lng], { icon: myIcon });
+            marker.bindPopup(describe);
+            marker.on('mouseover', () => {
+              marker.openPopup();
+            })
+            marker.on('mouseout', () => {
+              marker.closePopup();
+            })
+            marker.on('click', () => {
+              return;
+            })
+            this.markers.push(marker);
+            this.map.addLayer(marker);
           }
+          break;
         }
-        let marker = new L.Marker([lat, lng], { icon: myIcon });
-        marker.bindPopup(describe);
-        marker.on('mouseover', () => {
-          marker.openPopup();
-        })
-        marker.on('mouseout', () => {
-          marker.closePopup();
-        })
-        marker.on('click', () => {
-          return;
-        })
-        this.markers.push(marker);
-        this.map.addLayer(marker);
-      }
+        case window.google.maps.GeocoderStatus.OVER_QUERY_LIMIT: {
+          console.log(intl.get('Your_Google_Maps_key_has_exceeded_quota'));
+          break;
+        }
+        case window.google.maps.GeocoderStatus.UNKNOWN_ERROR:
+        case window.google.maps.GeocoderStatus.ERROR: {
+          this.addMarker(address, locationName, color);
+          break;
+        }
+        case window.google.maps.GeocoderStatus.INVALID_REQUEST:
+        case window.google.maps.GeocoderStatus.REQUEST_DENIED: {
+          break;
+        }
+        default: {
+          console.log(intl.get('address_not_be_found', {address: address}));
+          break;
+        }
+      }  
     });
   }
 
