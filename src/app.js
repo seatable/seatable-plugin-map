@@ -425,8 +425,7 @@ class App extends React.Component {
     }
 
     const locationGroups = [];
-    
-    for(let i = 0; i < locations.length; i+=50){
+    for(let i = 0; i < locations.length; i += 50){
       locationGroups.push(locations.slice(i, i+50));
     }
 
