@@ -423,7 +423,7 @@ class App extends React.Component {
     if (!this.geocoder) {
       this.geocoder = new window.google.maps.Geocoder();
     }
-    locations.forEach((location) => {
+    locations.forEach((location, index) => {
       let address;
       let locationName = location.name;
       if (location.type === 'geolocation') {
@@ -432,7 +432,7 @@ class App extends React.Component {
         address = location.location;
       }
       if (address) {
-        this.addMarker(address, locationName, location.color)
+        this.addMarker(address, locationName, location.color, index*1000);
       }
     });
   }
@@ -512,7 +512,7 @@ class App extends React.Component {
           }
         }
       });
-    }, 1000);
+    }, time);
   }
 
   formatGeolocationValue = (value) => {
