@@ -432,7 +432,7 @@ class App extends React.Component {
         address = location.location;
       }
       if (address) {
-        this.addMarker(address, locationName, location.color, index*1000);
+        this.addMarker(address, locationName, location.color, index * 1000);
       }
     });
   }
