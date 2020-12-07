@@ -446,7 +446,6 @@ class App extends React.Component {
         case window.google.maps.GeocoderStatus.OK: {
           let lat = points[0].geometry.location.lat();
           let lng = points[0].geometry.location.lng();
-          console.log(location.color, address);
           this.addMarker(lat, lng, location.color, name, address);
           this.geocoding(locations, 1, ++index);
           break;
@@ -454,12 +453,13 @@ class App extends React.Component {
         case window.google.maps.GeocoderStatus.OVER_QUERY_LIMIT: {
           this.timer =  setTimeout(() => {
             if (resolutionTimes < 4) {
-              console.log(resolutionTimes);
               this.geocoding(locations, ++resolutionTimes, index);
             } else {
               console.log(intl.get('Your_Google_Maps_key_has_exceeded_quota'));
               this.geocoding(locations, 1, ++index);
             }
+            clearTimeout(this.timer);
+            this.timer = null;
           }, resolutionTimes * 1000);
           break;
         }
@@ -467,6 +467,8 @@ class App extends React.Component {
         case window.google.maps.GeocoderStatus.ERROR: {
           this.timer = setTimeout(() => {
             this.geocoding(locations, 0, index);
+            clearTimeout(this.timer);
+            this.timer = null;
           }, 1000);
           break;
         }
