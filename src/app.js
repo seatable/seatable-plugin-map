@@ -28,6 +28,7 @@ const CONFIG_TYPE = {
 };
 
 const COLUMN_TYPES = ['geolocation', 'text'];
+const LOCATION_GROUP_LENGTH = 25;
 
 class App extends React.Component {
 
@@ -425,8 +426,8 @@ class App extends React.Component {
     }
 
     const locationGroups = [];
-    for(let i = 0; i < locations.length; i += 50){
-      locationGroups.push(locations.slice(i, i + 50));
+    for(let i = 0; i < locations.length; i += LOCATION_GROUP_LENGTH){
+      locationGroups.push(locations.slice(i, i + LOCATION_GROUP_LENGTH));
     }
 
     locationGroups.forEach((locationGroup, index) => {
