@@ -28,7 +28,6 @@ const CONFIG_TYPE = {
 };
 
 const COLUMN_TYPES = ['geolocation', 'text'];
-const LOCATION_GROUP_LENGTH = 25;
 
 class App extends React.Component {
 
@@ -46,6 +45,7 @@ class App extends React.Component {
     this.map = null;
     this.geocoder = null;
     this.markers = [];
+    this.timer = null;
   }
 
   componentDidMount() {
@@ -421,30 +421,64 @@ class App extends React.Component {
   renderLocations = (locations) => {
     // clear previous layers
     this.removeLayers();
+    if (this.timer) {
+      clearTimeout(this.timer);
+      this.timer = null;
+    }
     if (!this.geocoder) {
       this.geocoder = new window.google.maps.Geocoder();
     }
+    this.geocoding(locations, 1, 0);
+  }
 
-    const locationGroups = [];
-    for(let i = 0; i < locations.length; i += LOCATION_GROUP_LENGTH){
-      locationGroups.push(locations.slice(i, i + LOCATION_GROUP_LENGTH));
+  geocoding = (locations, resolutionTimes, index) => {
+    const location = locations[index];
+    if (!location) return;
+    let address;
+    let name = location.name;
+    if (location.type === 'geolocation') {
+      address = this.formatGeolocationValue(location);
+    } else {
+      address = location.location;
     }
-
-    locationGroups.forEach((locationGroup, index) => {
-      setTimeout(() => {
-        locationGroup.forEach((location, index) => {
-          let address;
-          let locationName = location.name;
-          if (location.type === 'geolocation') {
-            address = this.formatGeolocationValue(location);
-          } else {
-            address = location.location;
-          }
-          if (address) {
-            this.addMarker(address, locationName, location.color, index);
-          }
-        });
-      }, 1000 * index);
+    this.geocoder.geocode({ 'address': address }, (points, status) => {
+      switch (status) {
+        case window.google.maps.GeocoderStatus.OK: {
+          let lat = points[0].geometry.location.lat();
+          let lng = points[0].geometry.location.lng();
+          console.log(location.color, address);
+          this.addMarker(lat, lng, location.color, name, address);
+          this.geocoding(locations, 1, ++index);
+          break;
+        }
+        case window.google.maps.GeocoderStatus.OVER_QUERY_LIMIT: {
+          this.timer =  setTimeout(() => {
+            if (resolutionTimes < 4) {
+              console.log(resolutionTimes);
+              this.geocoding(locations, ++resolutionTimes, index);
+            } else {
+              console.log(intl.get('Your_Google_Maps_key_has_exceeded_quota'));
+              this.geocoding(locations, 1, ++index);
+            }
+          }, resolutionTimes * 1000);
+          break;
+        }
+        case window.google.maps.GeocoderStatus.UNKNOWN_ERROR:
+        case window.google.maps.GeocoderStatus.ERROR: {
+          this.timer = setTimeout(() => {
+            this.geocoding(locations, 0, index);
+          }, 1000);
+          break;
+        }
+        case window.google.maps.GeocoderStatus.INVALID_REQUEST:
+        case window.google.maps.GeocoderStatus.REQUEST_DENIED: {
+          break;
+        }
+        default: {
+          console.log(intl.get('address_not_be_found', { address: address }));
+          break;
+        }
+      }
     });
   }
 
@@ -461,66 +495,37 @@ class App extends React.Component {
     return currentOption.color;
   }
 
-  addMarker = (address, locationName, color) => {
-    const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${address}&key=${window.dtable.dtableGoogleMapKey}`;
-    fetch(url).then((res) => {
-      return res.json();
-    }).then((data) => {
-      const status = data.status;
-      switch(status) {
-        case window.google.maps.GeocoderStatus.OK: {
-          let lat = data.results[0].geometry.location.lat;
-          let lng = data.results[0].geometry.location.lng;
-          if (!this.markers.find(marker => marker._latlng.lat === lat && marker._latlng.lng === lng)) {
-            let describe = `<p>${address}</p><p>${locationName}</p>`;
-            let myIcon = L.icon({
-              iconUrl: [image['marker']],
-              iconSize: [25, 41],
-            });
-            if (color) {
-              const colorIndex = COLORS.findIndex((item) => color === item.COLOR);
-              if (colorIndex) {
-                myIcon = L.icon({
-                  iconUrl: [image['image' + (colorIndex + 1)]],
-                  iconSize: [25, 41],
-                });
-              }
-            }
-            let marker = new L.Marker([lat, lng], { icon: myIcon });
-            marker.bindPopup(describe);
-            marker.on('mouseover', () => {
-              marker.openPopup();
-            })
-            marker.on('mouseout', () => {
-              marker.closePopup();
-            })
-            marker.on('click', () => {
-              return;
-            })
-            this.markers.push(marker);
-            this.map.addLayer(marker);
-          }
-          break;
+  addMarker = (lat, lng, color, name, address) => {
+    if (!this.markers.find(marker => marker._latlng.lat === lat && marker._latlng.lng === lng)) {
+      let describe = `<p>${address}</p><p>${name}</p>`;
+      let myIcon = L.icon({
+        iconUrl: [image['marker']],
+        iconSize: [25, 41],
+      });
+      if (color) {
+        const colorIndex = COLORS.findIndex((item) => color === item.COLOR);
+        if (colorIndex) {
+          myIcon = L.icon({
+            iconUrl: [image['image' + (colorIndex + 1)]],
+            iconSize: [25, 41],
+          });
         }
-        case window.google.maps.GeocoderStatus.OVER_QUERY_LIMIT: {
-          console.log(intl.get('Your_Google_Maps_key_has_exceeded_quota'));
-          break;
-        }
-        case window.google.maps.GeocoderStatus.UNKNOWN_ERROR:
-        case window.google.maps.GeocoderStatus.ERROR: {
-          this.addMarker(address, locationName, color);
-          break;
-        }
-        case window.google.maps.GeocoderStatus.INVALID_REQUEST:
-        case window.google.maps.GeocoderStatus.REQUEST_DENIED: {
-          break;
-        }
-        default: {
-          console.log(intl.get('address_not_be_found', {address: address}));
-          break;
-        }
-      }  
-    });
+      }
+      let marker = new L.Marker([lat, lng], { icon: myIcon });
+
+      marker.bindPopup(describe);
+      marker.on('mouseover', () => {
+        marker.openPopup();
+      });
+      marker.on('mouseout', () => {
+        marker.closePopup();
+      });
+      marker.on('click', () => {
+        return;
+      })
+      this.markers.push(marker);
+      this.map.addLayer(marker);
+    }
   }
 
   formatGeolocationValue = (value) => {
