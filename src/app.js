@@ -76,6 +76,10 @@ class App extends React.Component {
   }
 
   onExit = () => {
+    if (this.timer) {
+      clearTimeout(this.timer);
+      this.timer = null;
+    }
     this.unsubscribeLocalDtableChanged();
     this.unsubscribeRemoteDtableChanged();
   }
@@ -452,23 +456,23 @@ class App extends React.Component {
         }
         case window.google.maps.GeocoderStatus.OVER_QUERY_LIMIT: {
           this.timer =  setTimeout(() => {
-            if (resolutionTimes < 4) {
+            clearTimeout(this.timer);
+            this.timer = null;
+            if (resolutionTimes < 3) {
               this.geocoding(locations, ++resolutionTimes, index);
             } else {
               console.log(intl.get('Your_Google_Maps_key_has_exceeded_quota'));
               this.geocoding(locations, 1, ++index);
             }
-            clearTimeout(this.timer);
-            this.timer = null;
           }, resolutionTimes * 1000);
           break;
         }
         case window.google.maps.GeocoderStatus.UNKNOWN_ERROR:
         case window.google.maps.GeocoderStatus.ERROR: {
           this.timer = setTimeout(() => {
-            this.geocoding(locations, 0, index);
             clearTimeout(this.timer);
             this.timer = null;
+            this.geocoding(locations, 0, index);
           }, 1000);
           break;
         }
