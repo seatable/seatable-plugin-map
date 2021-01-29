@@ -8,7 +8,11 @@ const zh_CN = {
   "Your_Google_Maps_key_has_exceeded_quota": "您的谷歌地图密钥已超出配额。",
   "address_not_be_found": "{address}没有被找到。",
   "Not_used": "不使用",
-  "Color_field": "颜色字段"
+  "Color_field": "颜色字段",
+  "Longitude_column": "经度列",
+  "Latitude_column": "纬度列",
+  "Text": "文本",
+  "Latitude_and_longitude": "经纬度"
 };
 
 export default zh_CN;

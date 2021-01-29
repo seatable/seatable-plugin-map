@@ -8,9 +8,11 @@ import Loading from './components/loading';
 import intl from 'react-intl-universal';
 import './locale/index.js';
 import  * as image  from './image/index';
+import { getLocations, renderMark } from './utils/location-utils';
 import COLORS from './marker-color';
 import { generateSettingsByConfig } from './utils/generate-settings-config';
-
+import { replaceSettingItemByType } from './utils/repalce-setting-item-by-type'; 
+import getConfigItemByType from './utils/get-config-item-by-type';
 import logo from './image/map.png';
 
 import './css/common.css';
@@ -24,7 +26,9 @@ const CONFIG_TYPE = {
   TABLE: 'table',
   VIEW: 'view',
   COLUMN: 'column',
-  MARK_COLUMN: 'mark_column'
+  MARK_COLUMN: 'mark_column',
+  LNG_COLUMN: 'lng_column',
+  LAT_COLUMN: 'lat_column'
 };
 
 const COLUMN_TYPES = ['geolocation', 'text'];
@@ -37,7 +41,7 @@ class App extends React.Component {
     this.state = {
       showDialog: props.showDialog || true,
       locations: [],
-      showSettingDialog: false,
+      showSettingDialog: true,
       isDataLoaded: false,
       configSettings: null,
       isFullScreen: false
@@ -85,16 +89,20 @@ class App extends React.Component {
   }
 
   onOpened = () => {
-    this.unsubscribeLocalDtableChanged = this.dtable.subscribe('local-dtable-changed', () => { this.onDTableChanged(); });
-    this.unsubscribeRemoteDtableChanged = this.dtable.subscribe('remote-dtable-changed', () => { this.onDTableChanged(); });
+    // if (this.dtable.subscribe) {
+      // this.unsubscribeLocalDtableChanged = this.dtable.subscribe('local-dtable-changed', () => { this.onDTableChanged(); });
+      // this.unsubscribeRemoteDtableChanged = this.dtable.subscribe('remote-dtable-changed', () => { this.onDTableChanged(); });
+    // }
   }
 
   async initPluginDTableData() {
     if (window.app !== undefined) {
       this.dtable.initInBrowser(window.app.dtableStore);
-      const { tableName, viewName, columnName, markColumnName } = this.initPluginSettings();
-      const configSettings = this.initSelectedSettings(tableName, viewName, columnName, markColumnName);
-      const locations = this.getLocations({tableName, viewName, columnName, markColumnName});
+      this.unsubscribeLocalDtableChanged = this.dtable.subscribe('local-dtable-changed', () => { this.onDTableChanged(); });
+      this.unsubscribeRemoteDtableChanged = this.dtable.subscribe('remote-dtable-changed', () => { this.onDTableChanged(); });
+      const settings = this.initPluginSettings();
+      const configSettings = this.initSelectedSettings(settings);
+      const locations = getLocations(this.dtable, configSettings);
       this.setState({
         configSettings,
         isDataLoaded: true,
@@ -111,13 +119,15 @@ class App extends React.Component {
     } else {
       await this.dtable.init(window.dtablePluginConfig);
       await this.dtable.syncWithServer();
+      this.unsubscribeLocalDtableChanged = this.dtable.subscribe('local-dtable-changed', () => { this.onDTableChanged(); });
+      this.unsubscribeRemoteDtableChanged = this.dtable.subscribe('remote-dtable-changed', () => { this.onDTableChanged(); });
       window.app = {};
       this.dtable.subscribe('dtable-connect', () => { this.onDTableConnect(); });
-      this.setState({
-        isDataLoaded: true
-      }, () => {
-        this.loadLeafletScript();
-      });
+      // this.setState({
+      //   isDataLoaded: true
+      // }, () => {
+      //   this.loadLeafletScript();
+      // });
     }
   }
 
@@ -138,7 +148,7 @@ class App extends React.Component {
 
   loadLeafletScript() {
     let lang = (window.dtable && window.dtable.lang) ? window.dtable.lang : 'en';
-    let url = `http://mt0.google.cn/vt/lyrs=m@160000000&hl=${lang}&gl=${lang}&src=app&y={y}&x={x}&z={z}&s=Ga`;
+    let url = `http://mt0.google.com/vt/lyrs=m@160000000&hl=${lang}&gl=${lang}&src=app&y={y}&x={x}&z={z}&s=Ga`;
     if (!document.getElementById('map-container')) return;
     let center = localStorage.getItem('dtable-map-plugin-center');
     let position = [20, 123], zoom = 5;
@@ -156,81 +166,27 @@ class App extends React.Component {
 
   onDTableConnect() {
     const pluginSettings = this.initPluginSettings();
-    const { tableName, viewName, columnName, markColumnName } = pluginSettings;
-    const configSettings = this.initSelectedSettings(tableName, viewName, columnName, markColumnName);
-    const locations = this.getLocations({tableName, viewName, columnName, markColumnName});
+    const configSettings = this.initSelectedSettings(pluginSettings);
+    const locations = getLocations(this.dtable, configSettings);
     this.setState({
       configSettings,
-      locations
+      locations,
+      isDataLoaded: true
+    }, () => {
+      this.loadLeafletScript();
     });
   }
 
   onDTableChanged() {
     const pluginSettings = this.initPluginSettings();
-    let { tableName, viewName, columnName, markColumnName } = pluginSettings;
-    const configSettings = this.initSelectedSettings(tableName, viewName, columnName, markColumnName);
-    const locations = this.getLocations({tableName, viewName, columnName, markColumnName});
+    const configSettings = this.initSelectedSettings(pluginSettings);
+    const locations = getLocations(this.dtable, configSettings);
     this.setState({
       locations,
       configSettings
     });
   }
 
-  getLocations({ tableName, viewName, columnName, markColumnName }) {
-    let locations = [];
-    let currentTable = this.dtable.getTableByName(tableName);
-    let currentView = this.dtable.getViewByName(currentTable, viewName);
-    let currentColumn = this.dtable.getColumnByName(currentTable, columnName);
-    const currentMarkColumn = this.dtable.getColumnByName(currentTable, markColumnName);
-    // current view has none column
-    if (!currentColumn) {
-      return locations;
-    }
-    
-    // table's rows length is 0
-    if (currentTable.rows.length === 0) {
-      return locations;
-    }
-
-    let locationNameKey = currentTable.columns[0].key;
-    let locationValueKey = currentColumn.key;
-    let locationColumnType = currentColumn.type;
-    if (currentView.rows.length === 0) { // table rows
-      const rows = currentTable.rows;
-      rows.forEach(row => {
-        let color = '';
-        if (currentMarkColumn) {
-          color = this.getMarkColor(currentMarkColumn, row);
-        }
-        if (locationColumnType === 'geolocation') {
-          const value = row[locationValueKey] || {};
-          locations.push({name: row[locationNameKey] || '', color, type: locationColumnType, ...value});
-        } else {
-          const value = row[locationValueKey] || '';
-          locations.push({name: row[locationNameKey] || '', color, type: locationColumnType, location: value});
-        }
-      });
-    } else {  // view rows
-      const rows = currentView.rows;
-      rows.forEach(rowId => {
-        let row = currentTable['id_row_map'][rowId];
-        let color = '';
-        if (currentMarkColumn) {
-          color = this.getMarkColor(currentMarkColumn, row);
-        }
-        if (locationColumnType === 'geolocation') {
-          const value = row[locationValueKey] || {};
-          locations.push({name: row[locationNameKey] || '', color, type: locationColumnType, ...value});
-        } else {
-          const value = row[locationValueKey] || '';
-          locations.push({name: row[locationNameKey] || '', color, type: locationColumnType, location: value});
-        }
-      });
-    }
-    return locations;
-  }
-
-  // plugin_settings: {tableName: '', viewName: '', columnName: ''}
   initPluginSettings = () => {
     let pluginSettings = this.dtable.getPluginSettings(PLUGIN_NAME);
     if (pluginSettings && this.isValidPluginSettings(pluginSettings)) {
@@ -247,77 +203,156 @@ class App extends React.Component {
     });
 
     // need option, get the column type is map
-    pluginSettings = {tableName: activeTable.name, viewName: activeView.name, columnName: columns[0] ? columns[0].name : '', markColumnName: null};
+    pluginSettings = {tableName: activeTable.name, viewName: activeView.name, addressType: 'text',  columnName: columns[0] ? columns[0].name : '', markColumnName: null };
     return pluginSettings;
   }
 
   isValidPluginSettings = (pluginSettings) => {
-    let { tableName, viewName, columnName } = pluginSettings;
+    let { tableName, viewName, columnName, addressType, markColumnName, latColumnName, lngColumnName } = pluginSettings;
     let table = this.dtable.getTableByName(tableName);
     if (!table) return false;
     let view = this.dtable.getViewByName(table, viewName);
     if (!view) return false;
-    let column = this.dtable.getColumnByName(table, columnName);
-    if (!column) return false;
+    if (!addressType) return false;
+    if (addressType === 'text') {
+      let column = this.dtable.getColumnByName(table, columnName);
+      if (!column && columnName) return false;
+    } else {
+      let latColumn = this.dtable.getColumnByName(table, latColumnName);
+      let lngColumn = this.dtable.getColumnByName(table, lngColumnName);
+      if (!latColumn && latColumnName) return false;
+      if (!lngColumn && latColumnName) return false;
+    }
+    let markColumn = this.dtable.getColumnByName(table, markColumnName);
+    if (!markColumn && markColumnName) return false;
     return true;
   }
 
-  initSelectedSettings = (tableName, viewName, columnName, markColumnName) => {
+  initSelectedSettings = (settings) => {
+    let configSettings = [];
+    let { tableName, viewName, columnName, markColumnName, addressType, latColumnName, lngColumnName } = settings;
     let activeTable = this.dtable.getTableByName(tableName);
     let tableSettings = this.getTableSettings(activeTable);
     let activeView = this.dtable.getViewByName(activeTable, viewName);
     let viewSettings = this.getViewSettings(activeTable, activeView);
-    let activeColumn = this.dtable.getColumnByName(activeTable, columnName);
-    let columnSettings = this.getColumnSettings(activeTable, activeView, activeColumn);
+    configSettings.push(tableSettings, viewSettings);
+    configSettings.push({type: 'address_type', name: '地址类型', active: addressType, settings: [{id: 'text', name: intl.get('Text')}, {id: 'lng_lat', name: intl.get('Latitude_and_longitude')}]});
+
+    if (addressType === 'text') {
+      let activeColumn = this.dtable.getColumnByName(activeTable, columnName);
+      let columnSettings = this.getColumnSettings(activeTable, activeView, activeColumn);
+      configSettings.push(columnSettings);
+    } else {
+      let activeLngColumn = this.dtable.getColumnByName(activeTable, lngColumnName);
+      const lngColumnSetting = this.getAddressSetting(activeTable, activeView, 'lng_column', activeLngColumn);
+      const activeLatColumn = this.dtable.getColumnByName(activeTable, latColumnName);
+      const latColumnSetting = this.getAddressSetting(activeTable, activeView, 'lat_column', activeLatColumn);
+      configSettings.push(lngColumnSetting, latColumnSetting);
+    }
 
     let activeMarkColumn = this.dtable.getColumnByName(activeTable, markColumnName);
     let markColumnSettings = this.getMarkColumnSetting(activeTable, activeView, activeMarkColumn);
-    return [tableSettings, viewSettings, columnSettings, markColumnSettings];
+    configSettings.push(markColumnSettings);
+    return configSettings;
+  }
+
+  getAddressSetting = (currentTable, currentView, type, activeColumn = null) => {
+    let columns = this.dtable.getShownColumns(currentTable, currentView);
+    // need options: checkout map column
+    columns = columns.filter(column => {
+      return column.type === 'text' || column.type === 'number';
+    });
+
+    let columnSettings = columns.map(column => {
+      return {id: column.key, name: column.name};
+    });
+
+    if (columns.length === 0) {
+      const column = currentTable.columns[0];
+      columnSettings.unshift({id: column.key, name: column.name});
+    }
+
+    columnSettings.unshift({id: 'not_used', name: intl.get('Not_used')});
+    let active = activeColumn ? activeColumn.name : columnSettings[0].name;
+    let title = type === 'lng_column' ?  intl.get('Longitude_column') : intl.get('Longitude_column');
+
+    return {type, name: title, active: active, settings: columnSettings};
   }
 
   updateSelectedSettings = (type, option) => {
+    let { configSettings } = this.state;
     switch(type) {
       case CONFIG_TYPE.TABLE: {
         let currentTable = this.dtable.getTableByName(option.name);
         let currentView = this.dtable.getViews(currentTable)[0];
         let tableSettings = this.getTableSettings(currentTable);
         let viewSettings = this.getViewSettings(currentTable);
-        let columnSettings = this.getColumnSettings(currentTable, currentView);
-        let markColumnSettings = this.getMarkColumnSetting(currentTable, currentView);
-        let configSettings = [tableSettings, viewSettings, columnSettings, markColumnSettings];
-        return configSettings;
+        let addressTypeSetting = getConfigItemByType(configSettings, 'address_type');
+        let markColumnSetting = this.getMarkColumnSetting(currentTable, currentView);
+        if (addressTypeSetting.active === 'text') {
+          let columnSetting = this.getColumnSettings(currentTable, currentView);
+          return [tableSettings, viewSettings, addressTypeSetting, columnSetting, markColumnSetting];
+        } else {
+          let lngColumnSetting = this.getAddressSetting(currentTable, currentView, 'lng_column');
+          let latColumnSetting = this.getAddressSetting(currentTable, currentView, 'lat_column');
+          return [tableSettings, viewSettings, addressTypeSetting, lngColumnSetting, latColumnSetting, markColumnSetting];
+        }
       }
       case CONFIG_TYPE.VIEW: {
-        let { configSettings } = this.state;
-        const tableName = configSettings[0].active;
+        const tableSettings =  getConfigItemByType(configSettings, 'table');
+        const tableName = tableSettings.active;
         let currentTable = this.dtable.getTableByName(tableName);
         let currentView = this.dtable.getViewByName(currentTable, option.name);
         let viewSettings = this.getViewSettings(currentTable, currentView);
-        let columnSettings = this.getColumnSettings(currentTable, currentView);
-        let markColumnSettings = this.getMarkColumnSetting(currentTable, currentView);
-        configSettings.splice(1, 3, viewSettings, columnSettings, markColumnSettings);
-        return configSettings;
+        let addressTypeSetting = getConfigItemByType(configSettings, 'address_type');
+        let markColumnSetting = this.getMarkColumnSetting(currentTable, currentView);
+        if (addressTypeSetting.active === 'text') {
+          let columnSetting = this.getColumnSettings(currentTable, currentView);
+          return [tableSettings, viewSettings, addressTypeSetting, columnSetting, markColumnSetting];
+        } else {
+          let lngColumnSetting = this.getAddressSetting(currentTable, currentView, 'lng_column');
+          let latColumnSetting = this.getAddressSetting(currentTable, currentView, 'lat_column');
+          return [tableSettings, viewSettings, addressTypeSetting, lngColumnSetting, latColumnSetting, markColumnSetting];
+        }
       }
       case CONFIG_TYPE.COLUMN: {
-        let { configSettings } = this.state;
         const tableName = configSettings[0].active;
         const viewName = configSettings[1].active;
         let currentTable = this.dtable.getTableByName(tableName);
         let currentView = this.dtable.getViewByName(currentTable, viewName);
-        let currentColumn = this.dtable.getColumnByName(currentTable, option.name);
+        let currentColumn = this.dtable.getColumnByName(currentTable, option.name)
         let columnSettings = this.getColumnSettings(currentTable, currentView, currentColumn);
-        configSettings.splice(2, 1, columnSettings);
+        replaceSettingItemByType(configSettings, 'column', columnSettings);
         return configSettings;
       }
       case CONFIG_TYPE.MARK_COLUMN: {
-        let { configSettings } = this.state;
         const tableName = configSettings[0].active;
         const viewName = configSettings[1].active;
         let currentTable = this.dtable.getTableByName(tableName);
         let currentView = this.dtable.getViewByName(currentTable, viewName);
         let currentColumn = this.dtable.getColumnByName(currentTable, option.name);
         let columnSettings = this.getMarkColumnSetting(currentTable, currentView, currentColumn);
-        configSettings.splice(3, 1, columnSettings);
+        replaceSettingItemByType(configSettings, 'mark_column', columnSettings);
+        return configSettings;
+      }
+      case CONFIG_TYPE.LNG_COLUMN: {
+        const tableName = configSettings[0].active;
+        const viewName = configSettings[1].active;
+        let currentTable = this.dtable.getTableByName(tableName);
+        let currentView = this.dtable.getViewByName(currentTable, viewName);
+        const column = this.dtable.getColumnByName(currentTable, option.name);
+        let columnSetting = this.getAddressSetting(currentTable, currentView, 'lng_column', column);
+        replaceSettingItemByType(configSettings, 'lng_column', columnSetting);
+        return configSettings;
+      }
+      case CONFIG_TYPE.LAT_COLUMN: {
+        const tableName = configSettings[0].active;
+        const viewName = configSettings[1].active;
+        let currentTable = this.dtable.getTableByName(tableName);
+        let currentView = this.dtable.getViewByName(currentTable, viewName);
+        const column = this.dtable.getColumnByName(currentTable, option.name);
+        let columnSetting = this.getAddressSetting(currentTable, currentView, 'lat_column', column);
+        replaceSettingItemByType(configSettings, 'lat_column', columnSetting);
         return configSettings;
       }
       default: {
@@ -389,6 +424,26 @@ class App extends React.Component {
     this.dtable.updatePluginSettings(PLUGIN_NAME, settings);
   }
 
+  onAddressTypeChange = (event, type) => {
+    const { configSettings } = this.state;
+    const setting = getConfigItemByType(configSettings, 'address_type');
+    const tableName = getConfigItemByType(configSettings, 'table').active;
+    const viewName = getConfigItemByType(configSettings, 'view').active;
+    let currentTable = this.dtable.getTableByName(tableName);
+    let currentView = this.dtable.getViewByName(currentTable, viewName);
+    setting.active = type;
+    if (type === 'lng_lat') {
+      const lngColumnSetting = this.getAddressSetting(currentTable, currentView, 'lng_column');
+      const latColumnSetting = this.getAddressSetting(currentTable, currentView, 'lat_column');
+      configSettings.splice(3, 1, lngColumnSetting, latColumnSetting);
+    } else {
+      const geolocationColumnSetting = this.getColumnSettings(currentTable, currentView);
+      configSettings.splice(3, 2, geolocationColumnSetting);
+    }
+    const settings = generateSettingsByConfig(configSettings);
+    this.dtable.updatePluginSettings(PLUGIN_NAME, settings);
+  }
+
   toggle = () => {
     const center = {};
     if (this.map) {
@@ -429,10 +484,16 @@ class App extends React.Component {
       clearTimeout(this.timer);
       this.timer = null;
     }
-    if (!this.geocoder) {
-      this.geocoder = new window.google.maps.Geocoder();
+
+    const addressType = getConfigItemByType(this.state.configSettings, 'address_type').active;
+    if (addressType === 'text') {
+      if (!this.geocoder) {
+        this.geocoder = new window.google.maps.Geocoder();
+      }
+      this.geocoding(locations, 1, 0);
+    } else {
+      renderMark(locations, this.addMarker);
     }
-    this.geocoding(locations, 1, 0);
   }
 
   geocoding = (locations, resolutionTimes, index) => {
@@ -441,7 +502,7 @@ class App extends React.Component {
     let address;
     let name = location.name;
     if (location.type === 'geolocation') {
-      address = this.formatGeolocationValue(location);
+      address = this.formatGeolocactionValue(location);
     } else {
       address = location.location;
     }
@@ -488,22 +549,9 @@ class App extends React.Component {
     });
   }
 
-  getMarkColor = (markColumn, row) => {
-    const key = markColumn.key;
-    if (!markColumn.data) return '';
-    const options = markColumn.data.options;
-    if (!options) return '';
-    
-    const currentOption = options.find((option) => {
-      return option.id === row[key];
-    });
-    if (!currentOption) return ''
-    return currentOption.color;
-  }
-
   addMarker = (lat, lng, color, name, address) => {
     if (!this.markers.find(marker => marker._latlng.lat === lat && marker._latlng.lng === lng)) {
-      let describe = `<p>${address}</p><p>${name}</p>`;
+      let describe = `<p>${address || ''}</p><p>${name}</p>`;
       let myIcon = L.icon({
         iconUrl: [image['marker']],
         iconSize: [25, 41],
@@ -534,10 +582,11 @@ class App extends React.Component {
     }
   }
 
-  formatGeolocationValue = (value) => {
-    let district = value.district === 'other' ? '' : value.district;
-    let city = value.city === 'other' ? '' : value.city;
-    let province = value.province === 'other' ? '' : value.province;
+  formatGeolocactionValue = (value) => {
+    const location = value.location ? value.location : {};
+    let district = location.district === 'other' ? '' : location.district;
+    let city = location.city === 'other' ? '' : location.city;
+    let province = location.province === 'other' ? '' : location.province;
     return `${province || ''}${city || ''}${district || ''}${value.detail || ''}`;
   }
 
@@ -639,6 +688,7 @@ class App extends React.Component {
             <LocationSettings 
               configSettings={configSettings} 
               onSelectChange={this.onSelectChange} 
+              onAddressTypeChange={this.onAddressTypeChange}
               onHideMapSettings={this.toggleSettingDialog}
             /> 
           )}
