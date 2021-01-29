@@ -8,7 +8,7 @@ import Loading from './components/loading';
 import intl from 'react-intl-universal';
 import './locale/index.js';
 import  * as image  from './image/index';
-import { getLocations, renderMark } from './utils/location-utils';
+import { getLocations, renderMarkByPosition } from './utils/location-utils';
 import COLORS from './marker-color';
 import { generateSettingsByConfig } from './utils/generate-settings-config';
 import { replaceSettingItemByType } from './utils/repalce-setting-item-by-type'; 
@@ -41,7 +41,7 @@ class App extends React.Component {
     this.state = {
       showDialog: props.showDialog || true,
       locations: [],
-      showSettingDialog: true,
+      showSettingDialog: false,
       isDataLoaded: false,
       configSettings: null,
       isFullScreen: false
@@ -88,13 +88,6 @@ class App extends React.Component {
     this.unsubscribeRemoteDtableChanged();
   }
 
-  onOpened = () => {
-    // if (this.dtable.subscribe) {
-      // this.unsubscribeLocalDtableChanged = this.dtable.subscribe('local-dtable-changed', () => { this.onDTableChanged(); });
-      // this.unsubscribeRemoteDtableChanged = this.dtable.subscribe('remote-dtable-changed', () => { this.onDTableChanged(); });
-    // }
-  }
-
   async initPluginDTableData() {
     if (window.app !== undefined) {
       this.dtable.initInBrowser(window.app.dtableStore);
@@ -123,11 +116,6 @@ class App extends React.Component {
       this.unsubscribeRemoteDtableChanged = this.dtable.subscribe('remote-dtable-changed', () => { this.onDTableChanged(); });
       window.app = {};
       this.dtable.subscribe('dtable-connect', () => { this.onDTableConnect(); });
-      // this.setState({
-      //   isDataLoaded: true
-      // }, () => {
-      //   this.loadLeafletScript();
-      // });
     }
   }
 
@@ -203,7 +191,7 @@ class App extends React.Component {
     });
 
     // need option, get the column type is map
-    pluginSettings = {tableName: activeTable.name, viewName: activeView.name, addressType: 'text',  columnName: columns[0] ? columns[0].name : '', markColumnName: null };
+    pluginSettings = { tableName: activeTable.name, viewName: activeView.name, addressType: 'text',  columnName: columns[0] ? columns[0].name : '', markColumnName: null };
     return pluginSettings;
   }
 
@@ -236,7 +224,7 @@ class App extends React.Component {
     let activeView = this.dtable.getViewByName(activeTable, viewName);
     let viewSettings = this.getViewSettings(activeTable, activeView);
     configSettings.push(tableSettings, viewSettings);
-    configSettings.push({type: 'address_type', name: '地址类型', active: addressType, settings: [{id: 'text', name: intl.get('Text')}, {id: 'lng_lat', name: intl.get('Latitude_and_longitude')}]});
+    configSettings.push({type: 'address_type', name: intl.get('Address_type'), active: addressType, settings: [{id: 'text', name: intl.get('Text')}, {id: 'lng_lat', name: intl.get('Latitude_and_longitude')}]});
 
     if (addressType === 'text') {
       let activeColumn = this.dtable.getColumnByName(activeTable, columnName);
@@ -274,7 +262,7 @@ class App extends React.Component {
 
     columnSettings.unshift({id: 'not_used', name: intl.get('Not_used')});
     let active = activeColumn ? activeColumn.name : columnSettings[0].name;
-    let title = type === 'lng_column' ?  intl.get('Longitude_column') : intl.get('Longitude_column');
+    let title = type === 'lng_column' ?  intl.get('Longitude_field') : intl.get('Latitude_field');
 
     return {type, name: title, active: active, settings: columnSettings};
   }
@@ -320,7 +308,7 @@ class App extends React.Component {
         const viewName = configSettings[1].active;
         let currentTable = this.dtable.getTableByName(tableName);
         let currentView = this.dtable.getViewByName(currentTable, viewName);
-        let currentColumn = this.dtable.getColumnByName(currentTable, option.name)
+        let currentColumn = this.dtable.getColumnByName(currentTable, option.name);
         let columnSettings = this.getColumnSettings(currentTable, currentView, currentColumn);
         replaceSettingItemByType(configSettings, 'column', columnSettings);
         return configSettings;
@@ -492,7 +480,7 @@ class App extends React.Component {
       }
       this.geocoding(locations, 1, 0);
     } else {
-      renderMark(locations, this.addMarker);
+      renderMarkByPosition(locations, this.addMarker);
     }
   }
 
@@ -506,7 +494,9 @@ class App extends React.Component {
     } else {
       address = location.location;
     }
+    const activeColumn = this.state.configSettings[3].active;
     this.geocoder.geocode({ 'address': address }, (points, status) => {
+      if (location.columnName !== activeColumn) return;
       switch (status) {
         case window.google.maps.GeocoderStatus.OK: {
           let lat = points[0].geometry.location.lat();

@@ -75,7 +75,7 @@ export const getLocations = (dtable, configSettings) => {
   return locations;
 }
 
-export const renderMark = (locations, renderer, start = 0) => {
+export const renderMarkByPosition = (locations, renderer, start = 0) => {
   let stack = locations.slice(start, start += 10);
 
   setTimeout(() => {
@@ -85,6 +85,6 @@ export const renderMark = (locations, renderer, start = 0) => {
         renderer(position[1], position[0], location.color, location.name);
       }
     });
-    renderMark(locations, renderer, start += 10);
+    renderMarkByPosition(locations, renderer, start += 10);
   }, 20);
 }

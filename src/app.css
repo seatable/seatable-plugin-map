@@ -167,13 +167,18 @@
   flex: 1 1;
   text-align: center;
   line-height: 34px;
+  padding: 0 5px;
   cursor: pointer;
   position: relative;
   font-weight: 500;
-  white-space: pre-line;
-  word-break: break-all;
-  text-overflow: ellipsis;
   overflow: hidden;
+  text-overflow:ellipsis;
+  white-space: nowrap;
+}
+
+.plugin-map-dialog-en .address-type-item:hover {
+  white-space: pre;
+  overflow: visible;
 }
 
 .plugin-map-dialog-en .address-type-item:first-child {

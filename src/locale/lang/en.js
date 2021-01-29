@@ -8,9 +8,10 @@ const en = {
   "Your_Google_Maps_key_has_exceeded_quota": "Your Google Maps key has exceeded quota.",
   "address_not_be_found": "{address} not be found.",
   "Not_used": "Not used",
+  "Address_type": "Address type",
   "Color_field": "Color filed",
-  "Longitude_column": "Longitude column",
-  "Latitude_column": "Latitude column",
+  "Longitude_field": "Longitude field",
+  "Latitude_field": "Latitude field",
   "Text": "Text",
   "Latitude_and_longitude": "Latitude and longitude"
 };

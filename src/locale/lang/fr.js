@@ -8,9 +8,10 @@ const fr = {
   "Your_Google_Maps_key_has_exceeded_quota": "Votre clé Google Maps a épuisé son quota.",
   "address_not_be_found": "{address} ne peut pas être trouvé.",
   "Not_used": "Ne pas utilisé",
-  "Color_field": "Couleur",
-  "Longitude_column": "Colonne de longitude",
-  "Latitude_column": "Colonne Latitude",
+  "Address_type": "Type d'adresse",
+  "Color_field": "Champ de couleur",
+  "Longitude_field": "Champ de longitude",
+  "Latitude_field": "Champ de latitude",
   "Text": "Texte",
   "Latitude_and_longitude": "Latitude et longitude"
 };
