@@ -8,7 +8,12 @@ const de = {
   "Your_Google_Maps_key_has_exceeded_quota": "Ihr Google Maps Schlüssel hat seine Quota ausgeschöpft.",
   "address_not_be_found": "{address} kannt nicht gefunden werden.",
   "Not_used": "Nicht genutzt",
-  "Color_field": "Farbe"
+  "Address_type": "Adresstyp",
+  "Color_field": "Farbfeld",
+  "Longitude_field": "Längengradfeld",
+  "Latitude_field": "Breitengradfeld",
+  "Text": "Text",
+  "Latitude_and_longitude": "Breiten-und Längengrad"
 };
 
 export default de;
