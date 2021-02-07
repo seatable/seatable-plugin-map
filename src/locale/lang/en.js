@@ -13,7 +13,10 @@ const en = {
   "Longitude_field": "Longitude field",
   "Latitude_field": "Latitude field",
   "Text": "Text",
-  "Latitude_and_longitude": "Latitude and longitude"
+  "Latitude_and_longitude": "Latitude and longitude",
+  "Cancle": "Cancle",
+  "Save": "Save",
+  "Please_select": "Please select"
 };
 
 export default en;
