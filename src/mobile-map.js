@@ -12,26 +12,14 @@ import { generateSettingsByConfig } from './utils/generate-settings-config';
 import { replaceSettingItemByType } from './utils/repalce-setting-item-by-type'; 
 import onCapture from './utils/capture';
 import getConfigItemByType from './utils/get-config-item-by-type';
+import { IMAGE_PATH, PLUGIN_NAME, CONFIG_TYPE, COLUMN_TYPES } from './constants';
 import styles from './css/mobile-en.module.css';
 import logo from './image/map.png';
 
 import './css/common.css';
 import 'leaflet/dist/leaflet.css';
 
-L.Icon.Default.imagePath = '//cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.4/images/';
-
-const PLUGIN_NAME = 'map-en';
-const CONFIG_TYPE = {
-  TABLE: 'table',
-  VIEW: 'view',
-  COLUMN: 'column',
-  MARK_COLUMN: 'mark_column',
-  LNG_COLUMN: 'lng_column',
-  LAT_COLUMN: 'lat_column',
-  ADDRESS_TYPE: 'address_type'
-};
-
-const COLUMN_TYPES = ['geolocation', 'text'];
+L.Icon.Default.imagePath = IMAGE_PATH;
 
 class App extends React.Component {
 
