@@ -8,7 +8,7 @@ class App extends React.Component {
 
   render() {
     return (
-      IS_MOBILE ? <MobileMap howDialog={this.props.showDialog}/> : <Map howDialog={this.props.showDialog}/>
+      IS_MOBILE ? <MobileMap showDialog={this.props.showDialog}/> : <Map showDialog={this.props.showDialog}/>
     );
   }
 }

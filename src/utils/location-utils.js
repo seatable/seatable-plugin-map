@@ -88,3 +88,11 @@ export const renderMarkByPosition = (locations, renderer, start = 0) => {
     renderMarkByPosition(locations, renderer, start += 10);
   }, 20);
 }
+
+export const formatGeolocactionValue = (value) => {
+  const location = value.location ? value.location : {};
+  let district = location.district === 'other' ? '' : location.district;
+  let city = location.city === 'other' ? '' : location.city;
+  let province = location.province === 'other' ? '' : location.province;
+  return `${province || ''}${city || ''}${district || ''}${value.detail || ''}`;
+}

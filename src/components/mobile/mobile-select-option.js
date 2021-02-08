@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import styles from '../../css/mobile.module.css';
+import styles from '../../css/mobile-en.module.css';
 import TouchFeedBack from './touch-feedback';
 import intl from 'react-intl-universal';
 

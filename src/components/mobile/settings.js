@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import styles from '../../css/mobile.module.css';
+import styles from '../../css/mobile-en.module.css';
 import MobileSettingItem from './mobile-setting-item';
 import MobileSelectOption from './mobile-select-option';
 import intl from 'react-intl-universal';

@@ -13,9 +13,9 @@ const onCapture = () => {
   }).then(canvas => {
     const captureContainer = document.createElement('div');
     captureContainer.className = 'map-capture';
-    const downLoadLink = document.createElement('a');
-    downLoadLink.className = 'download-link';
-    captureContainer.appendChild(downLoadLink);
+    const downloadLink = document.createElement('a');
+    downloadLink.className = 'download-link';
+    captureContainer.appendChild(downloadLink);
     captureContainer.appendChild(canvas);
     document.querySelector('#map-container').appendChild(captureContainer);
 

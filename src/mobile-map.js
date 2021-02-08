@@ -6,17 +6,16 @@ import Loading from './components/loading';
 import intl from 'react-intl-universal';
 import './locale/index.js';
 import  * as image  from './image/index';
-import { getLocations, renderMarkByPosition } from './utils/location-utils';
+import { getLocations, renderMarkByPosition, formatGeolocactionValue } from './utils/location-utils';
 import COLORS from './marker-color';
 import { generateSettingsByConfig } from './utils/generate-settings-config';
 import { replaceSettingItemByType } from './utils/repalce-setting-item-by-type'; 
 import onCapture from './utils/capture';
 import getConfigItemByType from './utils/get-config-item-by-type';
-import styles from './css/mobile.module.css';
+import styles from './css/mobile-en.module.css';
 import logo from './image/map.png';
 
 import './css/common.css';
-import './app.css';
 import 'leaflet/dist/leaflet.css';
 
 L.Icon.Default.imagePath = '//cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.4/images/';
@@ -409,7 +408,6 @@ class App extends React.Component {
 
   getMarkColumnSetting = (currentTable, currentView, activeColumn = null) => {
     let columns = this.dtable.getShownColumns(currentTable, currentView);
-    // n\ed options: checkout map column
     columns = columns.filter(column => {
       return column.type === 'single-select';
     });
@@ -498,7 +496,7 @@ class App extends React.Component {
     let address;
     let name = location.name;
     if (location.type === 'geolocation') {
-      address = this.formatGeolocactionValue(location);
+      address = formatGeolocactionValue(location);
     } else {
       address = location.location;
     }
@@ -578,14 +576,6 @@ class App extends React.Component {
       this.markers.push(marker);
       this.map.addLayer(marker);
     }
-  }
-
-  formatGeolocactionValue = (value) => {
-    const location = value.location ? value.location : {};
-    let district = location.district === 'other' ? '' : location.district;
-    let city = location.city === 'other' ? '' : location.city;
-    let province = location.province === 'other' ? '' : location.province;
-    return `${province || ''}${city || ''}${district || ''}${value.detail || ''}`;
   }
 
   toggleSettingDialog = () => {

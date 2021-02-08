@@ -13,7 +13,10 @@ const fr = {
   "Longitude_field": "Champ de longitude",
   "Latitude_field": "Champ de latitude",
   "Text": "Texte",
-  "Latitude_and_longitude": "Latitude et longitude"
+  "Latitude_and_longitude": "Latitude et longitude",
+  "Cancle": "Annuler",
+  "Save": "sauver",
+  "Please_select": "Veuillez sélectionner"
 };
 
 export default fr;

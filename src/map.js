@@ -7,7 +7,7 @@ import Loading from './components/loading';
 import intl from 'react-intl-universal';
 import './locale/index.js';
 import  * as image  from './image/index';
-import { getLocations, renderMarkByPosition } from './utils/location-utils';
+import { getLocations, renderMarkByPosition, formatGeolocactionValue } from './utils/location-utils';
 import COLORS from './marker-color';
 import { generateSettingsByConfig } from './utils/generate-settings-config';
 import { replaceSettingItemByType } from './utils/repalce-setting-item-by-type'; 
@@ -490,7 +490,7 @@ class App extends React.Component {
     let address;
     let name = location.name;
     if (location.type === 'geolocation') {
-      address = this.formatGeolocactionValue(location);
+      address = formatGeolocactionValue(location);
     } else {
       address = location.location;
     }
@@ -570,14 +570,6 @@ class App extends React.Component {
       this.markers.push(marker);
       this.map.addLayer(marker);
     }
-  }
-
-  formatGeolocactionValue = (value) => {
-    const location = value.location ? value.location : {};
-    let district = location.district === 'other' ? '' : location.district;
-    let city = location.city === 'other' ? '' : location.city;
-    let province = location.province === 'other' ? '' : location.province;
-    return `${province || ''}${city || ''}${district || ''}${value.detail || ''}`;
   }
 
   toggleSettingDialog = () => {
