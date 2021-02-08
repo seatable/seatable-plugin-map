@@ -351,7 +351,7 @@ class App extends React.Component {
         const viewName = getConfigItemByType(configSettings, 'view').active;
         let currentTable = this.dtable.getTableByName(tableName);
         let currentView = this.dtable.getViewByName(currentTable, viewName);
-        setting.active = type;
+        setting.active = option;
         if (type === 'lng_lat') {
           const lngColumnSetting = this.getAddressSetting(currentTable, currentView, 'lng_column');
           const latColumnSetting = this.getAddressSetting(currentTable, currentView, 'lat_column');
@@ -435,7 +435,8 @@ class App extends React.Component {
   }
 
   onSaveSetting = () => {
-    const settings = generateSettingsByConfig(this.state.columnSettings);
+    const settings = generateSettingsByConfig(this.state.configSettings);
+    this.toggleSettingDialog();
     this.dtable.updatePluginSettings(PLUGIN_NAME, settings);
   }
 
@@ -590,21 +591,6 @@ class App extends React.Component {
   toggleSettingDialog = () => {
     this.setState({showSettingDialog: !this.state.showSettingDialog});
   }
-
-  getDialogStyle = () => {
-    const { isFullScreen } = this.state;
-    if (isFullScreen) {
-      return {
-        maxWidth: '100%',
-        height: '100%',
-        margin: 0
-      } 
-    } else {
-      return {
-        maxWidth: 1180
-      }
-    }
-  }
   
   render() {
     const { isDataLoaded, showSettingDialog, configSettings, showDialog } = this.state;
@@ -618,10 +604,10 @@ class App extends React.Component {
             <span className={styles["dtable-map-plugin-name"]}>{intl.get('Map_plugin')}</span>
           </div>
           <div className={styles["map-tool-container"]}>
-            <span className={`close ${styles["title-button"]}`} onTouchEnd={this.toggle}>
+            <span className={`close ${styles["title-button"]}`} onClick={this.toggle}>
               <i className={"dtable-font dtable-icon-x"}></i>
             </span>
-            <span onTouchEnd={this.toggleSettingDialog} className={`close ${styles["title-button"]}`}>
+            <span onClick={this.toggleSettingDialog} className={`close ${styles["title-button"]}`}>
               <i className={"dtable-font dtable-icon-settings"}></i>
             </span>
             <span className={`close ${styles["title-button"]}`} onTouchEnd={onCapture}>

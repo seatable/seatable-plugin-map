@@ -612,7 +612,7 @@ class App extends React.Component {
     const mapKey = window.dtable.dtableGoogleMapKey;
     return (
       !showDialog ? null :
-      <Modal isOpen={true} onOpened={this.onOpened} onExit={this.onExit} toggle={this.toggle} className="plugin-map-dialog-en" style={this.getDialogStyle()}>
+      <Modal isOpen={true} onExit={this.onExit} toggle={this.toggle} className="plugin-map-dialog-en" style={this.getDialogStyle()}>
         <div className="modal-header dtable-map-plugin-title">
           <div className="modal-title">
             <img className="dtable-map-plugin-logo" src={logo} alt=""/>
