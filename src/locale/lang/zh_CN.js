@@ -13,7 +13,10 @@ const zh_CN = {
   "Longitude_field": "经度列",
   "Latitude_field": "纬度列",
   "Text": "文本",
-  "Latitude_and_longitude": "经纬度"
+  "Latitude_and_longitude": "经纬度",
+  "Cancle": "取消",
+  "Save": "保存",
+  "Please_select": "请选择"
 };
 
 export default zh_CN;

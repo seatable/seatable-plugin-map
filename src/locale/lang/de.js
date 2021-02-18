@@ -13,7 +13,10 @@ const de = {
   "Longitude_field": "Längengradfeld",
   "Latitude_field": "Breitengradfeld",
   "Text": "Text",
-  "Latitude_and_longitude": "Breiten-und Längengrad"
+  "Latitude_and_longitude": "Breiten-und Längengrad",
+  "Cancle": "Abbrechen",
+  "Save": "sparen",
+  "Please_select": "Bitte auswählen"
 };
 
 export default de;
