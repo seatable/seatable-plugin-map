@@ -110,7 +110,7 @@ class App extends React.Component {
       script.type = 'text/javascript';
       script.src = `https://maps.googleapis.com/maps/api/js?key=${AUTH_KEY}&libraries=places`;
       document.body.appendChild(script);
-      script.onload = async () => {
+      script.onload = () => {
         this.geocoder = new window.google.maps.Geocoder();
         this.initPluginDTableData();
       };
