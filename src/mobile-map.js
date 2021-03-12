@@ -112,6 +112,9 @@ class App extends React.Component {
         this.geocoder = new window.google.maps.Geocoder();
         this.initPluginDTableData();
       };
+    } else {
+      this.geocoder = new window.google.maps.Geocoder();
+      this.initPluginDTableData();
     }
   }
 
