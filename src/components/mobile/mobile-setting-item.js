@@ -13,7 +13,7 @@ class MobileSettingItem extends Component {
     const { configSetting } = this.props;
     if (configSetting.type === 'address_type') {
       const active = configSetting.active;
-      return active === 'text' ? intl.get('text') : intl.get('Latitude_and_longitude');
+      return active === 'text' ? intl.get('Text') : intl.get('Latitude_and_longitude');
     }
     return configSetting.active;
   }

@@ -7,7 +7,7 @@ import Loading from './components/loading';
 import intl from 'react-intl-universal';
 import './locale/index.js';
 import  * as image  from './image/index';
-import { getLocations, renderMarkByPosition, formatGeolocactionValue } from './utils/location-utils';
+import { getLocations, renderMarkByPosition, formatGeolocactionValue, getInitialMapCenter } from './utils/location-utils';
 import COLORS from './marker-color';
 import { generateSettingsByConfig } from './utils/generate-settings-config';
 import { replaceSettingItemByType } from './utils/repalce-setting-item-by-type'; 
@@ -44,17 +44,15 @@ class App extends React.Component {
   componentDidMount() {
     this.dtable = new DTable();
     this.loadMapScript();
-    setTimeout(() => {
-      this.initPluginDTableData();
-    }, 100);
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.showDialog) {
-      this.onDTableConnect();
-    }
     this.setState({
       showDialog: nextProps.showDialog
+    }, () => {
+      if (nextProps.showDialog) {
+        this.onDTableConnect();
+      }
     });
   }
 
@@ -63,7 +61,7 @@ class App extends React.Component {
     if (window.google && this.state.showDialog) {
       // render locations after the container rendered in the dom tree
       requestAnimationFrame(() => {
-        this.renderMap(this.state.locations);
+        this.renderLocations(this.state.locations);
       });
     }
   }
@@ -90,19 +88,12 @@ class App extends React.Component {
         isDataLoaded: true,
         locations
       }, () => {
-        this.loadLeafletScript();
-        this.timer = setInterval(() => {
-          if (window.google) {
-            clearInterval(this.timer);
-            this.renderMap(locations);
-          }
-        }, 100)
+        this.renderMap();
+        this.renderLocations(locations);
       });
     } else {
       await this.dtable.init(window.dtablePluginConfig);
       await this.dtable.syncWithServer();
-      this.unsubscribeLocalDtableChanged = this.dtable.subscribe('local-dtable-changed', () => { this.onDTableChanged(); });
-      this.unsubscribeRemoteDtableChanged = this.dtable.subscribe('remote-dtable-changed', () => { this.onDTableChanged(); });
       window.app = {};
       this.dtable.subscribe('dtable-connect', () => { this.onDTableConnect(); });
     }
@@ -119,21 +110,18 @@ class App extends React.Component {
       script.type = 'text/javascript';
       script.src = `https://maps.googleapis.com/maps/api/js?key=${AUTH_KEY}&libraries=places`;
       document.body.appendChild(script);
-      this.loadLeafletScript();
+      script.onload = async () => {
+        this.geocoder = new window.google.maps.Geocoder();
+        this.initPluginDTableData();
+      };
     }
   }
 
-  loadLeafletScript() {
+  async renderMap() {
     let lang = (window.dtable && window.dtable.lang) ? window.dtable.lang : 'en';
     let url = `http://mt0.google.com/vt/lyrs=m@160000000&hl=${lang}&gl=${lang}&src=app&y={y}&x={x}&z={z}&s=Ga`;
     if (!document.getElementById('map-container')) return;
-    let center = localStorage.getItem('dtable-map-plugin-center');
-    let position = [20, 123], zoom = 5;
-    if (center) {
-      center = JSON.parse(center)
-      position = [center.position.lat, center.position.lng];
-      zoom = center.zoom;
-    }
+    const { position, zoom } = await getInitialMapCenter(this.state.locations, this.geocoder);
     this.map = L.map('map-container').setView(position, zoom).invalidateSize();
     L.tileLayer(url, {
       maxZoom: 18,
@@ -142,6 +130,8 @@ class App extends React.Component {
   }
 
   onDTableConnect() {
+    this.unsubscribeLocalDtableChanged = this.dtable.subscribe('local-dtable-changed', () => { this.onDTableChanged(); });
+    this.unsubscribeRemoteDtableChanged = this.dtable.subscribe('remote-dtable-changed', () => { this.onDTableChanged(); });
     const pluginSettings = this.initPluginSettings();
     const configSettings = this.initSelectedSettings(pluginSettings);
     const locations = getLocations(this.dtable, configSettings);
@@ -150,7 +140,7 @@ class App extends React.Component {
       locations,
       isDataLoaded: true
     }, () => {
-      this.loadLeafletScript();
+      this.renderMap();
     });
   }
 
@@ -436,15 +426,6 @@ class App extends React.Component {
     }
   }
   
-  renderMap = (locations) => {
-    if (window.google && window.google.maps) {
-      if (!this.map) {
-        this.loadLeafletScript();
-      }
-      this.renderLocations(locations);
-    }
-  }
-
   removeLayers = () => {
     if (this.markers.length > 0) {
       this.markers.forEach((m) => {
@@ -464,9 +445,6 @@ class App extends React.Component {
 
     const addressType = getConfigItemByType(this.state.configSettings, 'address_type').active;
     if (addressType === 'text') {
-      if (!this.geocoder) {
-        this.geocoder = new window.google.maps.Geocoder();
-      }
       this.geocoding(locations, 1, 0);
     } else {
       renderMarkByPosition(locations, this.addMarker);
