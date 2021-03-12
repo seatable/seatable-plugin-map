@@ -329,7 +329,7 @@ class App extends React.Component {
         let currentTable = this.dtable.getTableByName(tableName);
         let currentView = this.dtable.getViewByName(currentTable, viewName);
         setting.active = option;
-        if (type === 'lng_lat') {
+        if (option === 'lng_lat') {
           const lngColumnSetting = this.getAddressSetting(currentTable, currentView, 'lng_column');
           const latColumnSetting = this.getAddressSetting(currentTable, currentView, 'lat_column');
           configSettings.splice(3, 1, lngColumnSetting, latColumnSetting);
