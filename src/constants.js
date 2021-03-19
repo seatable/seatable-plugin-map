@@ -8,7 +8,8 @@ export const CONFIG_TYPE = {
   COLUMN: 'column',
   MARK_COLUMN: 'mark_column',
   LNG_COLUMN: 'lng_column',
-  LAT_COLUMN: 'lat_column'
+  LAT_COLUMN: 'lat_column',
+  ADDRESS_TYPE: 'address_type'
 };
 
 export const COLUMN_TYPES = ['geolocation', 'text'];

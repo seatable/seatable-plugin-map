@@ -96,3 +96,34 @@ export const formatGeolocactionValue = (value) => {
   let province = location.province === 'other' ? '' : location.province;
   return `${province || ''}${city || ''}${district || ''}${value.detail || ''}`;
 }
+
+export const getInitialMapCenter = async (locations, geocoder) => {
+  let position = [32, 166], zoom = 2;
+  let center = localStorage.getItem('dtable-map-plugin-center');
+  if (!center) {
+    let location = locations[0] || {};
+    if (location.type === 'text') {
+      return await new Promise(resolve => {
+        geocoder.geocode(
+          { address: location.location },
+          (points, status) => {
+            if (status === window.google.maps.GeocoderStatus.OK) {
+              let lat = points[0].geometry.location.lat();
+              let lng = points[0].geometry.location.lng();
+              position = [lat, lng];
+            }
+            resolve({ position, zoom });
+          }
+        );
+      });
+    } else {
+      position = location.position || position;
+      position = [position[1], position[0]];
+    }
+  } else {
+    center = JSON.parse(center)
+    position = [center.position.lat, center.position.lng];
+    zoom = center.zoom;
+  }
+  return { position, zoom };
+}
