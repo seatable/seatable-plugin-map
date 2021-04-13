@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import styles from '../../css/mobile-en.module.css';
 import TouchFeedBack from './touch-feedback';
-import intl from 'react-intl-universal';
 
 class MobileSettingItem extends Component {
 
@@ -11,10 +10,6 @@ class MobileSettingItem extends Component {
 
   getText = () => {
     const { configSetting } = this.props;
-    if (configSetting.type === 'address_type') {
-      const active = configSetting.active;
-      return active === 'text' ? intl.get('Text') : intl.get('Latitude_and_longitude');
-    }
     return configSetting.active;
   }
 
