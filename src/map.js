@@ -372,6 +372,10 @@ class App extends React.Component {
     } else {
       address = location.location;
     }
+    if (!address) {
+      this.geocoding(locations, 1, ++index);
+      return;
+    }
     const activeColumn = this.state.configSettings[2].active;
     this.geocoder.geocode({ 'address': address }, (points, status) => {
       if (location.columnName !== activeColumn) return;

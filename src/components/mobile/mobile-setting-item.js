@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import styles from '../../css/mobile-en.module.css';
 import TouchFeedBack from './touch-feedback';
-import intl from 'react-intl-universal';
 
 class MobileSettingItem extends Component {
 
