@@ -368,24 +368,28 @@ class App extends React.Component {
   }
 
   geocoding = (locations, resolutionTimes, index) => {
-    const location = locations[index];
-    if (!location) return;
+    const locationItem = locations[index];
+    if (!locationItem) return;
     let address;
-    let name = location.name;
-    const value = location.location;
-    if (location.type === 'geolocation' && typeof value === 'object') {
+    let name = locationItem.name;
+    const value = locationItem.location;
+    if (locationItem.type === 'geolocation' && typeof value === 'object') {
       address = formatGeolocactionValue(value);
     } else {
-      address = location.location;
+      address = locationItem.location;
+    }
+    if (!address) {
+      this.geocoding(locations, 1, ++index);
+      return;
     }
     const activeColumn = this.state.configSettings[2].active;
     this.geocoder.geocode({ 'address': address }, (points, status) => {
-      if (location.columnName !== activeColumn) return;
+      if (locationItem.columnName !== activeColumn) return;
       switch (status) {
         case window.google.maps.GeocoderStatus.OK: {
           let lat = points[0].geometry.location.lat();
           let lng = points[0].geometry.location.lng();
-          this.addMarker(lat, lng, location.color, name, address);
+          this.addMarker(lat, lng, locationItem.color, name, address);
           this.geocoding(locations, 1, ++index);
           break;
         }

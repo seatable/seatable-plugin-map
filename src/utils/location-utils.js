@@ -20,11 +20,11 @@ export const getLocations = (dtable, configSettings) => {
   let currentTable = dtable.getTableByName(tableName);
   let currentView = dtable.getViewByName(currentTable, viewName);
   const columnName = getConfigItemByType(configSettings, 'column').active;
+  let currentColumn = dtable.getColumnByName(currentTable, columnName);
   const markColumnName = getConfigItemByType(configSettings, 'mark_column').active;
   const currentMarkColumn = dtable.getColumnByName(currentTable, markColumnName);
   let locationNameKey = currentTable.columns[0].key;
   let rows = currentTable.rows;
-  let currentColumn = dtable.getColumnByName(currentTable, columnName);
   if (!currentColumn) {
     return [];
   }
@@ -37,8 +37,8 @@ export const getLocations = (dtable, configSettings) => {
   if (rows.length === 0) return [];
 
   const columnData = currentColumn.data || {};
-  let locationValueKey = currentColumn.key;
   let addressType = columnData.geo_format || 'geolocation';
+  let locationValueKey = currentColumn.key;
 
   rows.forEach(row => {
     const color = currentMarkColumn ? getMarkColor(currentMarkColumn, row) : '';
