@@ -1,7 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import LocationSettingsItem from './local-settings-widgets/location-settings-item';
-import AddressType from './local-settings-widgets/address-type';
 import intl from 'react-intl-universal';
 import '../locale/index.js';
 
@@ -28,17 +27,6 @@ class LocationSettings extends Component {
         </div>
         <div className="dtable-plugin-location-settings-parameter">
           {configSettings && configSettings.map(configSetting => {
-            if (configSetting.type === 'address_type') {
-              return (
-                <Fragment key={configSetting.type}>
-                  <div className="setting-divider"></div>
-                  <AddressType
-                    configSetting={configSetting}
-                    onAddressTypeChange={this.props.onAddressTypeChange}
-                  />
-                </Fragment>
-              );
-            }
             if (configSetting.type === 'mark_column') {
               return (
                 <Fragment key={configSetting.type}>

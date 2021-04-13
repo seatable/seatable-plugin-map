@@ -6,9 +6,6 @@ const SETTING_MIRROR = {
   view: 'viewName',
   column: 'columnName',
   mark_column: 'markColumnName',
-  address_type: 'addressType',
-  lng_column: 'lngColumnName',
-  lat_column: 'latColumnName',
 }
 
 export const generateSettingsByConfig = (configSettings) => {
