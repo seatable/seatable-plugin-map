@@ -8,12 +8,7 @@ const zh_CN = {
   "Your_Google_Maps_key_has_exceeded_quota": "您的谷歌地图密钥已超出配额。",
   "address_not_be_found": "{address}没有被找到。",
   "Not_used": "不使用",
-  "Address_type": "地址列",
   "Color_field": "颜色列",
-  "Longitude_field": "经度列",
-  "Latitude_field": "纬度列",
-  "Text": "文本",
-  "Latitude_and_longitude": "经纬度",
   "Cancle": "取消",
   "Save": "保存",
   "Please_select": "请选择"
