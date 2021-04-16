@@ -6,7 +6,7 @@ const fr = {
   "Address_field": "Adresse",
   "Settings": "Paramètres",
   "Your_Google_Maps_key_has_exceeded_quota": "Votre clé Google Maps a épuisé son quota.",
-  "address_was_not_found": "l'{address} n'a pas été trouvée.",
+  "address_was_not_found": "{address} n'a pas été trouvée.",
   "Not_used": "Ne pas utilisé",
   "Color_field": "Champ de couleur",
   "Cancle": "Annuler",
