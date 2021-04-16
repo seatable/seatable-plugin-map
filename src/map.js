@@ -31,7 +31,7 @@ class App extends React.Component {
       showDialog: props.showDialog || true,
       locations: [],
       showSettingDialog: false,
-      isDataLoaded: true,
+      isDataLoaded: false,
       configSettings: null,
       isFullScreen: false
     };
@@ -505,7 +505,7 @@ class App extends React.Component {
         </div>
         <ModalBody className={"map-plugin-modal-body " + (isFullScreen ? 'map-plugin-modal-body-full-screen' : '')}>
           {(!isDataLoaded && mapKey) && <Loading />}
-          {(isDataLoaded && !mapKey) && (
+          {(!mapKey) && (
             <div className='d-flex justify-content-center mt-9'>
               <span className="alert-danger">{intl.get('The_map_plugin_is_not_properly_configured_contact_the_administrator_for_related_configuration')}</span>
             </div>
