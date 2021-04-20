@@ -1,6 +1,6 @@
 const zh_CN = {
   "Map_plugin": "地图插件",
-  "The_map_plugin_is_not_properly_configured_contact_the_administrator": "地图插件配置不正确，请与管理员联系。",
+  "The_map_plugin_is_not_properly_configured_contact_the_administrator": "地图插件配置不正确。请与管理员联系。",
   "Table": "表格",
   "View": "视图",
   "Address_field": "地址字段",
