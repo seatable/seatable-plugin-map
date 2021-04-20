@@ -1,6 +1,6 @@
 const en = {
   "Map_plugin": "Map plugin",
-  "The_map_plugin_is_not_properly_configured_contact_the_administrator_for_related_configuration": "The map plugin is not properly configured contact the administrator for related configuration.",
+  "The_map_plugin_is_not_properly_configured_contact_the_administrator": "The map plugin is not properly configured. Contact the administrator.",
   "Table": "Table",
   "View": "View",
   "Address_field": "Address field",
