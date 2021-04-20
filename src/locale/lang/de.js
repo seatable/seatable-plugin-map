@@ -1,6 +1,6 @@
 const de = {
   "Map_plugin": "Map",
-  "The_map_plugin_is_not_properly_configured_contact_the_administrator_for_related_configuration": "Das Karten-Plugin ist nicht richtig konfiguriert. Wenden Sie sich an den Administrator, um eine entsprechende Konfiguration zu erhalten.",
+  "The_map_plugin_is_not_properly_configured_contact_the_administrator": "Das Karten-Plugin ist nicht richtig konfiguriert. Wenden Sie sich an den Administrator.",
   "Table": "Tabelle",
   "View": "Ansicht",
   "Address_field": "Adresse",

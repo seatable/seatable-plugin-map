@@ -491,7 +491,7 @@ class App extends React.Component {
           {(!isDataLoaded && mapKey) && <Loading />}
           {(!mapKey) && (
             <div className='d-flex justify-content-center mt-9'>
-              <span className="alert-danger">{intl.get('The_map_plugin_is_not_properly_configured_contact_the_administrator_for_related_configuration')}</span>
+              <span className="alert-danger">{intl.get('The_map_plugin_is_not_properly_configured_contact_the_administrator')}</span>
             </div>
           )}
           {(isDataLoaded && mapKey) && <div id="map-container" className={styles['map-container']}></div>}
