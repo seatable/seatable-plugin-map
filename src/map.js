@@ -175,26 +175,28 @@ class App extends React.Component {
     });
 
     // need option, get the column type is map
-    pluginSettings = { tableName: activeTable.name, viewName: activeView.name, columnName: columns[0] ? columns[0].name : '', markColumnName: null };
+    pluginSettings = { tableName: activeTable.name, viewName: activeView.name, columnName: columns[0] ? columns[0].name : '', markDependence: null, directShownColumn: null };
     return pluginSettings;
   }
 
   isValidPluginSettings = (pluginSettings) => {
-    let { tableName, viewName, columnName, markColumnName } = pluginSettings;
+    let { tableName, viewName, columnName, markDependence, directShownColumnName } = pluginSettings;
     let table = this.dtable.getTableByName(tableName);
     if (!table) return false;
     let view = this.dtable.getViewByName(table, viewName);
     if (!view) return false;
     let column = this.dtable.getColumnByName(table, columnName);
     if (!column && columnName) return false;
-    let markColumn = this.dtable.getColumnByName(table, markColumnName);
-    if (!markColumn && markColumnName) return false;
+    let markColumn = this.dtable.getColumnByName(table, markDependence);
+    if (!markColumn && markDependence && markDependence !== 'rows_color') return false;
+    const directShownColumn = this.dtable.getColumnByName(table, directShownColumnName);
+    if (!directShownColumn && directShownColumnName) return false;
     return true;
   }
 
   initSelectedSettings = (settings) => {
     let configSettings = [];
-    let { tableName, viewName, columnName, markColumnName } = settings;
+    let { tableName, viewName, columnName, markDependence, directShownColumnName } = settings;
     let activeTable = this.dtable.getTableByName(tableName);
     let tableSettings = this.getTableSettings(activeTable);
     let activeView = this.dtable.getViewByName(activeTable, viewName);
@@ -203,9 +205,11 @@ class App extends React.Component {
     let activeColumn = this.dtable.getColumnByName(activeTable, columnName);
     let columnSettings = this.getColumnSettings(activeTable, activeView, activeColumn);
     configSettings.push(columnSettings);
-    let activeMarkColumn = this.dtable.getColumnByName(activeTable, markColumnName);
-    let markColumnSettings = this.getMarkColumnSetting(activeTable, activeView, activeMarkColumn);
+    let markColumnSettings = this.getMarkColumnSetting(activeTable, activeView, markDependence);;
     configSettings.push(markColumnSettings);
+    let directShownColumn = this.dtable.getColumnByName(activeTable, directShownColumnName);
+    let directShownColumnSetting = this.getDirectShownColumnSetting(activeTable, activeView, directShownColumn);
+    configSettings.push(directShownColumnSetting);
     return configSettings;
   }
 
@@ -218,8 +222,9 @@ class App extends React.Component {
         let tableSettings = this.getTableSettings(currentTable);
         let viewSettings = this.getViewSettings(currentTable);
         let markColumnSetting = this.getMarkColumnSetting(currentTable, currentView);
+        let directShownColumnSetting = this.getDirectShownColumnSetting(currentTable, currentView);
         let columnSetting = this.getColumnSettings(currentTable, currentView);
-        return [tableSettings, viewSettings, columnSetting, markColumnSetting];
+        return [tableSettings, viewSettings, columnSetting, markColumnSetting, directShownColumnSetting];
       }
       case CONFIG_TYPE.VIEW: {
         const tableSettings =  getConfigItemByType(configSettings, 'table');
@@ -228,8 +233,9 @@ class App extends React.Component {
         let currentView = this.dtable.getViewByName(currentTable, option.name);
         let viewSettings = this.getViewSettings(currentTable, currentView);
         let markColumnSetting = this.getMarkColumnSetting(currentTable, currentView);
+        let directShownColumnSetting = this.getDirectShownColumnSetting(currentTable, currentView);
         let columnSetting = this.getColumnSettings(currentTable, currentView);
-        return [tableSettings, viewSettings, columnSetting, markColumnSetting];
+        return [tableSettings, viewSettings, columnSetting, markColumnSetting, directShownColumnSetting];
       }
       case CONFIG_TYPE.COLUMN: {
         const tableName = configSettings[0].active;
@@ -241,14 +247,23 @@ class App extends React.Component {
         replaceSettingItemByType(configSettings, 'column', columnSettings);
         return configSettings;
       }
-      case CONFIG_TYPE.MARK_COLUMN: {
+      case CONFIG_TYPE.MARK_DEPENDENCE: {
         const tableName = configSettings[0].active;
         const viewName = configSettings[1].active;
         let currentTable = this.dtable.getTableByName(tableName);
         let currentView = this.dtable.getViewByName(currentTable, viewName);
-        let currentColumn = this.dtable.getColumnByName(currentTable, option.name);
-        let columnSettings = this.getMarkColumnSetting(currentTable, currentView, currentColumn);
-        replaceSettingItemByType(configSettings, 'mark_column', columnSettings);
+        let columnSetting = this.getMarkColumnSetting(currentTable, currentView, option.name);
+        replaceSettingItemByType(configSettings, 'mark_dependence', columnSetting);
+        return configSettings;
+      }
+      case CONFIG_TYPE.DIECT_SHOWN_COLUMN: {
+        const tableName = configSettings[0].active;
+        const viewName = configSettings[1].active;
+        let currentTable = this.dtable.getTableByName(tableName);
+        let currentView = this.dtable.getViewByName(currentTable, viewName);
+        let column = this.dtable.getColumnByName(currentTable, option.name);
+        let directShownColumnSetting = this.getDirectShownColumnSetting(currentTable, currentView, column);
+        replaceSettingItemByType(configSettings, 'direct_shown_column', directShownColumnSetting);
         return configSettings;
       }
       default: {
@@ -296,7 +311,7 @@ class App extends React.Component {
     return {type: CONFIG_TYPE.COLUMN, name: intl.get('Address_field'), active: active, settings: columnSettings};
   }
 
-  getMarkColumnSetting = (currentTable, currentView, activeColumn = null) => {
+  getMarkColumnSetting = (currentTable, currentView, dependence = null) => {
     let columns = this.dtable.getShownColumns(currentTable, currentView);
     // n\ed options: checkout map column
     columns = columns.filter(column => {
@@ -307,11 +322,28 @@ class App extends React.Component {
       return {id: column.key, name: column.name};
     });
 
-    columnSettings.unshift({id: 'not_used', name: intl.get('Not_used')});
+    let active = '';
+    columnSettings.unshift({id: 'not_used', name: intl.get('Not_used')}, {id: 'rows_color', name: intl.get('Row_color')});
+    if (dependence === 'rows_color') {
+      active = intl.get('Row_color');
+    } else {
+      active = dependence ? dependence : columnSettings[0].name;
+    }
+    return {type: 'mark_dependence', name: intl.get('Color_field'), active: active, settings: columnSettings};
+  }
 
+  getDirectShownColumnSetting = (currentTable, currentView, activeColumn = null) => {
+    let columns = this.dtable.getShownColumns(currentTable, currentView);
+    columns = columns.filter(column => {
+      return column.type === 'text' || column.type === 'single-select';
+    });
+    let columnSettings = columns.map(column => {
+      return {id: column.key, name: column.name};
+    });
+    columnSettings.unshift({id: '', name: intl.get('Not_used')});
     // need options: checkout map column
     let active = activeColumn ? activeColumn.name : columnSettings[0].name;
-    return {type: 'mark_column', name: intl.get('Color_field'), active: active, settings: columnSettings};
+    return { type: 'direct_shown_column', name: intl.get('Direct_shown_column'), active: active, settings: columnSettings };
   }
 
   onSelectChange = (option, type) => {
@@ -383,7 +415,7 @@ class App extends React.Component {
         case window.google.maps.GeocoderStatus.OK: {
           let lat = points[0].geometry.location.lat();
           let lng = points[0].geometry.location.lng();
-          this.addMarker(lat, lng, locationItem.color, name, address);
+          this.addMarker(locationItem, lat, lng, address);
           this.geocoding(locations, 1, ++index);
           break;
         }
@@ -421,7 +453,8 @@ class App extends React.Component {
     });
   }
 
-  addMarker = (lat, lng, color, name, address) => {
+  addMarker = (location, lat, lng, address) => {
+    const { color, name, directShownLabel } = location;
     if (!this.markers.find(marker => marker._latlng.lat === lat && marker._latlng.lng === lng)) {
       let describe = `<p>${address || ''}</p><p>${name}</p>`;
       let myIcon = L.icon({
@@ -430,7 +463,7 @@ class App extends React.Component {
       });
       if (color) {
         const colorIndex = COLORS.findIndex((item) => color === item.COLOR);
-        if (colorIndex) {
+        if (colorIndex > -1) {
           myIcon = L.icon({
             iconUrl: [image['image' + (colorIndex + 1)]],
             iconSize: [25, 41],
@@ -440,6 +473,14 @@ class App extends React.Component {
       let marker = new L.Marker([lat, lng], { icon: myIcon });
 
       marker.bindPopup(describe);
+      if (directShownLabel) {
+        marker.bindTooltip(directShownLabel, {
+          direction: 'right',
+          permanent: true,
+          offset: L.point(14, 0),
+          className: 'plugin-en-tooltip'
+        }).openTooltip();
+      }
       marker.on('mouseover', () => {
         marker.openPopup();
       });

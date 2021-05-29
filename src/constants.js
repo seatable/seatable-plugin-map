@@ -6,11 +6,12 @@ export const CONFIG_TYPE = {
   TABLE: 'table',
   VIEW: 'view',
   COLUMN: 'column',
-  MARK_COLUMN: 'mark_column',
-  LNG_COLUMN: 'lng_column',
-  LAT_COLUMN: 'lat_column',
-  ADDRESS_TYPE: 'address_type'
+  MARK_DEPENDENCE: 'mark_dependence',
+  ADDRESS_TYPE: 'address_type',
+  DIECT_SHOWN_COLUMN: 'direct_shown_column'
 };
+
+export const DEPENDENT_ROW_COLOR = '行颜色';
 
 export const COLUMN_TYPES = ['geolocation', 'text'];
 

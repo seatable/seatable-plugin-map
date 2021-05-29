@@ -37,6 +37,7 @@ class Settings extends Component {
   render() {
     const { toggleSettingDialog, configSettings } = this.props;
     const { selectedConfig, isShowSelectOption } = this.state;
+    console.log(configSettings);
     return (
       <div className={styles['setting']}>
         <div className={styles["dtable-map-plugin-title"]}>

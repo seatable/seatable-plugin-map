@@ -11,7 +11,9 @@ const zh_CN = {
   "Color_field": "颜色列",
   "Cancle": "取消",
   "Save": "保存",
-  "Please_select": "请选择"
+  "Please_select": "请选择",
+  "Direct_shown_column": "直接显示字段",
+  "Row_color": "行颜色"
 };
 
 export default zh_CN;

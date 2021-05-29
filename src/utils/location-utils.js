@@ -1,4 +1,5 @@
 import getConfigItemByType from './get-config-item-by-type';
+import intl from 'react-intl-universal';
 
 const getMarkColor = (markColumn, row) => {
   const key = markColumn.key;
@@ -21,8 +22,17 @@ export const getLocations = (dtable, configSettings) => {
   let currentView = dtable.getViewByName(currentTable, viewName);
   const columnName = getConfigItemByType(configSettings, 'column').active;
   let currentColumn = dtable.getColumnByName(currentTable, columnName);
-  const markColumnName = getConfigItemByType(configSettings, 'mark_column').active;
-  const currentMarkColumn = dtable.getColumnByName(currentTable, markColumnName);
+  const markDependence = getConfigItemByType(configSettings, 'mark_dependence').active;
+  const currentMarkColumn = dtable.getColumnByName(currentTable, markDependence);
+  const isRowColor = markDependence === intl.get('Row_color');
+  let rowsColor = {};
+  if (isRowColor) {
+    const viewRows = dtable.getViewRows(currentView, currentTable);
+    rowsColor = dtable.getViewRowsColor(viewRows, currentView, currentTable);
+  }
+  const directShownColumnName = getConfigItemByType(configSettings, 'direct_shown_column').active;
+  const directShownColumn = dtable.getColumnByName(currentTable, directShownColumnName);
+  let directShownLabel = '';
   let locationNameKey = currentTable.columns[0].key;
   let rows = currentTable.rows;
   if (!currentColumn) {
@@ -41,7 +51,15 @@ export const getLocations = (dtable, configSettings) => {
   let locationValueKey = currentColumn.key;
 
   rows.forEach(row => {
-    const color = currentMarkColumn ? getMarkColor(currentMarkColumn, row) : '';
+    let color = '';
+    if (isRowColor) {
+      color = getRowColor(rowsColor, row);
+    } else if (currentMarkColumn) {
+      color = getMarkColor(currentMarkColumn, row) || color;
+    }
+    if (directShownColumn) {
+      directShownLabel = getDirectShownLabel(row, directShownColumn);
+    }
     const value = row[locationValueKey] || {};
     locations.push({
       type: addressType,
@@ -49,10 +67,30 @@ export const getLocations = (dtable, configSettings) => {
       name: row[locationNameKey] || '',
       color,
       columnName,
+      directShownLabel
     });
   });
   return locations;
 }
+
+function getDirectShownLabel(row, column) {
+  let label = '';
+  let value = row[column.key];
+  if (column.type === 'text') {
+    if (!row[column.key]) {
+      return;
+    }
+    label = `<p class='map-en-direct-shown-label-container'>${row[column.key]}</p>`;
+  } else if (column.type === 'single-select') {
+    const item = column.data.options.find((item) => {
+      return item.id === value;
+    });
+    if (item) {
+      label = `<p class='map-en-direct-shown-label-container'><span style='background-color: ${item.color}; color: ${item.textColor}' class='single-select-formatter'>${item.name}</span></p>`;
+    }
+  }
+  return label;
+} 
 
 export const renderMarkByPosition = (locations, renderer, start = 0) => {
   let stack = locations.slice(start, start += 10);
@@ -62,7 +100,7 @@ export const renderMarkByPosition = (locations, renderer, start = 0) => {
     stack.forEach((location) => {
       const position = location.location;
       if (Number(position.lng) && Number(position.lat)) {
-        renderer(Number(position.lat), Number(position.lng), location.color, location.name);
+        renderer(location, Number(position.lat), Number(position.lng));
       }
     });
     renderMarkByPosition(locations, renderer, start);
@@ -75,6 +113,10 @@ export const formatGeolocactionValue = (value) => {
   let city = location.city === 'other' ? '' : location.city;
   let province = location.province === 'other' ? '' : location.province;
   return `${province || ''}${city || ''}${district || ''}${value.detail || ''}`;
+}
+
+const getRowColor = (rowsColors, row) => {
+  return rowsColors[row._id] || '';
 }
 
 export const getInitialMapCenter = async (locations, geocoder) => {
