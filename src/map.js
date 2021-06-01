@@ -610,7 +610,7 @@ class App extends React.Component {
         <div className={'dtable-map-plugin-title'}>
           <div className='plugin-logo'>
             <img className="plugin-logo-icon" src={logo} alt="" />
-            <span className="dtable-map-plugin-name">地图</span>
+            <span className="dtable-map-plugin-name">{intl.get('Map_plugin')}</span>
           </div>
           <div className="map-plugin-en-tabs">
             <ViewTabs
