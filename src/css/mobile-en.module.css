@@ -110,6 +110,7 @@
 .mobile-settting-item {
   margin-top: 16px;
   font-size: 14px;
+  overflow: auto;
 }
 
 .mobile-setting-title {

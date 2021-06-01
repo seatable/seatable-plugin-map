@@ -8,10 +8,20 @@ const fr = {
   "Your_Google_Maps_key_has_exceeded_quota": "Votre clé Google Maps a épuisé son quota.",
   "address_was_not_found": "{address} n'a pas été trouvée.",
   "Not_used": "Ne pas utilisé",
-  "Color_field": "Champ de couleur",
+  "Marker_colored_by": "Marqueur coloré par",
   "Cancle": "Annuler",
   "Save": "sauver",
-  "Please_select": "Veuillez sélectionner"
+  "Please_select": "Veuillez sélectionner",
+  "Display_field": "Afficher les champs",
+  "New_view": "Nouvelle vue",
+  "Rename_view": "Renommer la vue",
+  "Delete_view": "Supprimer la vue",
+  "Name": "Nom",
+  "Name_is_required": "Le nom est nécessaire.",
+  "Cancel": "Annuler",
+  "Submit": "Soumettre",
+  "Default_View": "Vue standard",
+  "Row_color": "Couleur de la ligne",
 };
 
 export default fr;

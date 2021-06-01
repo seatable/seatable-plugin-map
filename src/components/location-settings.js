@@ -27,7 +27,7 @@ class LocationSettings extends Component {
         </div>
         <div className="dtable-plugin-location-settings-parameter">
           {configSettings && configSettings.map(configSetting => {
-            if (configSetting.type === 'mark_column') {
+            if (configSetting.type === 'mark_dependence') {
               return (
                 <Fragment key={configSetting.type}>
                   <div className="setting-divider"></div>
