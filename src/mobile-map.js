@@ -507,7 +507,6 @@ class App extends React.Component {
         }
       }
       let marker = new L.Marker([lat, lng], { icon: myIcon });
-      
       marker.bindPopup(describe);
       if (directShownLabel) {
         marker.bindTooltip(directShownLabel, {

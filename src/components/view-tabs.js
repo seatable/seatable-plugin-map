@@ -4,6 +4,7 @@ import ModalPortal from './dialog/modal-portal';
 import NewViewDialog from './dialog/new-view-dialog';
 import RenameViewDialog from './dialog/rename-view-dialog';
 import DropdownMenu from './dropdownmenu';
+import intl from 'react-intl-universal';
 import tabStyles from '../css/view-tabs.module.css';
 
 const propTypes = {
@@ -103,12 +104,12 @@ class ViewTabs extends Component {
                           <React.Fragment>
                             <button className="dropdown-item" onClick={() => this.onRenameViewToggle(index)}>
                               <i className="item-icon dtable-font dtable-icon-rename"></i>
-                              <span className="item-text">{('重命名视图')}</span>
+                              <span className="item-text">{(intl.get('Rename_view'))}</span>
                             </button>
                             {settings.length > 1 &&
                               <button className="dropdown-item" onClick={() => this.props.onDeleteView(index)}>
                                 <i className="item-icon dtable-font dtable-icon-delete"></i>
-                                <span className="item-text">{('删除视图')}</span>
+                                <span className="item-text">{intl.get('Delete_view')}</span>
                               </button>
                             }
                           </React.Fragment>
