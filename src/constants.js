@@ -15,3 +15,6 @@ export const DEPENDENT_ROW_COLOR = '行颜色';
 
 export const COLUMN_TYPES = ['geolocation', 'text'];
 
+export const KEY_SELECTED_VIEW_IDS = `${PLUGIN_NAME}-selectedViewIds`;
+
+

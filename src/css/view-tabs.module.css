@@ -1,0 +1,94 @@
+.tabs-container {
+  display: flex;
+  flex: 1 1;
+  height: 100%;
+  font-size: 14px;
+  font-weight: 500;
+  overflow: hidden;
+}
+
+.view-item {
+  height: 100%;
+  padding: 0 16px;
+  flex: 1 0 auto;
+  user-select: none;
+}
+
+.view-item .tab-item-active {
+  border-color: #3b88fd;
+  color: #444;
+  cursor: default;
+}
+
+.view-item-content {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  color: #999;
+  border-bottom: 2px solid transparent;
+}
+
+.icon {
+  display: inline-block;
+  height: 18px;
+  font-size: 12px;
+  color: #949494;
+  transform: scale(.8);
+  transition: all .1s;
+}
+
+.btn-view-dropdown {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  margin-left: 5px;
+  margin-right: -5px;
+  line-height: 20px;
+  cursor: pointer;
+}
+
+.btn-add-view { 
+  display: flex;
+  align-items: center;
+  width: 24px;
+  height: 100%; 
+}
+
+.add-map-view-icon {
+  height: 24px;
+  width: 24px;
+  margin-left: 4px;
+  text-align: center;
+  cursor: pointer;
+  color: #000;
+  opacity: .5;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 24px;
+}
+
+.view-item .view-item-content:hover {
+  border-color: #3b88fd;
+  color: #444;
+  cursor: pointer;
+}
+
+.views-tabs-scroll {
+  overflow-x: scroll;
+  overflow-y: hidden;
+}
+
+.views-tabs-scroll::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+.views {
+  height: 100%;
+}

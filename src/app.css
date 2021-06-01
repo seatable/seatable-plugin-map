@@ -1,6 +1,33 @@
+.plugin-map-dialog-en {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1;
+  width: 100%;
+  min-height: 0;
+  background-color: #fff;
+  border-radius: 12px 12px 0 0;
+  box-shadow: 0 -1px 12px rgb(0 0 0 / 30%);
+}
+
+.plugin-map-dialog-en .dtable-map-plugin-title {
+  display: flex;
+  align-items: center;
+  height: 48px;
+  min-height: 48px;
+  padding: 0 16px;
+  background-color: #fff;
+  border-bottom: 1px solid #e7eaec;
+  border-radius: 12px 12px 0 0;
+}
 .plugin-map-dialog-en .map-plugin-modal-body-full-screen,
 .plugin-map-dialog-en .modal-content {
   height: 100%;
+}
+
+.plugin-map-dialog-en .full-screen-active {
+  background-color: #e0e0e0;
+  border-radius: 2px;
+  color: #404040;
 }
 
 .plugin-map-dialog-en .dtable-map-plugin-title .modal-title {
@@ -14,19 +41,55 @@
   font-weight: 600;
 }
 
-.plugin-map-dialog-en .dtable-map-plugin-title .dtable-map-plugin-logo {
-  width: 23px;
-  height: 23px;
-  margin-right: 8px;
+.plugin-map-dialog-en .plugin-logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 80px 0 0;
 } 
+
+.plugin-map-dialog-en .plugin-logo .plugin-logo-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 4px;
+}
+
+.plugin-map-dialog-en .map-operators {
+  margin-left: 80px;
+}
 
 .plugin-map-dialog-en .map-plugin-modal-body {
   padding: 0;
   min-height: 500px;
+  height: 100%;
+  position: relative;
+}
+
+.map-plugin-en-tabs {
+  display: flex;
+  flex: 1 1;
+  height: 100%;
+  font-size: 14px;
+  font-weight: 500;
+  overflow: hidden;
 }
 
 .plugin-map-dialog-en .dtable-map-plugin .map-container {
-  height: 500px;
+  height: 100%;
+}
+
+.plugin-map-dialog-en .dtable-map-plugin-title .map-operator {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  color: #000;
+  opacity: .5;
+  text-align: center;
+  cursor: pointer;
+}
+
+.plugin-map-dialog-en .btn-margin-right {
+  margin-right: 0.25rem;
 }
 
 .plugin-map-dialog-en .dtable-map-plugin {
@@ -68,19 +131,7 @@
   border-bottom: 1px solid #e4e4e4;
 }
 
-.plugin-map-dialog-en .dtable-plugin-location-settings-header .setting-header-title {
-  flex: 1 1;
-  font-size: 1rem;
-  font-weight: 700;
-}
-
-.plugin-map-dialog-en .dtable-plugin-location-settings-header .btn-close {
-  height: 24px;
-  width: 24px;
-  text-align: center;
-  cursor: pointer;
-  color: #000;
-  opacity: .5;
+.plugin-map-dialog-en .btn-close {
   font-weight: 700;
 }
 
