@@ -1,6 +1,7 @@
 {
   "name": "map-en",
   "version": "0.0.21",
+  "display_type": "overlay",
   "display_name": {
     "cs": "Mapy",
     "de": "Karten",
