@@ -34,7 +34,7 @@ class NewViewDialog extends React.Component {
     let { viewName } = this.state;
     viewName = viewName.trim();
     if (!viewName) {
-      this.setState({errMessage: '名称必须存在'});
+      this.setState({errMessage: 'Name_is_required'});
       return;
     }
     this.props.onNewViewConfirm(viewName);

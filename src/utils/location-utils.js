@@ -107,11 +107,23 @@ export const renderMarkByPosition = (locations, renderer, start = 0) => {
   }, 20);
 }
 
-export const formatGeolocactionValue = (value) => {
+export const formatGeolocactionValue = (value, type) => {
   const location = value ? value : {};
+  if (type === 'country_region') {
+    return `${value.country_region || ''}`;
+  }
   let district = location.district === 'other' ? '' : location.district;
   let city = location.city === 'other' ? '' : location.city;
   let province = location.province === 'other' ? '' : location.province;
+
+  if (type === 'province_city') {
+    return `${province || ''}${city || ''}`;
+  }
+
+  if (type === province) {
+    return `${province || ''}`;
+  }
+  
   return `${province || ''}${city || ''}${district || ''}${value.detail || ''}`;
 }
 

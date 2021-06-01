@@ -7,14 +7,6 @@ class MobileSelectOption extends Component {
   
   onClick = (option) => {
     const { selectedConfig } = this.props;
-    if (selectedConfig.type === 'address_type') {
-      if (option.id === selectedConfig.active) {
-        this.props.hideSelectConfig();
-        return;
-      };
-      this.props.onSelectOption(selectedConfig.type, option.id);
-      return;
-    }
 
     if (option.name === selectedConfig.active) {
       this.props.hideSelectConfig();

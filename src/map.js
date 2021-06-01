@@ -14,10 +14,13 @@ import { replaceSettingItemByType } from './utils/repalce-setting-item-by-type';
 import { generatorViewId, getSelectedViewIds, replaceSettingItem, setSelectedViewIds } from './utils/common-utils';
 import getConfigItemByType from './utils/get-config-item-by-type';
 import onCapture from './utils/capture';
-import { IMAGE_PATH, 
+import { 
+  IMAGE_PATH, 
   PLUGIN_NAME, 
   CONFIG_TYPE, 
-  KEY_SELECTED_VIEW_IDS } from './constants';
+  KEY_SELECTED_VIEW_IDS,
+  GEOCODING_FORMAT
+} from './constants';
 import logo from './image/map.png';
 
 import './css/common.css';
@@ -417,7 +420,7 @@ class App extends React.Component {
     const locationItem = locations[0] || {};
     const addressType = locationItem.type;
     if (!addressType) return;
-    if (addressType === 'geolocation') {
+    if (GEOCODING_FORMAT.includes(addressType)) {
       this.geocoding(locations, 1, 0);
     } else {
       renderMarkByPosition(locations, this.addMarker);
@@ -429,8 +432,8 @@ class App extends React.Component {
     if (!locationItem) return;
     let address;
     const value = locationItem.location;
-    if (locationItem.type === 'geolocation' && typeof value === 'object') {
-      address = formatGeolocactionValue(value);
+    if (GEOCODING_FORMAT.includes(locationItem.type) && typeof value === 'object') {
+      address = formatGeolocactionValue(value, locationItem.type);
     } else {
       address = locationItem.location;
     }
@@ -500,7 +503,7 @@ class App extends React.Component {
           });
         }
       }
-      let marker = new L.Marker([lat, lng], { icon: myIcon });
+      let marker = new L.Marker([lat, lng], { icon: myIcon, riseOnHover: true });
 
       marker.bindPopup(describe);
       if (directShownLabel) {
@@ -508,6 +511,7 @@ class App extends React.Component {
           direction: 'right',
           permanent: true,
           offset: L.point(14, 0),
+          opacity: 1,
           className: 'plugin-en-tooltip'
         }).openTooltip();
       }

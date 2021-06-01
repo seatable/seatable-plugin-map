@@ -17,7 +17,9 @@ import getConfigItemByType from './utils/get-config-item-by-type';
 import { IMAGE_PATH, 
   PLUGIN_NAME, 
   CONFIG_TYPE, 
-  KEY_SELECTED_VIEW_IDS } from './constants';
+  KEY_SELECTED_VIEW_IDS,
+  GEOCODING_FORMAT
+} from './constants';
 import styles from './css/mobile-en.module.css';
 import logo from './image/map.png';
 
@@ -433,8 +435,8 @@ class App extends React.Component {
     if (!locationItem) return;
     let address;
     const value = locationItem.location;
-    if (locationItem.type === 'geolocation' && typeof value === 'object') {
-      address = formatGeolocactionValue(value);
+    if (GEOCODING_FORMAT.includes(locationItem.type) && typeof value === 'object') {
+      address = formatGeolocactionValue(value, locationItem.type);
     } else {
       address = locationItem.location;
     }
@@ -512,6 +514,7 @@ class App extends React.Component {
           direction: 'right',
           permanent: true,
           offset: L.point(14, 0),
+          opacity: 1,
           className: 'plugin-en-tooltip'
         }).openTooltip();
       }

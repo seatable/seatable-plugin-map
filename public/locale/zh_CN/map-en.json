@@ -8,5 +8,5 @@
   "Your_Google_Maps_key_has_exceeded_quota": "您的谷歌地图密钥已超出配额。",
   "address_not_be_found": "{address}没有被找到。",
   "Not_used": "不使用",
-  "Marker_colored_by": "颜色字段"
+  "Color_field": "颜色字段"
 }

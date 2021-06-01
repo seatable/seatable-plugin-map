@@ -13,7 +13,7 @@ class ModalPortal extends React.Component {
   constructor(props) {
     super(props);
     this.el = document.createElement('div');
-    this.el.setAttribute('class', 'map-cn-modal-portal');
+    this.el.setAttribute('class', 'map-en-modal-portal');
   }
 
   componentDidMount() {
