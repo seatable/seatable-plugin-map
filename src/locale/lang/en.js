@@ -12,7 +12,7 @@ const en = {
   "Cancle": "Cancle",
   "Save": "Save",
   "Please_select": "Please select",
-  "Direct_shown_field": "Direct shown field",
+  "Display_field": "Display field",
   "New_view": "New view",
   "Rename_view": "Rename view",
   "Delete_view": "Delete view",

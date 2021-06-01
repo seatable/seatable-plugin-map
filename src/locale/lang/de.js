@@ -9,7 +9,7 @@ const de = {
   "address_was_not_found": "{address} wurde nicht gefunden.",
   "Not_used": "Nicht genutzt",
   "Marker_colored_by": "Marqueur coloré par",
-  "Directly_shown_field": "Direkt angezeigtes Feld",
+  "Display_field": "Felder anzeigen",
   "Cancle": "Abbrechen",
   "Save": "sparen",
   "Please_select": "Bitte auswählen",

@@ -95,7 +95,8 @@ class App extends React.Component {
         configSettings,
         isDataLoaded: true,
         locations,
-        settings
+        settings,
+        selectedViewIdx
       }, () => {
         this.renderMap();
         this.renderLocations(locations);
@@ -154,7 +155,8 @@ class App extends React.Component {
       configSettings,
       locations,
       isDataLoaded: true,
-      settings: pluginSettings
+      settings: pluginSettings,
+      selectedViewIdx
     }, () => {
       this.renderMap();
     });
@@ -366,7 +368,7 @@ class App extends React.Component {
     columnSettings.unshift({id: '', name: intl.get('Not_used')});
     // need options: checkout map column
     let active = activeColumn ? activeColumn.name : columnSettings[0].name;
-    return { type: 'direct_shown_column', name: intl.get('Direct_shown_column'), active: active, settings: columnSettings };
+    return { type: 'direct_shown_column', name: intl.get('Display_field'), active: active, settings: columnSettings };
   }
 
   onSelectChange = (type, option) => {

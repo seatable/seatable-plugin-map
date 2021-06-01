@@ -12,7 +12,7 @@ const fr = {
   "Cancle": "Annuler",
   "Save": "sauver",
   "Please_select": "Veuillez sélectionner",
-  "Directly_shown_field": "Champ affiché directement",
+  "Display_field": "Afficher les champs",
   "New_view": "Nouvelle vue",
   "Rename_view": "Renommer la vue",
   "Delete_view": "Supprimer la vue",

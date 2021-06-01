@@ -12,7 +12,7 @@ const zh_CN = {
   "Cancle": "取消",
   "Save": "保存",
   "Please_select": "请选择",
-  "Direct_shown_field": "直接显示字段",
+  "Display_field": "显示字段",
   "Row_color": "行颜色",
   "Default_View": "默认视图",
   "New_view": "新建视图",
