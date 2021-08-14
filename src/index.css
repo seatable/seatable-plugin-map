@@ -11,3 +11,14 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+#root {
+  height: calc(100% - 38px);
+  width: 100%;
+  display: flex;
+  overflow: hidden;
+}
+
+.plugin-en-dev-toolbar {
+  border-bottom: 1px solid #dddddd;
+}

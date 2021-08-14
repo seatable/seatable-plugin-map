@@ -8,10 +8,20 @@ const en = {
   "Your_Google_Maps_key_has_exceeded_quota": "Your Google Maps key has exceeded quota.",
   "address_was_not_found": "{address} was not found.",
   "Not_used": "Not used",
-  "Color_field": "Color filed",
+  "Marker_colored_by": "Marker colored by",
   "Cancle": "Cancle",
   "Save": "Save",
-  "Please_select": "Please select"
+  "Please_select": "Please select",
+  "Display_field": "Display field",
+  "New_view": "New view",
+  "Rename_view": "Rename view",
+  "Delete_view": "Delete view",
+  "Name": "Name",
+  "Name_is_required": "Name is required",
+  "Cancel": "Cancel",
+  "Submit": "Submit",
+  "Default_View": "Default View",
+  "Row_color": "Row color",
 };
 
 export default en;
