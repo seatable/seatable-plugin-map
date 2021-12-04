@@ -81,6 +81,7 @@
 .views-tabs-scroll {
   overflow-x: scroll;
   overflow-y: hidden;
+  scrollbar-width: none;
 }
 
 .views-tabs-scroll::-webkit-scrollbar {
