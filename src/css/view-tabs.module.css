@@ -52,6 +52,39 @@
   cursor: pointer;
 }
 
+.views-scroll-control {
+  display: flex;
+  align-items: center;
+  padding: 0 .25rem;
+}
+
+.views-scroll-control .scroll-control-btn {
+  cursor: default;
+}
+
+.views-scroll-control .scroll-control-btn:first-child {
+  margin-right: .1rem;
+}
+
+.views-scroll-control .scroll-active {
+  cursor: pointer;
+}
+
+.views-scroll-control .btn-scroll-icon {
+  color: #c2c2c2;
+  font-size: 12px;
+  line-height: 24px;
+}
+
+.views-scroll-control .scroll-active .btn-scroll-icon {
+  color: #8c8c8c;
+}
+
+.views-scroll-control .scroll-active:hover .btn-scroll-icon {
+  color: #000;
+  opacity: .75;
+}
+
 .btn-add-view { 
   display: flex;
   align-items: center;
@@ -70,6 +103,10 @@
   font-size: 14px;
   font-weight: 500;
   line-height: 24px;
+}
+
+.add-map-view-icon:hover {
+  opacity: .75;
 }
 
 .view-item .view-item-content:hover {

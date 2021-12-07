@@ -89,6 +89,10 @@
   cursor: pointer;
 }
 
+.plugin-map-dialog-en .dtable-map-plugin-title .map-operator:hover {
+  opacity: .75;
+}
+
 .plugin-map-dialog-en .btn-margin-right {
   margin-right: 0.25rem;
 }
