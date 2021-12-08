@@ -552,10 +552,13 @@ class App extends React.Component {
     const view = this.getInitSettingItem(name);
     const { settings } = this.state;
     settings.push(view);
+    const selectedViewIdx = settings.length - 1;
     this.setState({
-      selectedViewIdx: settings.length - 1,
+      selectedViewIdx,
     }, () => {
+      setSelectedViewIds(KEY_SELECTED_VIEW_IDS, selectedViewIdx);
       this.dtable.updatePluginSettings(PLUGIN_NAME, settings);
+      this.viewsTabs && this.viewsTabs.setViewsTabsScroll();
     });
   }
 
@@ -590,6 +593,8 @@ class App extends React.Component {
           </div>
           <div className="map-plugin-en-tabs">
             <ViewTabs
+              isMobile
+              ref={ref => this.viewsTabs = ref}
               settings={settings}
               selectedViewIdx={selectedViewIdx}
               onAddView={this.onAddView}
