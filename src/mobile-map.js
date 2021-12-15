@@ -213,7 +213,7 @@ class App extends React.Component {
     let table = this.dtable.getTableByName(tableName);
     if (!table) return false;
     let view = this.dtable.getViewByName(table, viewName);
-    if (!view) return false;
+    if (!view || view.type === 'archive') return false;
     let column = this.dtable.getColumnByName(table, columnName);
     if (!column && columnName) return false;
     let markColumn = this.dtable.getColumnByName(table, markDependence);
@@ -312,8 +312,10 @@ class App extends React.Component {
   getViewSettings = (currentTable, activeView = null) => {
     let views = this.dtable.getViews(currentTable);
     let viewSettings = views.map(view => {
-      return {id: view._id, name: view.name};
-    });
+      if (view.type !== 'archive') {
+        return { id: view._id, name: view.name };
+      }
+    }).filter(Boolean);
     let active = activeView ? activeView.name : views[0].name;
     return {type: CONFIG_TYPE.VIEW, name: intl.get('View'), active: active, settings: viewSettings};
   }
