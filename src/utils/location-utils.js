@@ -117,7 +117,7 @@ function getDirectShownLabel(row, column) {
 } 
 
 export const renderMarkByPosition = (locations, renderer, start = 0) => {
-  let stack = locations.slice(start, start += 100);
+  let stack = locations.slice(start, start += 10);
   if (stack.length === 0) return;
   setTimeout(() => {
     stack.forEach((location) => {
