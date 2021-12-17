@@ -105,8 +105,8 @@ class App extends React.Component {
         locations,
         settings,
         selectedViewIdx
-      }, () => {
-        this.renderMap();
+      }, async () => {
+        await this.renderMap();
         this.renderLocations(locations);
       });
     } else {
@@ -142,6 +142,7 @@ class App extends React.Component {
     let lang = (window.dtable && window.dtable.lang) ? window.dtable.lang : 'en';
     let url = `http://mt0.google.com/vt/lyrs=m@160000000&hl=${lang}&gl=${lang}&src=app&y={y}&x={x}&z={z}&s=Ga`;
     if (!document.getElementById('map-container')) return;
+    window.L = L;
     const { position, zoom } = await getInitialMapCenter(this.state.locations, this.geocoder);
     if (!this.map) {
       this.map = L.map('map-container').setView(position, zoom).invalidateSize();
