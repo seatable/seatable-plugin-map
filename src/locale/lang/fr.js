@@ -1,5 +1,8 @@
 const fr = {
   "Map_plugin": "Plan",
+  "Map_type": "Type de graphique",
+  "Default_map": "Carte normale",
+  "Image_map": "Carte illustrée",
   "The_map_plugin_is_not_properly_configured_contact_the_administrator": "Le plugin de carte n'est pas correctement configuré. Contactez l'administrateur.",
   "Table": "Tableau",
   "View": "Vue",
@@ -13,6 +16,7 @@ const fr = {
   "Save": "sauver",
   "Please_select": "Veuillez sélectionner",
   "Display_field": "Afficher les champs",
+  "Image_field": "Champ d'image",
   "New_view": "Nouvelle vue",
   "Rename_view": "Renommer la vue",
   "Delete_view": "Supprimer la vue",

@@ -1,5 +1,6 @@
 import getConfigItemByType from './get-config-item-by-type';
 import intl from 'react-intl-universal';
+import { MAP_MODE } from '../constants';
 
 const getMarkColor = (markColumn, row) => {
   const key = markColumn.key;
@@ -10,31 +11,39 @@ const getMarkColor = (markColumn, row) => {
   const currentOption = options.find((option) => {
     return option.id === row[key];
   });
-  if (!currentOption) return ''
+  if (!currentOption) return '';
   return currentOption.color;
 }
 
 export const getLocations = (dtable, configSettings) => {
   let locations = [];
+  const mapModeSetting = getConfigItemByType(configSettings, 'map_mode') || {};
+  const mapMode = mapModeSetting.active || MAP_MODE.DEFAULT;
   const tableName = getConfigItemByType(configSettings, 'table').active;
   const viewName = getConfigItemByType(configSettings, 'view').active;
   let currentTable = dtable.getTableByName(tableName);
   let currentView = dtable.getViewByName(currentTable, viewName);
   const columnName = getConfigItemByType(configSettings, 'column').active;
   let currentColumn = dtable.getColumnByName(currentTable, columnName);
-  const markDependence = getConfigItemByType(configSettings, 'mark_dependence').active;
-  const currentMarkColumn = dtable.getColumnByName(currentTable, markDependence);
-  const isRowColor = markDependence === intl.get('Row_color');
   let rowsColor = {};
-  if (isRowColor) {
-    const viewRows = dtable.getViewRows(currentView, currentTable);
-    rowsColor = dtable.getViewRowsColor(viewRows, currentView, currentTable);
+  let directShownLabel = '', color = '', directShownColumn, currentMarkColumn, isRowColor, imageColumn;
+  if (mapMode === MAP_MODE.DEFAULT) {
+    const markDependence = getConfigItemByType(configSettings, 'mark_dependence').active;
+    currentMarkColumn = dtable.getColumnByName(currentTable, markDependence);
+    isRowColor = markDependence === intl.get('Row_color');
+    if (isRowColor) {
+      const viewRows = dtable.getViewRows(currentView, currentTable);
+      rowsColor = dtable.getViewRowsColor(viewRows, currentView, currentTable);
+    }
+    const directShownColumnName = getConfigItemByType(configSettings, 'direct_shown_column').active;
+    directShownColumn = dtable.getColumnByName(currentTable, directShownColumnName);
+  } else {
+    let imageColumnName = getConfigItemByType(configSettings, 'image_column').active;
+    imageColumn = dtable.getColumnByName(currentTable, imageColumnName) || {};
   }
-  const directShownColumnName = getConfigItemByType(configSettings, 'direct_shown_column').active;
-  const directShownColumn = dtable.getColumnByName(currentTable, directShownColumnName);
-  let directShownLabel = '';
+
   let locationNameKey = currentTable.columns[0].key;
-  let rows = currentTable.rows;
+  let rows = dtable.getViewRows(currentView, currentTable);
   if (!currentColumn) {
     return [];
   }
@@ -51,24 +60,39 @@ export const getLocations = (dtable, configSettings) => {
   let locationValueKey = currentColumn.key;
 
   rows.forEach(row => {
-    let color = '';
-    if (isRowColor) {
-      color = getRowColor(rowsColor, row);
-    } else if (currentMarkColumn) {
-      color = getMarkColor(currentMarkColumn, row) || color;
-    }
-    if (directShownColumn) {
-      directShownLabel = getDirectShownLabel(row, directShownColumn);
+    if (mapMode === MAP_MODE.DEFAULT) {
+      if (isRowColor) {
+        color = getRowColor(rowsColor, row);
+      } else if (currentMarkColumn) {
+        color = getMarkColor(currentMarkColumn, row) || color;
+      }
+      if (directShownColumn) {
+        directShownLabel = getDirectShownLabel(row, directShownColumn);
+      }
     }
     const value = row[locationValueKey] || {};
-    locations.push({
-      type: addressType,
-      location: value,
-      name: row[locationNameKey] || '',
-      color,
-      columnName,
-      directShownLabel
-    });
+    let locationItem;
+    if (mapMode === MAP_MODE.DEFAULT) {
+      locationItem = {
+        type: addressType,
+        location: value,
+        name: row[locationNameKey] || '',
+        color,
+        columnName,
+        directShownLabel,
+        mapMode
+      }
+    } else {
+      locationItem = {
+        type: addressType,
+        location: value,
+        name: row[locationNameKey] || '',
+        columnName,
+        imgUrl: row[imageColumn.key] || [],
+        mapMode
+      }
+    }
+    locations.push(locationItem);
   });
   return locations;
 }
@@ -93,9 +117,8 @@ function getDirectShownLabel(row, column) {
 } 
 
 export const renderMarkByPosition = (locations, renderer, start = 0) => {
-  let stack = locations.slice(start, start += 10);
+  let stack = locations.slice(start, start += 100);
   if (stack.length === 0) return;
-
   setTimeout(() => {
     stack.forEach((location) => {
       const position = location.location;

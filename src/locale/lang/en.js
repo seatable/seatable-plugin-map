@@ -1,5 +1,8 @@
 const en = {
   "Map_plugin": "Map plugin",
+  "Map_type": "Map type",
+  "Default_map": "Default map",
+  "Image_map": "Image map",
   "The_map_plugin_is_not_properly_configured_contact_the_administrator": "The map plugin is not properly configured. Contact the administrator.",
   "Table": "Table",
   "View": "View",
@@ -13,6 +16,7 @@ const en = {
   "Save": "Save",
   "Please_select": "Please select",
   "Display_field": "Display field",
+  "Image_field": "Image field",
   "New_view": "New view",
   "Rename_view": "Rename view",
   "Delete_view": "Delete view",

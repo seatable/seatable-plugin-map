@@ -8,7 +8,9 @@ const SETTING_MIRROR = {
   mark_dependence: 'markDependence',
   direct_shown_column: 'directShownColumnName',
   name: 'name',
-  id: 'id'
+  id: 'id',
+  map_mode: 'mapMode',
+  image_column: 'imageColumnName'
 }
 
 export const generateSettingsByConfig = (configSettings, currentSettingItem) => {
@@ -27,6 +29,6 @@ export const generateSettingsByConfig = (configSettings, currentSettingItem) => 
     settings[SETTING_MIRROR[config.type]] = value;
   });
   settings.id = currentSettingItem.id;
-  settings.name = currentSettingItem.name 
+  settings.name = currentSettingItem.name;
   return settings;
 }
