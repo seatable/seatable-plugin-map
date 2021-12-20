@@ -1,5 +1,8 @@
 const zh_CN = {
   "Map_plugin": "地图插件",
+  "Map_type": "图表类型",
+  "Default_map": "普通地图",
+  "Image_map": "图片地图",
   "The_map_plugin_is_not_properly_configured_contact_the_administrator": "地图插件配置不正确。请与管理员联系。",
   "Table": "表格",
   "View": "视图",
@@ -13,6 +16,7 @@ const zh_CN = {
   "Save": "保存",
   "Please_select": "请选择",
   "Display_field": "显示字段",
+  "Image_field": "图片字段",
   "Row_color": "行颜色",
   "Default_View": "默认视图",
   "New_view": "新建视图",

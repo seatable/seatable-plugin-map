@@ -8,6 +8,7 @@
     "html2canvas": "^1.0.0-rc.7",
     "jszip": "^3.2.2",
     "leaflet": "^1.6.0",
+    "leaflet.markercluster": "^1.5.3",
     "moment": "^2.24.0",
     "react": "16.14.0",
     "react-app-polyfill": "^1.0.5",

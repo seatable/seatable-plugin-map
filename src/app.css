@@ -281,3 +281,48 @@
   border-bottom: 1px solid #e4e4e4;
   margin-bottom: 14px;
 }
+
+ .map-plugin-custom-image-container {
+  padding: 4px;
+  background: #fff;
+  width: 80px;
+  height: 80px;
+  cursor: default;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 10%);
+  position: relative;
+}
+
+.map-plugin-custom-image-number {
+  position: absolute;
+  right: -15px;
+  top: -8px;
+  padding: 0 12px;
+  background: #20AD7E;
+  color: #fff;
+  border-radius: 10px;
+  text-align: center;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.map-plugin-custom-image-container .plugin-map-image-label-arrow {
+  position: absolute;
+  bottom: 5px;
+  transform: translate( -50%, 100%);
+  left: 50%;
+  color: #fff;
+  display: inline-block;
+  line-height: 16px;
+  height: 16px;
+}
+
+.map-plugin-empty-custom-image-wrapper {
+  width: 72px;
+  height: 72px;
+  background: #efefef
+}
+
+.leaflet-div-icon {
+  border: none;
+}

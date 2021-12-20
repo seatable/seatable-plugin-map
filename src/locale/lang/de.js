@@ -1,5 +1,8 @@
 const de = {
   "Map_plugin": "Map",
+  "Map_type": "Diagramm Typ",
+  "Default_map": "Normale Karte",
+  "Image_map": "Bildkarte",
   "The_map_plugin_is_not_properly_configured_contact_the_administrator": "Das Karten-Plugin ist nicht richtig konfiguriert. Wenden Sie sich an den Administrator.",
   "Table": "Tabelle",
   "View": "Ansicht",
@@ -10,6 +13,7 @@ const de = {
   "Not_used": "Nicht genutzt",
   "Marker_colored_by": "Marqueur coloré par",
   "Display_field": "Felder anzeigen",
+  "Image_field": "Bildfeld",
   "Cancle": "Abbrechen",
   "Save": "sparen",
   "Please_select": "Bitte auswählen",
