@@ -392,7 +392,7 @@ class App extends React.Component {
   }
 
   getColumnSettings = (currentTable, currentView, activeColumn = null) => {
-    let columns = this.dtable.getShownColumns(currentTable, currentView);
+    let columns = this.dtable.getViewColumns(currentTable, currentView);
 
     // need options: checkout map column
     columns = columns.filter(column => {
@@ -413,7 +413,7 @@ class App extends React.Component {
   }
 
   getMarkColumnSetting = (currentTable, currentView, dependence = null) => {
-    let columns = this.dtable.getShownColumns(currentTable, currentView);
+    let columns = this.dtable.getViewColumns(currentTable, currentView);
     columns = columns.filter(column => {
       return column.type === 'single-select';
     });
@@ -433,7 +433,7 @@ class App extends React.Component {
   }
 
   getDirectShownColumnSetting = (currentTable, currentView, activeColumn = null) => {
-    let columns = this.dtable.getShownColumns(currentTable, currentView);
+    let columns = this.dtable.getViewColumns(currentTable, currentView);
     columns = columns.filter(column => {
       return column.type === 'text' || column.type === 'single-select';
     });
@@ -447,7 +447,7 @@ class App extends React.Component {
   }
 
   getImageColumnsSetting = (currentTable, currentView, activeColumn = null) => {
-    let columns = this.dtable.getShownColumns(currentTable, currentView);
+    let columns = this.dtable.getViewColumns(currentTable, currentView);
     columns = columns.filter(column => {
       return column.type === 'image';
     });
