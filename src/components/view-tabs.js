@@ -153,33 +153,33 @@ class ViewTab extends Component {
           className={`${tabStyles['view-item-content']} ${isSelected ? tabStyles['tab-item-active'] : ''}`}
         >
           <div className="view-name">{view.name}</div>
-        {isSelected &&
-        <div onClick={this.onDropdownToggle} ref={ref => this.btnViewDropdown = ref} className={`${tabStyles['btn-view-dropdown']}`}>
-        <i className={`${tabStyles['icon']} dtable-font dtable-icon-drop-down`}></i>
-        {isShowViewDropdown &&
-          <ModalPortal>
-          <DropdownMenu
-          dropdownMenuPosition={dropdownMenuPosition}
-          options={
-            <React.Fragment>
-            <button className="dropdown-item" onClick={this.props.onRenameViewToggle}>
-            <i className="item-icon dtable-font dtable-icon-rename"></i>
-            <span className="item-text">{(intl.get('Rename_view'))}</span>
-            </button>
-            {canDelete &&
-              <button className="dropdown-item" onClick={() => this.props.onDeleteView(index)}>
-              <i className="item-icon dtable-font dtable-icon-delete"></i>
-              <span className="item-text">{intl.get('Delete_view')}</span>
-              </button>
+          {isSelected &&
+          <div onClick={this.onDropdownToggle} ref={ref => this.btnViewDropdown = ref} className={`${tabStyles['btn-view-dropdown']}`}>
+            <i className={`${tabStyles['icon']} dtable-font dtable-icon-drop-down`}></i>
+            {isShowViewDropdown &&
+            <ModalPortal>
+              <DropdownMenu
+                dropdownMenuPosition={dropdownMenuPosition}
+                options={
+                  <React.Fragment>
+                    <button className="dropdown-item" onClick={this.props.onRenameViewToggle}>
+                      <i className="item-icon dtable-font dtable-icon-rename"></i>
+                      <span className="item-text">{(intl.get('Rename_view'))}</span>
+                    </button>
+                    {canDelete &&
+                    <button className="dropdown-item" onClick={() => this.props.onDeleteView(index)}>
+                      <i className="item-icon dtable-font dtable-icon-delete"></i>
+                      <span className="item-text">{intl.get('Delete_view')}</span>
+                    </button>
+                    }
+                  </React.Fragment>
+                }
+              />
+            </ModalPortal>
             }
-            </React.Fragment>
+          </div>
           }
-          />
-          </ModalPortal>
-        }
         </div>
-      }
-      </div>
       </div>
     );
   }
@@ -192,6 +192,7 @@ const propTypes = {
   onAddView: PropTypes.func,
   onRenameView: PropTypes.func,
   onDeleteView: PropTypes.func,
+  onMoveView: PropTypes.func,
   onSelectView: PropTypes.func
 };
 
@@ -364,7 +365,7 @@ class ViewTabs extends Component {
           ref={ref => this.viewsTabsScroll = ref}
           onScroll={this.onViewsScroll}
         >
-            {this.renderTabs()}
+          {this.renderTabs()}
         </div>
         {(!isMobile && (canScrollPrev || canScrollNext)) &&
           <div className={tabStyles['views-scroll-control']}>
