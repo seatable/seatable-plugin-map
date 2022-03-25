@@ -333,7 +333,7 @@ class ViewTabs extends Component {
     const { settings, selectedViewIdx } = this.props;
     let tabs = [];
     if (settings) {
-      const canDelete = settings.length > 0;
+      const canDelete = settings.length > 1;
       tabs = settings.map((view, index) => {
         return (
           <ViewTab
