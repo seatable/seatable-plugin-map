@@ -12,6 +12,179 @@ const SCROLL_TYPE = {
   NEXT: 'next',
 };
 
+const viewTabPropTypes = {
+  view: PropTypes.object,
+  index: PropTypes.number,
+  selectedViewIdx: PropTypes.number,
+  setViewItem: PropTypes.func,
+  onSelectView: PropTypes.func,
+  onDeleteView: PropTypes.func,
+  onMoveView: PropTypes.func,
+  onRenameViewToggle: PropTypes.func,
+  canDelete: PropTypes.bool
+};
+
+class ViewTab extends Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      isShowViewDropdown: false,
+      dropdownMenuPosition: {
+        top: 0,
+        left: 0
+      }
+    };
+    this.enteredCounter = 0;
+  }
+
+  componentDidMount() {
+    document.addEventListener('click', this.onHideViewDropdown);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('click', this.onHideViewDropdown);
+  }
+
+  onHideViewDropdown = () => {
+    if (this.state.isShowViewDropdown) {
+      this.setState({isShowViewDropdown: false});
+    }
+  }
+
+  onDropdownToggle = (evt) => {
+    evt.nativeEvent.stopImmediatePropagation();
+    let { top, left, height } = this.btnViewDropdown.parentNode.getBoundingClientRect();
+    this.setState({
+      isShowViewDropdown: !this.state.isShowViewDropdown,
+      dropdownMenuPosition: {
+        top: top + height - 3,
+        left
+      }
+    });
+  }
+
+  onSelectView = (index) => {
+    if (index === this.props.selectedViewIdx) {
+      return;
+    }
+    this.props.onSelectView(index);
+  }
+
+  onDragStart = (event) => {
+    event.stopPropagation();
+    let ref = this.itemRef;
+    event.dataTransfer.setDragImage(ref, 10, 10);
+    event.dataTransfer.effectAllowed = 'move';
+    event.dataTransfer.setData('text/plain', this.props.view.id);
+  }
+
+  onDragEnter = (event) => {
+    event.stopPropagation();
+    this.enteredCounter++;
+  }
+
+  onDragOver = (event) => {
+    if (event.dataTransfer.dropEffect === 'copy') {
+      return;
+    }
+    event.stopPropagation();
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'move';
+    this.setState({
+      dropRelativePosition: event.nativeEvent.offsetX <= event.target.clientWidth / 2 ?
+        'before' : 'after'
+    });
+  }
+
+  onDragLeave = (event) => {
+    event.stopPropagation();
+    this.enteredCounter--;
+    if (this.enteredCounter === 0) {
+      this.setState({
+        dropRelativePosition: ''
+      });
+    }
+  }
+
+  onDrop = (event) => {
+    event.stopPropagation();
+    event.preventDefault();
+
+    this.enteredCounter = 0;
+    const { dropRelativePosition } = this.state;
+    this.setState({
+      dropRelativePosition: ''
+    });
+
+    const droppedViewID = event.dataTransfer.getData('text/plain');
+    const { id } = this.props.view;
+    if (droppedViewID == id) {
+      return;
+    }
+    this.props.onMoveView(droppedViewID, id, dropRelativePosition);
+  }
+
+  render() {
+    const { view, index, selectedViewIdx, canDelete } = this.props;
+    const isSelected = selectedViewIdx === index;
+    const {
+      isShowViewDropdown, dropdownMenuPosition,
+      dropRelativePosition
+    } = this.state;
+    return (
+      <div
+        ref={ref => this.itemRef = ref}
+        draggable="true"
+        onDragStart={this.onDragStart}
+        onDragEnter={this.onDragEnter}
+        onDragOver={this.onDragOver}
+        onDragLeave={this.onDragLeave}
+        onDrop={this.onDrop}
+        className={`
+          ${tabStyles['view-item']}
+          ${dropRelativePosition == 'before' ? tabStyles['view-item-can-drop-before'] : ''}
+          ${dropRelativePosition == 'after' ? tabStyles['view-item-can-drop-after'] : ''}
+        `}
+      >
+        <div
+          ref={this.props.setViewItem(index)}
+          onClick={() => this.onSelectView(index)}
+          className={`${tabStyles['view-item-content']} ${isSelected ? tabStyles['tab-item-active'] : ''}`}
+        >
+          <div className="view-name">{view.name}</div>
+          {isSelected &&
+          <div onClick={this.onDropdownToggle} ref={ref => this.btnViewDropdown = ref} className={`${tabStyles['btn-view-dropdown']}`}>
+            <i className={`${tabStyles['icon']} dtable-font dtable-icon-drop-down`}></i>
+            {isShowViewDropdown &&
+            <ModalPortal>
+              <DropdownMenu
+                dropdownMenuPosition={dropdownMenuPosition}
+                options={
+                  <React.Fragment>
+                    <button className="dropdown-item" onClick={this.props.onRenameViewToggle}>
+                      <i className="item-icon dtable-font dtable-icon-rename"></i>
+                      <span className="item-text">{(intl.get('Rename_view'))}</span>
+                    </button>
+                    {canDelete &&
+                    <button className="dropdown-item" onClick={() => this.props.onDeleteView(index)}>
+                      <i className="item-icon dtable-font dtable-icon-delete"></i>
+                      <span className="item-text">{intl.get('Delete_view')}</span>
+                    </button>
+                    }
+                  </React.Fragment>
+                }
+              />
+            </ModalPortal>
+            }
+          </div>
+          }
+        </div>
+      </div>
+    );
+  }
+}
+
 const propTypes = {
   settings: PropTypes.array,
   selectedViewIdx: PropTypes.number,
@@ -19,6 +192,7 @@ const propTypes = {
   onAddView: PropTypes.func,
   onRenameView: PropTypes.func,
   onDeleteView: PropTypes.func,
+  onMoveView: PropTypes.func,
   onSelectView: PropTypes.func
 };
 
@@ -38,7 +212,6 @@ class ViewTabs extends Component {
 
   componentDidMount() {
     this.initSelectedViewScroll(this.props);
-    document.addEventListener('click', this.onHideViewDropdown);
   }
 
   componentDidUpdate(prevProps) {
@@ -46,10 +219,6 @@ class ViewTabs extends Component {
     if (!prevProps.settings && settings !== prevProps.settings) {
       this.initSelectedViewScroll(this.props);
     }
-  }
-
-  componentWillUnmount() {
-    document.removeEventListener('click', this.onHideViewDropdown);
   }
 
   initSelectedViewScroll = (props) => {
@@ -139,38 +308,12 @@ class ViewTabs extends Component {
     this.checkAvailableScrollType();
   }
 
-  onDropdownToggle = (evt) => {
-    evt.nativeEvent.stopImmediatePropagation();
-    let { top, left, height } = this.btnViewDropdown.parentNode.getBoundingClientRect();
-    this.setState({
-      isShowViewDropdown: !this.state.isShowViewDropdown,
-      dropdownMenuPosition: {
-        top: top + height - 3,
-        left
-      }
-    });
-  }
-
-
-  onHideViewDropdown = () => {
-    if (this.state.isShowViewDropdown) {
-      this.setState({isShowViewDropdown: false});
-    }
-  }
-
   onNewViewToggle = () => {
     this.setState({isShowNewViewDialog: !this.state.isShowNewViewDialog});
   }
 
   onNewViewCancel = () => {
     this.setState({isShowNewViewDialog: false});
-  }
-
-  onSelectView = (index) => {
-    if (index === this.props.selectedViewIdx) {
-      return;
-    }
-    this.props.onSelectView(index);
   }
 
   onAddView = (viewName) => {
@@ -190,47 +333,21 @@ class ViewTabs extends Component {
     const { settings, selectedViewIdx } = this.props;
     let tabs = [];
     if (settings) {
-      const { isShowViewDropdown, dropdownMenuPosition } = this.state;
-      tabs = settings.map((item, index) => {
-        const isSelected = selectedViewIdx === index;
+      const canDelete = settings.length > 1;
+      tabs = settings.map((view, index) => {
         return (
-          <div
-            key={item.id}
-            ref={this.setViewItem(index)}
-            onClick={() => this.onSelectView(index)}
-            className={`${tabStyles['view-item']}`}
-          >
-            <div className={`${tabStyles['view-item-content']} ${isSelected && tabStyles['tab-item-active']}`}>
-              <div className="view-name">{item.name}</div>
-              {
-                isSelected &&
-                <div onClick={this.onDropdownToggle} ref={ref => this.btnViewDropdown = ref} className={`${tabStyles['btn-view-dropdown']}`}>
-                  <i className={`${tabStyles['icon']} dtable-font dtable-icon-drop-down`}></i>
-                  {isShowViewDropdown &&
-                    <ModalPortal>
-                      <DropdownMenu
-                        dropdownMenuPosition={dropdownMenuPosition}
-                        options={
-                          <React.Fragment>
-                            <button className="dropdown-item" onClick={() => this.onRenameViewToggle(index)}>
-                              <i className="item-icon dtable-font dtable-icon-rename"></i>
-                              <span className="item-text">{(intl.get('Rename_view'))}</span>
-                            </button>
-                            {settings.length > 1 &&
-                              <button className="dropdown-item" onClick={() => this.props.onDeleteView(index)}>
-                                <i className="item-icon dtable-font dtable-icon-delete"></i>
-                                <span className="item-text">{intl.get('Delete_view')}</span>
-                              </button>
-                            }
-                          </React.Fragment>
-                        }
-                      />
-                    </ModalPortal>
-                  }
-                </div>
-              }
-            </div>
-          </div>
+          <ViewTab
+            key={index}
+            view={view}
+            index={index}
+            canDelete={canDelete}
+            selectedViewIdx={selectedViewIdx}
+            setViewItem={this.setViewItem}
+            onSelectView={this.props.onSelectView}
+            onRenameViewToggle={this.onRenameViewToggle}
+            onDeleteView={this.props.onDeleteView}
+            onMoveView={this.props.onMoveView}
+          />
         );
       });
     }
@@ -244,13 +361,11 @@ class ViewTabs extends Component {
     return (
       <div className={tabStyles['tabs-container']}>
         <div
-          className={tabStyles["views-tabs-scroll"]}
+          className={`${tabStyles['views-tabs-scroll']} d-flex pr-1`}
           ref={ref => this.viewsTabsScroll = ref}
           onScroll={this.onViewsScroll}
         >
-          <div className={`${tabStyles['views']} d-inline-flex`}>
-            {this.renderTabs()}
-          </div>
+          {this.renderTabs()}
         </div>
         {(!isMobile && (canScrollPrev || canScrollNext)) &&
           <div className={tabStyles['views-scroll-control']}>
@@ -289,6 +404,7 @@ class ViewTabs extends Component {
   }
 }
 
+ViewTab.propTypes = viewTabPropTypes;
 ViewTabs.propTypes = propTypes;
 
 export default ViewTabs;

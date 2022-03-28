@@ -11,15 +11,15 @@ import { getLocations, renderMarkByPosition, formatGeolocactionValue, getInitial
 import COLORS from './marker-color';
 import ViewTabs from './components/view-tabs';
 import { generateSettingsByConfig } from './utils/generate-settings-config';
-import { replaceSettingItemByType } from './utils/repalce-setting-item-by-type'; 
+import { replaceSettingItemByType } from './utils/repalce-setting-item-by-type';
 import { generatorViewId, getSelectedViewIds, replaceSettingItem, setSelectedViewIds } from './utils/common-utils';
 import getConfigItemByType from './utils/get-config-item-by-type';
 import onCapture from './utils/capture';
 import removeSettingByType from './utils/remove-setting-by-type';
-import { 
-  IMAGE_PATH, 
-  PLUGIN_NAME, 
-  CONFIG_TYPE, 
+import {
+  IMAGE_PATH,
+  PLUGIN_NAME,
+  CONFIG_TYPE,
   KEY_SELECTED_VIEW_IDS,
   GEOCODING_FORMAT,
   MAP_MODE
@@ -213,9 +213,9 @@ class App extends React.Component {
   getInitSettingItem = (name = intl.get('Default_View')) => {
     let activeTable = this.dtable.getActiveTable();
     let activeView = this.dtable.getActiveView();
-    let pluginSettingItem = {id: generatorViewId(), name, tableName: activeTable.name, viewName: activeView.name, columnName: null, markDependence: null, directShownColumn: null};    
+    let pluginSettingItem = {id: generatorViewId(), name, tableName: activeTable.name, viewName: activeView.name, columnName: null, markDependence: null, directShownColumn: null};
     return pluginSettingItem;
-  }  
+  }
 
   isValidSettingItem = (pluginSettings) => {
     let { mapMode, tableName, viewName, columnName, markDependence, directShownColumnName, imageColumnName } = pluginSettings;
@@ -256,7 +256,7 @@ class App extends React.Component {
       configSettings.push(imageColumnSettings);
       return configSettings;
     }
-    let markColumnSettings = this.getMarkColumnSetting(activeTable, activeView, markDependence);;
+    let markColumnSettings = this.getMarkColumnSetting(activeTable, activeView, markDependence);
     configSettings.push(markColumnSettings);
     let directShownColumn = this.dtable.getColumnByName(activeTable, directShownColumnName);
     let directShownColumnSetting = this.getDirectShownColumnSetting(activeTable, activeView, directShownColumn);
@@ -381,7 +381,7 @@ class App extends React.Component {
       return {id: table._id, name: table.name};
     });
     let active = activeTable ? activeTable.name : tables[0].name;
-    return {type: CONFIG_TYPE.TABLE, name: intl.get('Table'), active: active, settings: tableSettings}
+    return {type: CONFIG_TYPE.TABLE, name: intl.get('Table'), active: active, settings: tableSettings};
   }
 
   getViewSettings = (currentTable, activeView = null) => {
@@ -422,7 +422,7 @@ class App extends React.Component {
     columns = columns.filter(column => {
       return column.type === 'single-select';
     });
-    
+
     let columnSettings = columns.map(column => {
       return {id: column.key, name: column.name};
     });
@@ -487,15 +487,15 @@ class App extends React.Component {
     }, 500);
     window.app.onClosePlugin && window.app.onClosePlugin();
   }
-  
+
   removeLayers = () => {
     if (this.markers.length > 0) {
       this.markers.forEach((m) => {
         m.remove();
-      })
+      });
       this.markers = [];
     }
-  } 
+  }
 
   clearClusterMarkers = () => {
     if (this.clusterMarkers) {
@@ -540,8 +540,8 @@ class App extends React.Component {
               markerUrl = urls[0];
             }
           });
-          const imageElement = `<img src=${markerUrl} width="72" height="72" />`
-          return L.divIcon({ 
+          const imageElement = `<img src=${markerUrl} width="72" height="72" />`;
+          return L.divIcon({
             html: `
             <div class="map-plugin-custom-image-container">
               ${markerUrl ? imageElement : '<div class="map-plugin-empty-custom-image-wrapper"></div>' }
@@ -549,7 +549,7 @@ class App extends React.Component {
               <i class='plugin-map-image-label-arrow dtable-font dtable-icon-drop-down'></i>
             </div>
           `,
-          iconAnchor: [48, 55],
+            iconAnchor: [48, 55],
           });
         },
         showCoverageOnHover: false
@@ -561,7 +561,7 @@ class App extends React.Component {
       const { imgUrl, location } = item;
       const { lat, lng } = location;
       if (lng && lat) {
-        const imageElement = `<img src=${imgUrl[0]} width="72" height="72" />`
+        const imageElement = `<img src=${imgUrl[0]} width="72" height="72" />`;
         const htmlString =  `
           <div class="map-plugin-custom-image-container">
             ${imgUrl.length > 0 ? `<span class="map-plugin-custom-image-number">${imgUrl.length}</span> ${imageElement}` : '<div class="map-plugin-empty-custom-image-wrapper"></div>' }
@@ -675,24 +675,24 @@ class App extends React.Component {
         }
         let marker = new L.Marker([lat, lng], { icon: myIcon, riseOnHover: true });
         marker.bindPopup(describe);
-          if (directShownLabel) {
-            marker.bindTooltip(directShownLabel, {
-              direction: 'right',
-              permanent: true,
-              offset: L.point(14, 0),
-              opacity: 1,
-              className: 'plugin-en-tooltip'
-            }).openTooltip();
-          }
-          marker.on('mouseover', () => {
-            marker.openPopup();
-          });
-          marker.on('mouseout', () => {
-            marker.closePopup();
-          });
-          marker.on('click', () => {
-            return;
-          });
+        if (directShownLabel) {
+          marker.bindTooltip(directShownLabel, {
+            direction: 'right',
+            permanent: true,
+            offset: L.point(14, 0),
+            opacity: 1,
+            className: 'plugin-en-tooltip'
+          }).openTooltip();
+        }
+        marker.on('mouseover', () => {
+          marker.openPopup();
+        });
+        marker.on('mouseout', () => {
+          marker.closePopup();
+        });
+        marker.on('click', () => {
+          return;
+        });
         this.markers.push(marker);
         this.map.addLayer(marker);
       }
@@ -721,12 +721,56 @@ class App extends React.Component {
         top: 0,
         left: 0,
         margin: 0
-      } 
+      };
     } else {
       return {
         maxWidth: '100%'
-      }
+      };
     }
+  }
+
+  // move view, update `selectedViewIdx`
+  onMoveView = (targetViewID, targetIndexViewID, relativePosition) => {
+    // the 'names' and setting data structure in this plugin are different from the others.
+    let { settings: plugin_settings, selectedViewIdx } = this.state;
+    let updatedViews = plugin_settings;
+
+    let viewIDMap = {};
+    updatedViews.forEach((view, index) => {
+      viewIDMap[view.id] = view;
+    });
+    const targetView = viewIDMap[targetViewID];
+    const targetIndexView = viewIDMap[targetIndexViewID];
+    const selectedView = updatedViews[selectedViewIdx];
+
+    const originalIndex = updatedViews.indexOf(targetView);
+    let targetIndex = updatedViews.indexOf(targetIndexView);
+    // `relativePosition`: 'before'|'after'
+    targetIndex += relativePosition == 'before' ? 0 : 1;
+
+    if (originalIndex < targetIndex) {
+      if (targetIndex < updatedViews.length) {
+        updatedViews.splice(targetIndex, 0, targetView);
+      } else {
+        // drag it to the end
+        updatedViews.push(targetView);
+      }
+      updatedViews.splice(originalIndex, 1);
+    } else {
+      updatedViews.splice(originalIndex, 1);
+      updatedViews.splice(targetIndex, 0, targetView);
+    }
+
+    const newSelectedViewIndex = updatedViews.indexOf(selectedView);
+
+    //plugin_settings.views = updatedViews;
+    this.setState({
+      settings: plugin_settings,
+      selectedViewIdx: newSelectedViewIndex
+    }, () => {
+      setSelectedViewIds(KEY_SELECTED_VIEW_IDS, newSelectedViewIndex);
+      this.dtable.updatePluginSettings(PLUGIN_NAME, plugin_settings);
+    });
   }
 
   onSelectView = (index) => {
@@ -773,7 +817,7 @@ class App extends React.Component {
       this.dtable.updatePluginSettings(PLUGIN_NAME, settings);
     });
   }
-  
+
   render() {
     const { isDataLoaded, showSettingDialog, configSettings, isFullScreen, showDialog, settings, selectedViewIdx } = this.state;
     const mapKey = window.dtable.dtableGoogleMapKey;
@@ -795,6 +839,7 @@ class App extends React.Component {
               onRenameView={this.onRenameView}
               onDeleteView={this.onDeleteView}
               onSelectView={this.onSelectView}
+              onMoveView={this.onMoveView}
             />
           </div>
           <div className="map-operators">
@@ -804,7 +849,7 @@ class App extends React.Component {
             <span className="map-operator dtable-font dtable-icon-x btn-margin-right btn-close" onClick={this.toggle}></span>
           </div>
         </div>
-        <div className={"map-plugin-modal-body " + (isFullScreen ? 'map-plugin-modal-body-full-screen' : '')}>
+        <div className={'map-plugin-modal-body ' + (isFullScreen ? 'map-plugin-modal-body-full-screen' : '')}>
           {(!isDataLoaded && mapKey) && <Loading />}
           {(!mapKey) && (
             <div className='d-flex justify-content-center mt-9'>
@@ -817,11 +862,11 @@ class App extends React.Component {
             </div>
           )}
           {showSettingDialog && (
-            <LocationSettings 
-              configSettings={configSettings} 
-              onSelectChange={this.onSelectChange} 
+            <LocationSettings
+              configSettings={configSettings}
+              onSelectChange={this.onSelectChange}
               onHideMapSettings={this.toggleSettingDialog}
-            /> 
+            />
           )}
         </div>
       </div>

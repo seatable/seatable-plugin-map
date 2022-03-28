@@ -66,7 +66,7 @@ class RenameViewDialog extends Component {
           {this.state.errMessage && <Alert color="danger" className="mt-2">{(this.state.errMessage)}</Alert>}
         </ModalBody>
         <ModalFooter>
-          <Button color="secondary" onClick={this.toggle}>{intl.get(this.state.errMessage)}</Button>
+          <Button color="secondary" onClick={this.toggle}>{intl.get('Cancel')}</Button>
           <Button color="primary" onClick={this.handleSubmit}>{intl.get('Submit')}</Button>
         </ModalFooter>
       </Modal>

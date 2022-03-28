@@ -12,6 +12,26 @@
   padding: 0 16px;
   flex: 1 0 auto;
   user-select: none;
+  cursor: grab;
+  position: relative;
+}
+
+.view-item-can-drop-before::before,
+.view-item-can-drop-after::after {
+  content: '';
+  border: 1px solid #555;
+  border-radius: 1px;
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+}
+
+.view-item-can-drop-before::before {
+  left: 0;
+}
+
+.view-item-can-drop-after::after {
+  right: -2px;
 }
 
 .view-item .tab-item-active {
@@ -125,8 +145,4 @@
   display: none;
   width: 0;
   height: 0;
-}
-
-.views {
-  height: 100%;
 }
