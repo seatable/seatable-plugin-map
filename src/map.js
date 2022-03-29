@@ -849,7 +849,7 @@ class App extends React.Component {
             <span className="map-operator dtable-font dtable-icon-x btn-margin-right btn-close" onClick={this.toggle}></span>
           </div>
         </div>
-        <div className={'map-plugin-modal-body ' + (isFullScreen ? 'map-plugin-modal-body-full-screen' : '')}>
+        <div className={'flex-fill map-plugin-modal-body ' + (isFullScreen ? 'map-plugin-modal-body-full-screen' : '')}>
           {(!isDataLoaded && mapKey) && <Loading />}
           {(!mapKey) && (
             <div className='d-flex justify-content-center mt-9'>

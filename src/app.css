@@ -20,11 +20,6 @@
   border-radius: 12px 12px 0 0;
 }
 
-.plugin-map-dialog-en .map-plugin-modal-body-full-screen,
-.plugin-map-dialog-en .modal-content {
-  height: 100%;
-}
-
 .plugin-map-dialog-en .full-screen-active {
   background-color: #e0e0e0;
   border-radius: 2px;
@@ -57,13 +52,6 @@
 
 .plugin-map-dialog-en .map-operators {
   margin-left: 80px;
-}
-
-.plugin-map-dialog-en .map-plugin-modal-body {
-  padding: 0;
-  min-height: 500px;
-  height: 100%;
-  position: relative;
 }
 
 .map-plugin-en-tabs {
