@@ -144,7 +144,13 @@ class App extends React.Component {
     window.L = L;
     const { position, zoom } = await getInitialMapCenter(this.state.locations, this.geocoder);
     if (!this.map) {
-      this.map = L.map('map-container').setView(position, zoom).invalidateSize();
+      this.map = L.map('map-container', {
+        center: position,
+        zoom: zoom,
+        maxBounds: [[-90, -180], [90, 180]],
+        maxBoundsViscosity: 1.0 // prevent the user from dragging outside the bounds
+      })
+      .invalidateSize();
       L.tileLayer(url, {
         maxZoom: 18,
         minZoom: 2

@@ -145,7 +145,13 @@ class App extends React.Component {
     window.L = L;
     const { position, zoom } = await getInitialMapCenter(this.state.locations, this.geocoder);
     if (!this.map) {
-      this.map = L.map('map-container').setView(position, zoom).invalidateSize();
+      this.map = L.map('map-container', {
+        center: position,
+        zoom: zoom,
+        maxBounds: [[-90, -180], [90, 180]],
+        maxBoundsViscosity: 1.0 // prevent the user from dragging outside the bounds
+      })
+      .invalidateSize();
       L.tileLayer(url, {
         maxZoom: 18,
         minZoom: 2
@@ -849,7 +855,7 @@ class App extends React.Component {
             <span className="map-operator dtable-font dtable-icon-x btn-margin-right btn-close" onClick={this.toggle}></span>
           </div>
         </div>
-        <div className={'map-plugin-modal-body ' + (isFullScreen ? 'map-plugin-modal-body-full-screen' : '')}>
+        <div className={'flex-fill map-plugin-modal-body ' + (isFullScreen ? 'map-plugin-modal-body-full-screen' : '')}>
           {(!isDataLoaded && mapKey) && <Loading />}
           {(!mapKey) && (
             <div className='d-flex justify-content-center mt-9'>
