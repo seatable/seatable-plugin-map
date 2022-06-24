@@ -304,7 +304,7 @@ class App extends React.Component {
       case CONFIG_TYPE.TABLE: {
         const mapModeSettings = getConfigItemByType(configSettings, CONFIG_TYPE.MAP_MODE);
         let currentTable = this.dtable.getTableByName(option.name);
-        let currentView = this.dtable.getViews(currentTable)[0];
+        let currentView = this.dtable.getNonArchiveViews(currentTable)[0];
         let tableSettings = this.getTableSettings(currentTable);
         let viewSettings = this.getViewSettings(currentTable);
         let columnSetting = this.getColumnSettings(currentTable, currentView);
@@ -391,11 +391,9 @@ class App extends React.Component {
   }
 
   getViewSettings = (currentTable, activeView = null) => {
-    let views = this.dtable.getViews(currentTable);
+    let views = this.dtable.getNonArchiveViews(currentTable);
     let viewSettings = views.map(view => {
-      if (view.type !== 'archive') {
-        return { id: view._id, name: view.name };
-      }
+      return { id: view._id, name: view.name };
     }).filter(Boolean);
     let active = activeView ? activeView.name : views[0].name;
     return {type: CONFIG_TYPE.VIEW, name: intl.get('View'), active: active, settings: viewSettings};
