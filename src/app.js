@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import MobileMap from './mobile-map';
 import Map from './map';
 
@@ -12,5 +13,9 @@ class App extends React.Component {
     );
   }
 }
+
+App.propTypes = {
+  showDialog: PropTypes.bool,
+};
 
 export default App;

@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import styles from '../../css/mobile-en.module.css';
 import TouchFeedBack from './touch-feedback';
 
 class MobileSettingItem extends Component {
 
   onClick = () => {
-    this.props.onSelectConfig(this.props.configSetting)
+    this.props.onSelectConfig(this.props.configSetting);
   }
 
   getText = () => {
@@ -13,10 +14,10 @@ class MobileSettingItem extends Component {
     return configSetting.active;
   }
 
-  render() { 
+  render() {
     const { configSetting } = this.props;
     return (
-      <div className={styles['mobile-settting-item']}>
+      <div className={styles['mobile-setting-item']}>
         <div className={styles['mobile-setting-title']}>{configSetting.name}</div>
         <TouchFeedBack activeClassName={styles['selected-selector']}>
           <div onClick={this.onClick} className={`${styles['mobile-selector']}`}>
@@ -29,8 +30,13 @@ class MobileSettingItem extends Component {
           </div>
         </TouchFeedBack>
       </div>
-    )
+    );
   }
 }
- 
+
+MobileSettingItem.propTypes = {
+  configSetting: PropTypes.object,
+  onSelectConfig: PropTypes.func,
+};
+
 export default MobileSettingItem;

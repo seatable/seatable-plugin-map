@@ -1,7 +1,8 @@
 import * as React from 'react';
+import PropTypes from 'prop-types';
 import * as classNames from 'classnames';
 
-export default class TouchFeedback extends React.Component {
+class TouchFeedback extends React.Component {
   static defaultProps = {
     disabled: false,
   };
@@ -96,3 +97,12 @@ export default class TouchFeedback extends React.Component {
     return React.cloneElement(child, events);
   }
 }
+
+TouchFeedback.propTypes = {
+  disabled: PropTypes.bool,
+  children: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
+  activeClassName: PropTypes.string,
+  activeStyle: PropTypes.object,
+};
+
+export default TouchFeedback;

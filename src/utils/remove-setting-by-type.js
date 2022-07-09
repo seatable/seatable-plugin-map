@@ -8,6 +8,6 @@ const removeSettingByType = (configSettings, settingTypes) => {
       return setting.type !== settingTypes;
     });
   }
-}
+};
 
 export default removeSettingByType;

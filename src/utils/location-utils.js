@@ -7,13 +7,13 @@ const getMarkColor = (markColumn, row) => {
   if (!markColumn.data) return '';
   const options = markColumn.data.options;
   if (!options) return '';
-  
+
   const currentOption = options.find((option) => {
     return option.id === row[key];
   });
   if (!currentOption) return '';
   return currentOption.color;
-}
+};
 
 export const getLocations = (dtable, configSettings) => {
   let locations = [];
@@ -81,7 +81,7 @@ export const getLocations = (dtable, configSettings) => {
         columnName,
         directShownLabel,
         mapMode
-      }
+      };
     } else {
       locationItem = {
         type: addressType,
@@ -90,12 +90,12 @@ export const getLocations = (dtable, configSettings) => {
         columnName,
         imgUrl: row[imageColumn.key] || [],
         mapMode
-      }
+      };
     }
     locations.push(locationItem);
   });
   return locations;
-}
+};
 
 function getDirectShownLabel(row, column) {
   let label = '';
@@ -114,7 +114,7 @@ function getDirectShownLabel(row, column) {
     }
   }
   return label;
-} 
+}
 
 export const renderMarkByPosition = (locations, renderer, start = 0) => {
   let stack = locations.slice(start, start += 10);
@@ -128,7 +128,7 @@ export const renderMarkByPosition = (locations, renderer, start = 0) => {
     });
     renderMarkByPosition(locations, renderer, start);
   }, 20);
-}
+};
 
 export const formatGeolocactionValue = (value, type) => {
   const location = value ? value : {};
@@ -146,13 +146,13 @@ export const formatGeolocactionValue = (value, type) => {
   if (type === province) {
     return `${province || ''}`;
   }
-  
+
   return `${province || ''}${city || ''}${district || ''}${value.detail || ''}`;
-}
+};
 
 const getRowColor = (rowsColors, row) => {
   return rowsColors[row._id] || '';
-}
+};
 
 export const getInitialMapCenter = async (locations, geocoder) => {
   let position = [32, 166], zoom = 2;
@@ -178,9 +178,9 @@ export const getInitialMapCenter = async (locations, geocoder) => {
       position = [position[1], position[0]];
     }
   } else {
-    center = JSON.parse(center)
+    center = JSON.parse(center);
     position = [center.position.lat, center.position.lng];
     zoom = center.zoom;
   }
   return { position, zoom };
-}
+};

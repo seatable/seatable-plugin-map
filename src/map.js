@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import DTable from 'dtable-sdk';
 import L from 'leaflet';
 import 'leaflet.markercluster/dist/leaflet.markercluster-src';
@@ -145,13 +146,14 @@ class App extends React.Component {
     window.L = L;
     const { position, zoom } = await getInitialMapCenter(this.state.locations, this.geocoder);
     if (!this.map) {
-      this.map = L.map('map-container', {
-        center: position,
-        zoom: zoom,
-        maxBounds: [[-90, -180], [90, 180]],
-        maxBoundsViscosity: 1.0 // prevent the user from dragging outside the bounds
-      })
-      .invalidateSize();
+      this.map = L
+        .map('map-container', {
+          center: position,
+          zoom: zoom,
+          maxBounds: [[-90, -180], [90, 180]],
+          maxBoundsViscosity: 1.0 // prevent the user from dragging outside the bounds
+        })
+        .invalidateSize();
       L.tileLayer(url, {
         maxZoom: 18,
         minZoom: 2
@@ -625,6 +627,7 @@ class App extends React.Component {
             if (resolutionTimes < 3) {
               this.geocoding(locations, ++resolutionTimes, index);
             } else {
+              // eslint-disable-next-line no-console
               console.log(intl.get('Your_Google_Maps_key_has_exceeded_quota'));
               this.geocoding(locations, 1, ++index);
             }
@@ -645,6 +648,7 @@ class App extends React.Component {
           break;
         }
         default: {
+          // eslint-disable-next-line no-console
           console.log(intl.get('address_was_not_found', { address: address }));
           break;
         }
@@ -877,5 +881,9 @@ class App extends React.Component {
     );
   }
 }
+
+App.propTypes = {
+  showDialog: PropTypes.bool,
+};
 
 export default App;
