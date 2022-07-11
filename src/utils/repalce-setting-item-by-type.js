@@ -6,4 +6,4 @@ export const replaceSettingItemByType = (configSettings, type, settingItems) => 
     configSettings.splice(index, 1, settingItems);
   }
   return configSettings;
-}
+};

@@ -26,7 +26,7 @@ export const getSelectedViewIds = (key) => {
   const dtableUuid = getDtableUuid();
   let selectedViewIds = selectedViewIdsString ? JSON.parse(selectedViewIdsString) : {};
   return selectedViewIds[dtableUuid];
-}
+};
 
 export const setSelectedViewIds = (key, index) => {
   let selectedViewIdsString = window.localStorage.getItem(key);
@@ -34,7 +34,7 @@ export const setSelectedViewIds = (key, index) => {
   let selectedViewIds = selectedViewIdsString ? JSON.parse(selectedViewIdsString) : {};
   selectedViewIds[dtableUuid] = index;
   localStorage.setItem(key, JSON.stringify(selectedViewIds));
-}
+};
 
 export const getDtableUuid = () => {
   if (window.dtable && window.dtable.dtableUuid) {
@@ -46,4 +46,4 @@ export const getDtableUuid = () => {
 export const replaceSettingItem = (settings, settingItem, index) => {
   settings.splice(index, 1, settingItem);
   return settings;
-}
+};

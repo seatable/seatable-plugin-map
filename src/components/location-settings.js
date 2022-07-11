@@ -7,6 +7,7 @@ import '../locale/index.js';
 const propTypes = {
   configSettings: PropTypes.array,
   onSelectChange: PropTypes.func,
+  onHideMapSettings: PropTypes.func,
 };
 
 class LocationSettings extends Component {

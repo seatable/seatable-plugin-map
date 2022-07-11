@@ -101,13 +101,13 @@
   color: rgb(240, 159, 63);
 }
 
-.dtable-map-plugin-setting-warpper {
+.dtable-map-plugin-setting-wrapper {
   width: 100%;
   height: calc(100% - 50px);
   overflow: auto;
 }
 
-.mobile-settting-item {
+.mobile-setting-item {
   margin-top: 16px;
   font-size: 14px;
   overflow: auto;

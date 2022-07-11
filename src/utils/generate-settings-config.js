@@ -11,7 +11,7 @@ const SETTING_MIRROR = {
   id: 'id',
   map_mode: 'mapMode',
   image_column: 'imageColumnName'
-}
+};
 
 export const generateSettingsByConfig = (configSettings, currentSettingItem) => {
   const settings = {};
@@ -31,4 +31,4 @@ export const generateSettingsByConfig = (configSettings, currentSettingItem) => 
   settings.id = currentSettingItem.id;
   settings.name = currentSettingItem.name;
   return settings;
-}
+};
