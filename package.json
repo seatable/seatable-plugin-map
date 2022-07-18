@@ -1,9 +1,9 @@
 {
   "name": "seatable-plugin-map",
-  "version": "0.0.32",
+  "version": "0.0.33",
   "private": true,
   "dependencies": {
-    "dtable-sdk": "0.0.150",
+    "dtable-sdk": "0.0.154",
     "dtable-web-api": "^1.0.19",
     "html2canvas": "^1.0.0-rc.7",
     "leaflet": "^1.6.0",
