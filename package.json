@@ -1,6 +1,6 @@
 {
   "name": "seatable-plugin-map",
-  "version": "0.0.34",
+  "version": "0.0.35",
   "private": true,
   "dependencies": {
     "dtable-sdk": "0.0.156",
