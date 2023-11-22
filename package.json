@@ -5,16 +5,15 @@
   "dependencies": {
     "dtable-sdk": "0.1.0",
     "dtable-web-api": "4.3.1",
-    "html2canvas": "^1.0.0-rc.7",
+    "html2canvas": "^1.4.1",
     "leaflet": "^1.6.0",
     "leaflet.markercluster": "^1.5.3",
     "react": "17.0.2",
-    "react-app-polyfill": "^3.0.0",
     "react-dom": "17.0.2",
     "react-i18next": "^10.12.2",
     "react-intl-universal": "^2.2.5",
     "react-select": "5.7.0",
-    "reactstrap": "^8.0.0"
+    "reactstrap": "8.9.0"
   },
   "scripts": {
     "clean": "rm -rf plugin-zip && mkdir plugin-zip",
@@ -85,6 +84,7 @@
     "react-dev-utils": "10.0.0",
     "resolve": "1.15.0",
     "resolve-url-loader": "3.1.1",
+    "react-app-polyfill": "^3.0.0",
     "sass-loader": "8.0.2",
     "semver": "6.3.0",
     "style-loader": "1.1.3",
