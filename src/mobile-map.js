@@ -1,12 +1,14 @@
 import React from 'react';
-import DTable from 'dtable-sdk';
+import PropTypes from 'prop-types';
+import intl from 'react-intl-universal';
 import L from 'leaflet';
 import 'leaflet.markercluster/dist/leaflet.markercluster-src';
+import {
+  getTableByName, getViewByName, getTableColumnByName, getNonArchiveViews, getViewShownColumns,
+} from 'dtable-utils';
 import Settings from './components/mobile/settings';
 import Loading from './components/loading';
-import intl from 'react-intl-universal';
-import './locale/index.js';
-import  * as image  from './image/index';
+import * as image from './image/index';
 import { getLocations, renderMarkByPosition, formatGeolocactionValue, getInitialMapCenter } from './utils/location-utils';
 import COLORS from './marker-color';
 import ViewTabs from './components/view-tabs';
@@ -23,9 +25,12 @@ import { IMAGE_PATH,
   GEOCODING_FORMAT,
   MAP_MODE
 } from './constants';
-import styles from './css/mobile-en.module.css';
+
+import './locale';
+
 import logo from './image/map.png';
 
+import styles from './css/mobile-en.module.css';
 import './css/common.css';
 import 'leaflet/dist/leaflet.css';
 
@@ -35,7 +40,6 @@ class App extends React.Component {
 
   constructor(props) {
     super(props);
-    this.dtable = null;
     this.state = {
       showDialog: props.showDialog || true,
       locations: [],
@@ -55,11 +59,10 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    this.dtable = new DTable();
     this.loadMapScript();
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     this.setState({
       showDialog: nextProps.showDialog
     }, () => {
@@ -88,16 +91,22 @@ class App extends React.Component {
     this.unsubscribeRemoteDtableChanged();
   }
 
+  getLocations = (configSettings) => {
+    const tables = window.dtableSDK.getTables();
+    return getLocations(tables, configSettings);
+  }
+
   async initPluginDTableData() {
-    if (window.app !== undefined) {
-      this.dtable.initInBrowser(window.app.dtableStore);
-      this.unsubscribeLocalDtableChanged = this.dtable.subscribe('local-dtable-changed', () => { this.onDTableChanged(); });
-      this.unsubscribeRemoteDtableChanged = this.dtable.subscribe('remote-dtable-changed', () => { this.onDTableChanged(); });
+    if (this.props.isDevelopment) {
+      window.dtableSDK.subscribe('dtable-connect', () => { this.onDTableConnect(); });
+    } else {
+      this.unsubscribeLocalDtableChanged = window.dtableSDK.subscribe('local-dtable-changed', () => { this.onDTableChanged(); });
+      this.unsubscribeRemoteDtableChanged = window.dtableSDK.subscribe('remote-dtable-changed', () => { this.onDTableChanged(); });
       const settings = this.initPluginSettings();
       let selectedViewIdx = getSelectedViewIds(KEY_SELECTED_VIEW_IDS) || 0;
       selectedViewIdx = selectedViewIdx > settings.length - 1 ? 0 : selectedViewIdx;
       const configSettings = this.initSelectedSettings(settings[selectedViewIdx]);
-      const locations = getLocations(this.dtable, configSettings);
+      const locations = this.getLocations(configSettings);
       this.setState({
         configSettings,
         isDataLoaded: true,
@@ -108,11 +117,6 @@ class App extends React.Component {
         await this.renderMap();
         this.renderLocations(locations);
       });
-    } else {
-      await this.dtable.init(window.dtablePluginConfig);
-      await this.dtable.syncWithServer();
-      window.app = {};
-      this.dtable.subscribe('dtable-connect', () => { this.onDTableConnect(); });
     }
   }
 
@@ -150,7 +154,7 @@ class App extends React.Component {
         maxBounds: [[-90, -180], [90, 180]],
         maxBoundsViscosity: 1.0 // prevent the user from dragging outside the bounds
       })
-      .invalidateSize();
+        .invalidateSize();
       L.tileLayer(url, {
         maxZoom: 18,
         minZoom: 2
@@ -159,12 +163,13 @@ class App extends React.Component {
   }
 
   onDTableConnect() {
-    this.unsubscribeLocalDtableChanged = this.dtable.subscribe('local-dtable-changed', () => { this.onDTableChanged(); });
-    this.unsubscribeRemoteDtableChanged = this.dtable.subscribe('remote-dtable-changed', () => { this.onDTableChanged(); });
+    this.unsubscribeLocalDtableChanged = window.dtableSDK.subscribe('local-dtable-changed', () => { this.onDTableChanged(); });
+    this.unsubscribeRemoteDtableChanged = window.dtableSDK.subscribe('remote-dtable-changed', () => { this.onDTableChanged(); });
     const pluginSettings = this.initPluginSettings();
     let selectedViewIdx = getSelectedViewIds(KEY_SELECTED_VIEW_IDS) || 0;
     selectedViewIdx = selectedViewIdx > pluginSettings.length - 1 ? 0 : selectedViewIdx;
-    const configSettings = this.initSelectedSettings(pluginSettings[selectedViewIdx]);    const locations = getLocations(this.dtable, configSettings);
+    const configSettings = this.initSelectedSettings(pluginSettings[selectedViewIdx]);
+    const locations = this.getLocations(configSettings);
     this.setState({
       configSettings,
       locations,
@@ -180,7 +185,8 @@ class App extends React.Component {
     const pluginSettings = this.initPluginSettings();
     let selectedViewIdx = getSelectedViewIds(KEY_SELECTED_VIEW_IDS) || 0;
     selectedViewIdx = selectedViewIdx > pluginSettings.length - 1 ? 0 : selectedViewIdx;
-    const configSettings = this.initSelectedSettings(pluginSettings[selectedViewIdx]);    const locations = getLocations(this.dtable, configSettings);
+    const configSettings = this.initSelectedSettings(pluginSettings[selectedViewIdx]);
+    const locations = this.getLocations(configSettings);
     this.setState({
       locations,
       configSettings,
@@ -190,7 +196,7 @@ class App extends React.Component {
   }
 
   initPluginSettings = () => {
-    let pluginSettings = this.dtable.getPluginSettings(PLUGIN_NAME);
+    let pluginSettings = window.dtableSDK.getPluginSettings(PLUGIN_NAME);
     if (Array.isArray(pluginSettings)) {
       const newPluginSettings = pluginSettings.filter((settingItem) => {
         return this.isValidSettingItem(settingItem);
@@ -214,53 +220,62 @@ class App extends React.Component {
   }
 
   getInitSettingItem = (name = intl.get('Default_View')) => {
-    let activeTable = this.dtable.getActiveTable();
-    let activeView = this.dtable.getActiveView();
-    let pluginSettingItem = {id: generatorViewId(), name, tableName: activeTable.name, viewName: activeView.name, columnName: null, markDependence: null, directShownColumn: null};
-    return pluginSettingItem;
+    const activeTable = window.dtableSDK.getActiveTable();
+    const activeView = window.dtableSDK.getActiveView();
+    return {
+      id: generatorViewId(),
+      tableName: activeTable.name,
+      viewName: activeView.name,
+      columnName: null,
+      markDependence: null,
+      directShownColumn: null,
+      name,
+    };
   }
 
   isValidSettingItem = (pluginSettings) => {
-    let { mapMode, tableName, viewName, columnName, markDependence, directShownColumnName, imageColumnName } = pluginSettings;
-    let table = this.dtable.getTableByName(tableName);
+    const { mapMode, tableName, viewName, columnName, markDependence, directShownColumnName, imageColumnName } = pluginSettings;
+    const tables = window.dtableSDK.getTables();
+    const table = getTableByName(tables, tableName);
     if (!table) return false;
-    let view = this.dtable.getViewByName(table, viewName);
+    const view = getViewByName(table.views, viewName);
     if (!view || view.type === 'archive') return false;
-    let column = this.dtable.getColumnByName(table, columnName);
+    const column = getTableColumnByName(table, columnName);
     if (!column && columnName) return false;
     if (mapMode === MAP_MODE.DEFAULT) {
-      let markColumn = this.dtable.getColumnByName(table, markDependence);
+      const markColumn = getTableColumnByName(table, markDependence);
       if (!markColumn && markDependence && markDependence !== 'rows_color') return false;
-      const directShownColumn = this.dtable.getColumnByName(table, directShownColumnName);
+      const directShownColumn = getTableColumnByName(table, directShownColumnName);
       if (!directShownColumn && directShownColumnName) return false;
     } else {
-      let imageColumn = this.dtable.getColumnByName(table, imageColumnName);
+      const imageColumn = getTableColumnByName(table, imageColumnName);
       if (!imageColumn && imageColumnName) return false;
     }
     return true;
   }
 
   initSelectedSettings = (settings) => {
+    const tables = window.dtableSDK.getTables();
     let configSettings = [];
     let { mapMode, tableName, viewName, columnName, markDependence, directShownColumnName, imageColumnName } = settings;
     const mapSettings = this.getMapSetting(mapMode);
     configSettings.push(mapSettings);
-    let activeTable = this.dtable.getTableByName(tableName);
+    let activeTable = getTableByName(tables, tableName);
     let tableSettings = this.getTableSettings(activeTable);
-    let activeView = this.dtable.getViewByName(activeTable, viewName);
+    let activeView = getViewByName(activeTable.views, viewName);
     let viewSettings = this.getViewSettings(activeTable, activeView);
     configSettings.push(tableSettings, viewSettings);
-    let activeColumn = this.dtable.getColumnByName(activeTable, columnName);
+    let activeColumn = getTableColumnByName(activeTable, columnName);
     let columnSettings = this.getColumnSettings(activeTable, activeView, activeColumn);
     configSettings.push(columnSettings);
     if (mapMode === MAP_MODE.IMAGE) {
-      let activeImageColumn = this.dtable.getColumnByName(activeTable, imageColumnName);
+      let activeImageColumn = getTableColumnByName(activeTable, imageColumnName);
       const imageColumnSettings = this.getImageColumnsSetting(activeTable, activeView, activeImageColumn);
       configSettings.push(imageColumnSettings);
       return configSettings;
     }
     let markColumnSettings = this.getMarkColumnSetting(activeTable, activeView, markDependence);
-    let directShownColumn = this.dtable.getColumnByName(activeTable, directShownColumnName);
+    let directShownColumn = getTableColumnByName(activeTable, directShownColumnName);
     let directShownColumnSetting = this.getDirectShownColumnSetting(activeTable, activeView, directShownColumn);
     configSettings.push(markColumnSettings, directShownColumnSetting);
     return configSettings;
@@ -268,14 +283,15 @@ class App extends React.Component {
 
   updateSelectedSettings = (type, option) => {
     let { configSettings } = this.state;
+    const tables = window.dtableSDK.getTables();
     switch(type) {
       case CONFIG_TYPE.MAP_MODE: {
         const tableName = getConfigItemByType(configSettings, 'table').active;
         const viewName = getConfigItemByType(configSettings, 'view').active;
         const mapMode = option.name;
         const currentMapMode = configSettings[0].active;
-        let currentTable = this.dtable.getTableByName(tableName);
-        let currentView = this.dtable.getViewByName(currentTable, viewName);
+        const currentTable = getTableByName(tables, tableName);
+        const currentView = getViewByName(currentTable.views, viewName);
         if (currentMapMode === mapMode) return configSettings;
         let newConfigSettings = [];
         const mapSettings = this.getMapSetting(mapMode);
@@ -299,8 +315,8 @@ class App extends React.Component {
       }
       case CONFIG_TYPE.TABLE: {
         const mapModeSettings = getConfigItemByType(configSettings, CONFIG_TYPE.MAP_MODE);
-        let currentTable = this.dtable.getTableByName(option.name);
-        let currentView = this.dtable.getNonArchiveViews(currentTable)[0];
+        let currentTable = getTableByName(tables, option.name);
+        let currentView = getNonArchiveViews(currentTable.views)[0];
         let tableSettings = this.getTableSettings(currentTable);
         let viewSettings = this.getViewSettings(currentTable);
         let columnSetting = this.getColumnSettings(currentTable, currentView);
@@ -316,8 +332,8 @@ class App extends React.Component {
         const mapModeSettings = getConfigItemByType(configSettings, CONFIG_TYPE.MAP_MODE);
         const tableSettings = getConfigItemByType(configSettings, 'table');
         const tableName = tableSettings.active;
-        let currentTable = this.dtable.getTableByName(tableName);
-        let currentView = this.dtable.getViewByName(currentTable, option.name);
+        let currentTable = getTableByName(tables, tableName);
+        let currentView = getViewByName(currentTable.views, option.name);
         let viewSettings = this.getViewSettings(currentTable, currentView);
         let columnSetting = this.getColumnSettings(currentTable, currentView);
         if (configSettings[0].active === MAP_MODE.IMAGE) {
@@ -331,9 +347,9 @@ class App extends React.Component {
       case CONFIG_TYPE.COLUMN: {
         const tableName = getConfigItemByType(configSettings, 'table').active;
         const viewName = getConfigItemByType(configSettings, 'view').active;
-        let currentTable = this.dtable.getTableByName(tableName);
-        let currentView = this.dtable.getViewByName(currentTable, viewName);
-        let currentColumn = this.dtable.getColumnByName(currentTable, option.name);
+        let currentTable = getTableByName(tables, tableName);
+        let currentView = getViewByName(currentTable.views, viewName);
+        let currentColumn = getTableColumnByName(currentTable, option.name);
         let columnSettings = this.getColumnSettings(currentTable, currentView, currentColumn);
         replaceSettingItemByType(configSettings, 'column', columnSettings);
         return configSettings;
@@ -341,8 +357,8 @@ class App extends React.Component {
       case CONFIG_TYPE.MARK_DEPENDENCE: {
         const tableName = getConfigItemByType(configSettings, 'table').active;
         const viewName = getConfigItemByType(configSettings, 'view').active;
-        let currentTable = this.dtable.getTableByName(tableName);
-        let currentView = this.dtable.getViewByName(currentTable, viewName);
+        let currentTable = getTableByName(tables, tableName);
+        let currentView = getViewByName(currentTable.views, viewName);
         let columnSetting = this.getMarkColumnSetting(currentTable, currentView, option.name);
         replaceSettingItemByType(configSettings, 'mark_dependence', columnSetting);
         return configSettings;
@@ -350,9 +366,9 @@ class App extends React.Component {
       case CONFIG_TYPE.DIECT_SHOWN_COLUMN: {
         const tableName = getConfigItemByType(configSettings, 'table').active;
         const viewName = getConfigItemByType(configSettings, 'view').active;
-        let currentTable = this.dtable.getTableByName(tableName);
-        let currentView = this.dtable.getViewByName(currentTable, viewName);
-        let column = this.dtable.getColumnByName(currentTable, option.name);
+        let currentTable = getTableByName(tables, tableName);
+        let currentView = getViewByName(currentTable.views, viewName);
+        let column = getTableColumnByName(currentTable, option.name);
         let directShownColumnSetting = this.getDirectShownColumnSetting(currentTable, currentView, column);
         replaceSettingItemByType(configSettings, 'direct_shown_column', directShownColumnSetting);
         return configSettings;
@@ -360,9 +376,9 @@ class App extends React.Component {
       case CONFIG_TYPE.IMAGE_COLUMN: {
         const tableName = getConfigItemByType(configSettings, 'table').active;
         const viewName = getConfigItemByType(configSettings, 'view').active;
-        let currentTable = this.dtable.getTableByName(tableName);
-        let currentView = this.dtable.getViewByName(currentTable, viewName);
-        let column = this.dtable.getColumnByName(currentTable, option.name);
+        let currentTable = getTableByName(tables, tableName);
+        let currentView = getViewByName(currentTable.views, viewName);
+        let column = getTableColumnByName(currentTable, option.name);
         let imageColumnSetting = this.getImageColumnsSetting(currentTable, currentView, column);
         replaceSettingItemByType(configSettings, CONFIG_TYPE.IMAGE_COLUMN, imageColumnSetting);
         return configSettings;
@@ -378,25 +394,35 @@ class App extends React.Component {
   }
 
   getTableSettings = (activeTable = null) => {
-    let tables = this.dtable.getTables();
+    const tables = window.dtableSDK.getTables();
     let tableSettings = tables.map(table => {
       return {id: table._id, name: table.name};
     });
     let active = activeTable ? activeTable.name : tables[0].name;
-    return {type: CONFIG_TYPE.TABLE, name: intl.get('Table'), active: active, settings: tableSettings};
+    return {
+      type: CONFIG_TYPE.TABLE,
+      name: intl.get('Table'),
+      settings: tableSettings,
+      active,
+    };
   }
 
   getViewSettings = (currentTable, activeView = null) => {
-    let views = this.dtable.getNonArchiveViews(currentTable);
+    const views = getNonArchiveViews(currentTable.views);
     let viewSettings = views.map(view => {
       return { id: view._id, name: view.name };
     }).filter(Boolean);
     let active = activeView ? activeView.name : views[0].name;
-    return {type: CONFIG_TYPE.VIEW, name: intl.get('View'), active: active, settings: viewSettings};
+    return {
+      type: CONFIG_TYPE.VIEW,
+      name: intl.get('View'),
+      settings: viewSettings,
+      active,
+    };
   }
 
   getColumnSettings = (currentTable, currentView, activeColumn = null) => {
-    let columns = this.dtable.getViewShownColumns(currentView, currentTable);
+    let columns = getViewShownColumns(currentView, currentTable.columns);
 
     // need options: checkout map column
     columns = columns.filter(column => {
@@ -413,11 +439,16 @@ class App extends React.Component {
     } else {
       active = activeColumn ? activeColumn.name : columns[0].name;
     }
-    return {type: CONFIG_TYPE.COLUMN, name: intl.get('Address_field'), active: active, settings: columnSettings};
+    return {
+      type: CONFIG_TYPE.COLUMN,
+      name: intl.get('Address_field'),
+      settings: columnSettings,
+      active,
+    };
   }
 
   getMarkColumnSetting = (currentTable, currentView, dependence = null) => {
-    let columns = this.dtable.getViewShownColumns(currentView, currentTable);
+    let columns = getViewShownColumns(currentView, currentTable.columns);
     columns = columns.filter(column => {
       return column.type === 'single-select';
     });
@@ -433,11 +464,16 @@ class App extends React.Component {
     } else {
       active = dependence ? dependence : columnSettings[0].name;
     }
-    return {type: 'mark_dependence', name: intl.get('Marker_colored_by'), active: active, settings: columnSettings};
+    return {
+      type: 'mark_dependence',
+      name: intl.get('Marker_colored_by'),
+      settings: columnSettings,
+      active,
+    };
   }
 
   getDirectShownColumnSetting = (currentTable, currentView, activeColumn = null) => {
-    let columns = this.dtable.getViewShownColumns(currentView, currentTable);
+    let columns = getViewShownColumns(currentView, currentTable.columns);
     columns = columns.filter(column => {
       return column.type === 'text' || column.type === 'single-select';
     });
@@ -445,13 +481,19 @@ class App extends React.Component {
       return {id: column.key, name: column.name};
     });
     columnSettings.unshift({id: '', name: intl.get('Not_used')});
+
     // need options: checkout map column
     let active = activeColumn ? activeColumn.name : columnSettings[0].name;
-    return { type: 'direct_shown_column', name: intl.get('Display_field'), active: active, settings: columnSettings };
+    return {
+      type: 'direct_shown_column',
+      name: intl.get('Display_field'),
+      settings: columnSettings,
+      active,
+    };
   }
 
   getImageColumnsSetting = (currentTable, currentView, activeColumn = null) => {
-    let columns = this.dtable.getViewShownColumns(currentView, currentTable);
+    let columns = getViewShownColumns(currentView, currentTable.columns);
     columns = columns.filter(column => {
       return column.type === 'image';
     });
@@ -461,7 +503,12 @@ class App extends React.Component {
 
     columnSettings.unshift({id: 'not_used', name: intl.get('Not_used')});
     let active = activeColumn ? activeColumn.name : columnSettings[0].name;
-    return {type: 'image_column', name: intl.get('Image_field'), active: active, settings: columnSettings};
+    return {
+      type: 'image_column',
+      name: intl.get('Image_field'),
+      settings: columnSettings,
+      active,
+    };
   }
 
   onSelectChange = (type, option) => {
@@ -469,7 +516,7 @@ class App extends React.Component {
     let { settings, selectedViewIdx } = this.state;
     let settingItem = generateSettingsByConfig(configSettings, settings[selectedViewIdx]);
     settings = replaceSettingItem(settings, settingItem, selectedViewIdx);
-    this.dtable.updatePluginSettings(PLUGIN_NAME, settings);
+    window.dtableSDK.updatePluginSettings(PLUGIN_NAME, settings);
   }
 
   onSaveSetting = () => {
@@ -477,7 +524,7 @@ class App extends React.Component {
     const settingItem = generateSettingsByConfig(configSettings, this.state.settings[selectedViewIdx]);
     const settings = replaceSettingItem(this.state.settings, settingItem, selectedViewIdx);
     this.toggleSettingDialog();
-    this.dtable.updatePluginSettings(PLUGIN_NAME, settings);
+    window.dtableSDK.updatePluginSettings(PLUGIN_NAME, settings);
   }
 
   toggle = () => {
@@ -621,6 +668,7 @@ class App extends React.Component {
             if (resolutionTimes < 3) {
               this.geocoding(locations, ++resolutionTimes, index);
             } else {
+              // eslint-disable-next-line
               console.log(intl.get('Your_Google_Maps_key_has_exceeded_quota'));
               this.geocoding(locations, 1, ++index);
             }
@@ -641,6 +689,7 @@ class App extends React.Component {
           break;
         }
         default: {
+          // eslint-disable-next-line
           console.log(intl.get('address_was_not_found', { address: address }));
           break;
         }
@@ -743,7 +792,7 @@ class App extends React.Component {
       selectedViewIdx: newSelectedViewIndex
     }, () => {
       setSelectedViewIds(KEY_SELECTED_VIEW_IDS, newSelectedViewIndex);
-      this.dtable.updatePluginSettings(PLUGIN_NAME, plugin_settings);
+      window.dtableSDK.updatePluginSettings(PLUGIN_NAME, plugin_settings);
     });
   }
 
@@ -752,7 +801,7 @@ class App extends React.Component {
     const settingItem = settings[index];
     const configSettings = this.initSelectedSettings(settingItem);
     setSelectedViewIds(KEY_SELECTED_VIEW_IDS, index);
-    const locations = getLocations(this.dtable, configSettings);
+    const locations = this.getLocations(configSettings);
     this.setState({
       configSettings,
       selectedViewIdx: index,
@@ -769,7 +818,7 @@ class App extends React.Component {
       selectedViewIdx,
     }, () => {
       setSelectedViewIds(KEY_SELECTED_VIEW_IDS, selectedViewIdx);
-      this.dtable.updatePluginSettings(PLUGIN_NAME, settings);
+      window.dtableSDK.updatePluginSettings(PLUGIN_NAME, settings);
       this.viewsTabs && this.viewsTabs.setViewsTabsScroll();
     });
   }
@@ -778,7 +827,7 @@ class App extends React.Component {
     let { selectedViewIdx, settings } = this.state;
     const newSettingItem = Object.assign({}, settings[selectedViewIdx], {name: name});
     settings.splice(selectedViewIdx, 1, newSettingItem);
-    this.dtable.updatePluginSettings(PLUGIN_NAME, settings);
+    window.dtableSDK.updatePluginSettings(PLUGIN_NAME, settings);
   }
 
   onDeleteView = (index) => {
@@ -788,7 +837,7 @@ class App extends React.Component {
     this.setState({
       selectedViewIdx: selectedViewIdx
     }, () => {
-      this.dtable.updatePluginSettings(PLUGIN_NAME, settings);
+      window.dtableSDK.updatePluginSettings(PLUGIN_NAME, settings);
     });
   }
 
@@ -829,7 +878,7 @@ class App extends React.Component {
           </div>
         </div>
         <div className={styles['map-wrapper']}>
-          {(!isDataLoaded && mapKey) && <Loading />}
+          {(!isDataLoaded && mapKey) && <div className={styles['plugin-map-loading']}><Loading /></div>}
           {(!mapKey) && (
             <div className='d-flex justify-content-center mt-9'>
               <span className="alert-danger">{intl.get('The_map_plugin_is_not_properly_configured_contact_the_administrator')}</span>
@@ -853,5 +902,10 @@ class App extends React.Component {
     );
   }
 }
+
+App.propTypes = {
+  isDevelopment: PropTypes.bool,
+  showDialog: PropTypes.bool,
+};
 
 export default App;
