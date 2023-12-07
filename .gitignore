@@ -14,7 +14,7 @@
 /lib
 
 #src/settings
-/src/settings.js
+/src/setting.local.js
 
 /plugin-zip
 
