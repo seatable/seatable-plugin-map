@@ -1,5 +1,6 @@
-import getConfigItemByType from './get-config-item-by-type';
 import intl from 'react-intl-universal';
+import { getTableByName, getViewByName, getTableColumnByName } from 'dtable-utils';
+import getConfigItemByType from './get-config-item-by-type';
 import { MAP_MODE } from '../constants';
 
 const getMarkColor = (markColumn, row) => {
@@ -15,35 +16,35 @@ const getMarkColor = (markColumn, row) => {
   return currentOption.color;
 };
 
-export const getLocations = (dtable, configSettings) => {
+export const getLocations = (tables, configSettings) => {
   let locations = [];
   const mapModeSetting = getConfigItemByType(configSettings, 'map_mode') || {};
   const mapMode = mapModeSetting.active || MAP_MODE.DEFAULT;
   const tableName = getConfigItemByType(configSettings, 'table').active;
   const viewName = getConfigItemByType(configSettings, 'view').active;
-  let currentTable = dtable.getTableByName(tableName);
-  let currentView = dtable.getViewByName(currentTable, viewName);
+  let currentTable = getTableByName(tables, tableName);
+  let currentView = getViewByName(currentTable.views, viewName);
   const columnName = getConfigItemByType(configSettings, 'column').active;
-  let currentColumn = dtable.getColumnByName(currentTable, columnName);
+  let currentColumn = getTableColumnByName(currentTable, columnName);
   let rowsColor = {};
   let directShownLabel = '', color = '', directShownColumn, currentMarkColumn, isRowColor, imageColumn;
   if (mapMode === MAP_MODE.DEFAULT) {
     const markDependence = getConfigItemByType(configSettings, 'mark_dependence').active;
-    currentMarkColumn = dtable.getColumnByName(currentTable, markDependence);
+    currentMarkColumn = getTableColumnByName(currentTable, markDependence);
     isRowColor = markDependence === intl.get('Row_color');
     if (isRowColor) {
-      const viewRows = dtable.getViewRows(currentView, currentTable);
-      rowsColor = dtable.getViewRowsColor(viewRows, currentView, currentTable);
+      const viewRows = window.dtableSDK.getViewRows(currentView, currentTable);
+      rowsColor = window.dtableSDK.getViewRowsColor(viewRows, currentView, currentTable);
     }
     const directShownColumnName = getConfigItemByType(configSettings, 'direct_shown_column').active;
-    directShownColumn = dtable.getColumnByName(currentTable, directShownColumnName);
+    directShownColumn = getTableColumnByName(currentTable, directShownColumnName);
   } else {
     let imageColumnName = getConfigItemByType(configSettings, 'image_column').active;
-    imageColumn = dtable.getColumnByName(currentTable, imageColumnName) || {};
+    imageColumn = getTableColumnByName(currentTable, imageColumnName) || {};
   }
 
   let locationNameKey = currentTable.columns[0].key;
-  let rows = dtable.getViewRows(currentView, currentTable);
+  let rows = window.dtableSDK.getViewRows(currentView, currentTable);
   if (!currentColumn) {
     return [];
   }

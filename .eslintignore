@@ -1,0 +1,8 @@
+# settings
+/src/setting**
+
+/src/locale/lang
+/src/locale/lang/de.js
+/scr/locale/lang/en.js
+/src/locale/lang/fr.js
+/src/locale/lang/zh_CN.js

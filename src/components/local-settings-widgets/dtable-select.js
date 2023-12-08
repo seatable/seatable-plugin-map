@@ -56,7 +56,7 @@ class DTableSelect extends React.Component {
     const { options, onChange, value, isSearchable, placeholder } = this.props;
 
     return(
-      <Select 
+      <Select
         value={value}
         onChange={onChange}
         options={options}
@@ -70,7 +70,7 @@ class DTableSelect extends React.Component {
         menuPortalTarget={this.getMenuPortalTarget()}
         captureMenuScroll={false}
       />
-    ); 
+    );
   }
 }
 

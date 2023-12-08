@@ -42,7 +42,7 @@
   justify-content: center;
   align-items: center;
   margin: 0 80px 0 0;
-} 
+}
 
 .plugin-map-dialog-en .plugin-logo .plugin-logo-icon {
   width: 20px;
@@ -160,7 +160,7 @@
 }
 
 .plugin-map-dialog-en .plugin-label-name {
-  margin-top: 5px; 
+  margin-top: 5px;
 }
 
 .map-container .leaflet-bottom.leaflet-right .leaflet-control-attribution.leaflet-control {
@@ -310,4 +310,8 @@
 
 .leaflet-div-icon {
   border: none;
+}
+
+.plugin-map-en-loading {
+  padding-top: 50px;
 }

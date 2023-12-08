@@ -55,6 +55,11 @@
 .map-wrapper {
   height: calc(100% - 50px);
   width: 100%;
+  background-color: #fff;
+}
+
+.plugin-map-loading {
+  padding-top: 50px;
 }
 
 .map-container {
@@ -141,7 +146,7 @@
 
 .mobile-select-options {
   border-bottom: 1px solid #e9e9e9;
-  border-top: 1px solid #e9e9e9; 
+  border-top: 1px solid #e9e9e9;
   color: #202428;
 }
 
@@ -159,7 +164,7 @@
   display: flex;
   justify-content: space-between;
   height: 51px;
-  line-height: 50px; 
+  line-height: 50px;
 }
 
 .mobile-select-option:last-child .mobile-selector-option-wrapper {
