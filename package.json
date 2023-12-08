@@ -1,9 +1,9 @@
 {
   "name": "seatable-plugin-map",
-  "version": "0.0.36",
+  "version": "0.0.37",
   "private": true,
   "dependencies": {
-    "dtable-utils": "4.3.2-beta.1",
+    "dtable-utils": "4.3.3",
     "html2canvas": "^1.4.1",
     "leaflet": "^1.6.0",
     "leaflet.markercluster": "^1.5.3",
