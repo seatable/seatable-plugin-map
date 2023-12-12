@@ -1,8 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import DTable from 'dtable-sdk';
+import './setting';
 import App from './app';
-import './settings';
 
 import './index.css';
 
