@@ -80,7 +80,7 @@
 
 .dtable-map-plugin-header-title {
   margin-bottom: 0;
-  color: #333;
+  color: #212529;
   line-height: 50px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -137,7 +137,7 @@
   box-sizing: border-box;
   line-height: 50px;
   justify-content: space-between;
-  color: #202428;
+  color: #212529;
 }
 
 .mobile-selector:last-child {
@@ -147,7 +147,7 @@
 .mobile-select-options {
   border-bottom: 1px solid #e9e9e9;
   border-top: 1px solid #e9e9e9;
-  color: #202428;
+  color: #212529;
 }
 
 .mobile-select-option {

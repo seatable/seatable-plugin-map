@@ -36,7 +36,7 @@
 
 .view-item .tab-item-active {
   border-color: #3b88fd;
-  color: #444;
+  color: #212529;
   cursor: default;
 }
 
@@ -131,7 +131,7 @@
 
 .view-item .view-item-content:hover {
   border-color: #3b88fd;
-  color: #444;
+  color: #212529;
   cursor: pointer;
 }
 
