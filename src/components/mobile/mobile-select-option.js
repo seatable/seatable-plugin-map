@@ -14,7 +14,7 @@ class MobileSelectOption extends Component {
       return;
     }
     this.props.onSelectOption(selectedConfig.type, option.name);
-  }
+  };
 
   renderOptions = () => {
     const { selectedConfig } = this.props;
@@ -50,7 +50,7 @@ class MobileSelectOption extends Component {
         </div>
       </div>
     );
-  }
+  };
 
   render() {
     const { selectedConfig, hideSelectConfig } = this.props;

@@ -50,7 +50,7 @@ class ViewTab extends Component {
     if (this.state.isShowViewDropdown) {
       this.setState({isShowViewDropdown: false});
     }
-  }
+  };
 
   onDropdownToggle = (evt) => {
     evt.nativeEvent.stopImmediatePropagation();
@@ -62,14 +62,14 @@ class ViewTab extends Component {
         left
       }
     });
-  }
+  };
 
   onSelectView = (index) => {
     if (index === this.props.selectedViewIdx) {
       return;
     }
     this.props.onSelectView(index);
-  }
+  };
 
   onDragStart = (event) => {
     event.stopPropagation();
@@ -77,12 +77,12 @@ class ViewTab extends Component {
     event.dataTransfer.setDragImage(ref, 10, 10);
     event.dataTransfer.effectAllowed = 'move';
     event.dataTransfer.setData('text/plain', this.props.view.id);
-  }
+  };
 
   onDragEnter = (event) => {
     event.stopPropagation();
     this.enteredCounter++;
-  }
+  };
 
   onDragOver = (event) => {
     if (event.dataTransfer.dropEffect === 'copy') {
@@ -95,7 +95,7 @@ class ViewTab extends Component {
       dropRelativePosition: event.nativeEvent.offsetX <= event.target.clientWidth / 2 ?
         'before' : 'after'
     });
-  }
+  };
 
   onDragLeave = (event) => {
     event.stopPropagation();
@@ -105,7 +105,7 @@ class ViewTab extends Component {
         dropRelativePosition: ''
       });
     }
-  }
+  };
 
   onDrop = (event) => {
     event.stopPropagation();
@@ -123,7 +123,7 @@ class ViewTab extends Component {
       return;
     }
     this.props.onMoveView(droppedViewID, id, dropRelativePosition);
-  }
+  };
 
   render() {
     const { view, index, selectedViewIdx, canDelete } = this.props;
@@ -233,7 +233,7 @@ class ViewTabs extends Component {
     } else {
       this.checkAvailableScrollType();
     }
-  }
+  };
 
   checkAvailableScrollType = () => {
     if (this.props.isMobile) {
@@ -256,7 +256,7 @@ class ViewTabs extends Component {
         canScrollNext: _canScrollNext,
       });
     }
-  }
+  };
 
   onScrollWithControl = (type) => {
     const { offsetWidth, scrollWidth, scrollLeft } = this.viewsTabsScroll;
@@ -290,11 +290,11 @@ class ViewTabs extends Component {
         }
       }, 15);
     }
-  }
+  };
 
   setViewItem = idx => viewItem => {
     this.views[idx] = viewItem;
-  }
+  };
 
   setViewsTabsScroll = () => {
     if (!this.viewsTabsScroll) return;
@@ -302,32 +302,32 @@ class ViewTabs extends Component {
     if (scrollWidth > offsetWidth) {
       this.viewsTabsScroll.scrollLeft = scrollWidth - offsetWidth;
     }
-  }
+  };
 
   onViewsScroll = () => {
     this.checkAvailableScrollType();
-  }
+  };
 
   onNewViewToggle = () => {
     this.setState({isShowNewViewDialog: !this.state.isShowNewViewDialog});
-  }
+  };
 
   onNewViewCancel = () => {
     this.setState({isShowNewViewDialog: false});
-  }
+  };
 
   onAddView = (viewName) => {
     this.props.onAddView(viewName);
     this.onNewViewToggle();
-  }
+  };
 
   onRenameViewToggle = () => {
     this.setState({isShowRenameViewDialog: !this.state.isShowRenameViewDialog});
-  }
+  };
 
   hideRenameViewDialog = () => {
     this.setState({isShowRenameViewDialog: false});
-  }
+  };
 
   renderTabs = () => {
     const { settings, selectedViewIdx } = this.props;
@@ -353,7 +353,7 @@ class ViewTabs extends Component {
     }
 
     return tabs;
-  }
+  };
 
   render() {
     const { isShowNewViewDialog, isShowRenameViewDialog, canScrollPrev, canScrollNext } = this.state;

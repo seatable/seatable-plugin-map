@@ -35,32 +35,32 @@ class TouchFeedback extends React.Component {
 
   onTouchStart = (e) => {
     this.triggerEvent('TouchStart', true, e);
-  }
+  };
 
   onTouchMove = (e) => {
     this.triggerEvent('TouchMove', false, e);
-  }
+  };
 
   onTouchEnd = (e) => {
     this.triggerEvent('TouchEnd', false, e);
-  }
+  };
 
   onTouchCancel = (e) => {
     this.triggerEvent('TouchCancel', false, e);
-  }
+  };
 
   onMouseDown = (e) => {
     // pc simulate mobile
     this.triggerEvent('MouseDown', true, e);
-  }
+  };
 
   onMouseUp = (e) => {
     this.triggerEvent('MouseUp', false, e);
-  }
+  };
 
   onMouseLeave = (e) => {
     this.triggerEvent('MouseLeave', false, e);
-  }
+  };
 
   render() {
     const { children, disabled, activeClassName, activeStyle } = this.props;
