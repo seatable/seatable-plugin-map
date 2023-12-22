@@ -14,7 +14,7 @@ class LocationSettings extends Component {
 
   onSelectChange = (option, type) => {
     this.props.onSelectChange(option, type);
-  }
+  };
 
   render() {
     const { configSettings, onHideMapSettings } = this.props;

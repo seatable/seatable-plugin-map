@@ -3,14 +3,14 @@
   "version": "4.3.1",
   "private": true,
   "dependencies": {
-    "dtable-utils": "4.3.3",
+    "dtable-utils": "4.3.5",
+    "dtable-ui-component": "4.3.3",
     "html2canvas": "^1.4.1",
     "leaflet": "^1.6.0",
     "leaflet.markercluster": "^1.5.3",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-intl-universal": "^2.9.0",
-    "react-select": "5.7.0",
     "reactstrap": "8.9.0"
   },
   "scripts": {
@@ -94,6 +94,7 @@
     "resolve-url-loader": "^4.0.0",
     "sass-loader": "^12.3.0",
     "semver": "^7.3.5",
+    "react-i18next": "^10.12.2",
     "source-map-loader": "^3.0.0",
     "style-loader": "^3.3.1",
     "svg-sprite-loader": "^6.0.11",

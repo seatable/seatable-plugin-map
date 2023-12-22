@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import DTableSelect from './dtable-select';
+import { DTableSelect } from 'dtable-ui-component';
 
 const propTypes = {
   configSetting: PropTypes.object,
@@ -14,7 +14,7 @@ class LocationSettingsItem extends Component {
     return configSetting.settings.map(option => {
       return this.createOption(option);
     });
-  }
+  };
 
   createOption = (option) => {
     if (!option || !option.id) {
@@ -38,14 +38,14 @@ class LocationSettingsItem extends Component {
       label: (<span className='select-option-name'>{option.name}</span>),
       value: { name: option.name },
     });
-  }
+  };
 
   onSelectChange = (option) => {
     let { configSetting } = this.props;
     let { active } = configSetting;
     if (active === option.value.name) return;
     this.props.onSelectChange(option.value, configSetting.type);
-  }
+  };
 
   render() {
     let { configSetting } = this.props;

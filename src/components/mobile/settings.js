@@ -20,20 +20,20 @@ class Settings extends Component {
       isShowSelectOption: true,
       selectedConfig: configItem
     });
-  }
+  };
 
   hideSelectConfig = () => {
     this.setState({
       isShowSelectOption: false
     });
-  }
+  };
 
   onSelectOption = (type, option) => {
     this.setState({
       isShowSelectOption: false,
     });
     this.props.onSelectChange(type, option);
-  }
+  };
 
   render() {
     const { toggleSettingDialog, configSettings } = this.props;

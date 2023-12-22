@@ -7,12 +7,12 @@ class MobileSettingItem extends Component {
 
   onClick = () => {
     this.props.onSelectConfig(this.props.configSetting);
-  }
+  };
 
   getText = () => {
     const { configSetting } = this.props;
     return configSetting.active;
-  }
+  };
 
   render() {
     const { configSetting } = this.props;
