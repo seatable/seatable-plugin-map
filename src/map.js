@@ -31,7 +31,6 @@ import './locale';
 
 import logo from './image/map.png';
 
-import './css/common.css';
 import './app.css';
 import 'leaflet/dist/leaflet.css';
 

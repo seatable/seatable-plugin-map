@@ -31,7 +31,6 @@ import './locale';
 import logo from './image/map.png';
 
 import styles from './css/mobile-en.module.css';
-import './css/common.css';
 import 'leaflet/dist/leaflet.css';
 
 L.Icon.Default.imagePath = IMAGE_PATH;
