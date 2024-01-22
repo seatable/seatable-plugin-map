@@ -27,7 +27,6 @@ import {
   MAP_MODE
 } from './constants';
 
-import './locale';
 
 import logo from './image/map.png';
 
@@ -93,7 +92,23 @@ class App extends React.Component {
 
   async initPluginDTableData() {
     if (this.props.isDevelopment) {
-      window.dtableSDK.subscribe('dtable-connect', () => { this.onDTableConnect(); });
+      this.unsubscribeLocalDtableChanged = window.dtableSDK.subscribe('local-dtable-changed', () => { this.onDTableChanged(); });
+      this.unsubscribeRemoteDtableChanged = window.dtableSDK.subscribe('remote-dtable-changed', () => { this.onDTableChanged(); });
+      const settings = this.initPluginSettings();
+      let selectedViewIdx = getSelectedViewIds(KEY_SELECTED_VIEW_IDS) || 0;
+      selectedViewIdx = selectedViewIdx > settings.length - 1 ? 0 : selectedViewIdx;
+      const configSettings = this.initSelectedSettings(settings[selectedViewIdx]);
+      const locations = this.getLocations(configSettings);
+      this.setState({
+        configSettings,
+        isDataLoaded: true,
+        locations,
+        settings,
+        selectedViewIdx
+      }, async () => {
+        await this.renderMap();
+        this.renderLocations(locations);
+      });
     } else {
       this.unsubscribeLocalDtableChanged = window.dtableSDK.subscribe('local-dtable-changed', () => { this.onDTableChanged(); });
       this.unsubscribeRemoteDtableChanged = window.dtableSDK.subscribe('remote-dtable-changed', () => { this.onDTableChanged(); });

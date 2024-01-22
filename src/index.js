@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import DTable from 'dtable-sdk';
 import './setting';
+import './locale';
 import App from './app';
 
 import './index.css';
