@@ -12,7 +12,7 @@ const en = {
   "address_was_not_found": "{address} was not found.",
   "Not_used": "Not used",
   "Marker_colored_by": "Marker colored by",
-  "Cancle": "Cancle",
+  "Cancel": "Cancel",
   "Save": "Save",
   "Please_select": "Please select",
   "Display_field": "Display field",
@@ -22,10 +22,9 @@ const en = {
   "Delete_view": "Delete view",
   "Name": "Name",
   "Name_is_required": "Name is required",
-  "Cancel": "Cancel",
   "Submit": "Submit",
   "Default_View": "Default View",
-  "Row_color": "Row color",
+  "Row_color": "Row color"
 };
 
 export default en;

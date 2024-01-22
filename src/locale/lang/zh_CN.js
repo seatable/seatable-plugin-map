@@ -12,20 +12,19 @@ const zh_CN = {
   "address_was_not_found": "{address}没有被找到。",
   "Not_used": "不使用",
   "Marker_colored_by": "标签颜色来自",
-  "Cancle": "取消",
+  "Cancel": "取消",
   "Save": "保存",
   "Please_select": "请选择",
   "Display_field": "显示字段",
   "Image_field": "图片字段",
-  "Row_color": "行颜色",
-  "Default_View": "默认视图",
   "New_view": "新建视图",
   "Rename_view": "重命名视图",
   "Delete_view": "删除视图",
   "Name": "名称",
   "Name_is_required": "名称必须存在",
-  "Cancel": "取消",
   "Submit": "提交",
+  "Default_View": "默认视图",
+  "Row_color": "行颜色"
 };
 
 export default zh_CN;

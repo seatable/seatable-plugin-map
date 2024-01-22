@@ -41,7 +41,7 @@ class Settings extends Component {
     return (
       <div className={styles['setting']}>
         <div className={styles['dtable-map-plugin-title']}>
-          <span onClick={toggleSettingDialog} className={styles['dtable-map-plugin-header-btn']}>{intl.get('Cancle')}</span>
+          <span onClick={toggleSettingDialog} className={styles['dtable-map-plugin-header-btn']}>{intl.get('Cancel')}</span>
           <h4 className={styles['dtable-map-plugin-header-title']}>{intl.get('Settings')}</h4>
           <span onClick={this.props.onSaveSetting} className={`${styles['dtable-map-plugin-header-btn-highlight']} ${styles['dtable-map-plugin-header-btn']}`}>{intl.get('Save')}</span>
         </div>
