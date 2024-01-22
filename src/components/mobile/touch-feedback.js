@@ -82,7 +82,7 @@ class TouchFeedback extends React.Component {
 
       if (activeStyle !== false) {
         if (activeStyle) {
-          style = {...style, ...activeStyle };
+          style = { ...style, ...activeStyle };
         }
         className = classNames(className, activeClassName);
       }

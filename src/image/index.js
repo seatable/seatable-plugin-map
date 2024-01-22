@@ -24,4 +24,4 @@ import  image23  from './map-icon/23.png';
 import  image24  from './map-icon/24.png';
 import marker from './map-icon/marker.png';
 
-export { image1, image2, image3, image4, image5, image6, image7, image8, image9, image10, image11, image12, image13, image14, image15, image16, image17, image18, image19, image20, image21, image22, image23, image24, marker};
+export { image1, image2, image3, image4, image5, image6, image7, image8, image9, image10, image11, image12, image13, image14, image15, image16, image17, image18, image19, image20, image21, image22, image23, image24, marker };

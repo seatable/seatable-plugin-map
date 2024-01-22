@@ -48,7 +48,7 @@ class ViewTab extends Component {
 
   onHideViewDropdown = () => {
     if (this.state.isShowViewDropdown) {
-      this.setState({isShowViewDropdown: false});
+      this.setState({ isShowViewDropdown: false });
     }
   };
 
@@ -119,7 +119,7 @@ class ViewTab extends Component {
 
     const droppedViewID = event.dataTransfer.getData('text/plain');
     const { id } = this.props.view;
-    if (droppedViewID == id) {
+    if (droppedViewID === id) {
       return;
     }
     this.props.onMoveView(droppedViewID, id, dropRelativePosition);
@@ -143,8 +143,8 @@ class ViewTab extends Component {
         onDrop={this.onDrop}
         className={`
           ${tabStyles['view-item']}
-          ${dropRelativePosition == 'before' ? tabStyles['view-item-can-drop-before'] : ''}
-          ${dropRelativePosition == 'after' ? tabStyles['view-item-can-drop-after'] : ''}
+          ${dropRelativePosition === 'before' ? tabStyles['view-item-can-drop-before'] : ''}
+          ${dropRelativePosition === 'after' ? tabStyles['view-item-can-drop-after'] : ''}
         `}
       >
         <div
@@ -309,11 +309,11 @@ class ViewTabs extends Component {
   };
 
   onNewViewToggle = () => {
-    this.setState({isShowNewViewDialog: !this.state.isShowNewViewDialog});
+    this.setState({ isShowNewViewDialog: !this.state.isShowNewViewDialog });
   };
 
   onNewViewCancel = () => {
-    this.setState({isShowNewViewDialog: false});
+    this.setState({ isShowNewViewDialog: false });
   };
 
   onAddView = (viewName) => {
@@ -322,11 +322,11 @@ class ViewTabs extends Component {
   };
 
   onRenameViewToggle = () => {
-    this.setState({isShowRenameViewDialog: !this.state.isShowRenameViewDialog});
+    this.setState({ isShowRenameViewDialog: !this.state.isShowRenameViewDialog });
   };
 
   hideRenameViewDialog = () => {
-    this.setState({isShowRenameViewDialog: false});
+    this.setState({ isShowRenameViewDialog: false });
   };
 
   renderTabs = () => {

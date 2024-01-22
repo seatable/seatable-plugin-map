@@ -131,7 +131,7 @@ export const renderMarkByPosition = (locations, renderer, start = 0) => {
   }, 20);
 };
 
-export const formatGeolocactionValue = (value, type) => {
+export const formatGeolocationValue = (value, type) => {
   const location = value ? value : {};
   if (type === 'country_region') {
     return `${value.country_region || ''}`;

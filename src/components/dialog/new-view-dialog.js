@@ -23,7 +23,7 @@ class NewViewDialog extends React.Component {
     if (value === this.state.viewName) {
       return;
     }
-    this.setState({viewName: value});
+    this.setState({ viewName: value });
   };
 
   toggle = () => {
@@ -34,7 +34,7 @@ class NewViewDialog extends React.Component {
     let { viewName } = this.state;
     viewName = viewName.trim();
     if (!viewName) {
-      this.setState({errMessage: 'Name_is_required'});
+      this.setState({ errMessage: 'Name_is_required' });
       return;
     }
     this.props.onNewViewConfirm(viewName);
@@ -50,7 +50,7 @@ class NewViewDialog extends React.Component {
             <FormGroup>
               <Label for="viewName">{intl.get('Name')}</Label>
               <Input id="viewName" value={this.state.viewName} innerRef={input => {this.newInput = input;}} onChange={this.handleChange} autoFocus={true} />
-              <Input style={{display: 'none'}} />
+              <Input style={{ display: 'none' }} />
             </FormGroup>
           </Form>
           {this.state.errMessage && <Alert color="danger" className="mt-2">{intl.get(this.state.errMessage)}</Alert>}
