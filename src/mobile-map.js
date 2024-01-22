@@ -9,7 +9,7 @@ import {
 import Settings from './components/mobile/settings';
 import Loading from './components/loading';
 import * as image from './image/index';
-import { getLocations, renderMarkByPosition, formatGeolocactionValue, getInitialMapCenter } from './utils/location-utils';
+import { getLocations, renderMarkByPosition, formatGeolocationValue, getInitialMapCenter } from './utils/location-utils';
 import COLORS from './marker-color';
 import ViewTabs from './components/view-tabs';
 import { generateSettingsByConfig } from './utils/generate-settings-config';
@@ -119,7 +119,7 @@ class App extends React.Component {
     }
   }
 
-  async loadMapScript () {
+  async loadMapScript() {
     let AUTH_KEY = window.dtable.dtableGoogleMapKey;
     if (!AUTH_KEY) {
       return;
@@ -210,7 +210,7 @@ class App extends React.Component {
       const initSettingItem = this.getInitSettingItem();
       if (pluginSettings && this.isValidSettingItem(pluginSettings)) {
         const { name, id } = initSettingItem;
-        pluginSettings = [{...pluginSettings, name, id}];
+        pluginSettings = [{ ...pluginSettings, name, id }];
       } else {
         pluginSettings = [initSettingItem];
       }
@@ -283,7 +283,7 @@ class App extends React.Component {
   updateSelectedSettings = (type, option) => {
     let { configSettings } = this.state;
     const tables = window.dtableSDK.getTables();
-    switch(type) {
+    switch (type) {
       case CONFIG_TYPE.MAP_MODE: {
         const tableName = getConfigItemByType(configSettings, 'table').active;
         const viewName = getConfigItemByType(configSettings, 'view').active;
@@ -389,13 +389,13 @@ class App extends React.Component {
   };
 
   getMapSetting = (mapType = MAP_MODE.DEFAULT) => {
-    return { name: intl.get('Map_type'), active: mapType, type: 'map_mode', settings:[{name: MAP_MODE.DEFAULT, id: 'map'}, {name: MAP_MODE.IMAGE, id: 'image'}] };
+    return { name: intl.get('Map_type'), active: mapType, type: 'map_mode', settings: [{ name: MAP_MODE.DEFAULT, id: 'map' }, { name: MAP_MODE.IMAGE, id: 'image' }] };
   };
 
   getTableSettings = (activeTable = null) => {
     const tables = window.dtableSDK.getTables();
     let tableSettings = tables.map(table => {
-      return {id: table._id, name: table.name};
+      return { id: table._id, name: table.name };
     });
     let active = activeTable ? activeTable.name : tables[0].name;
     return {
@@ -428,13 +428,13 @@ class App extends React.Component {
       return column.type === 'text' || column.type === 'geolocation';
     });
     let columnSettings = columns.map(column => {
-      return {id: column.key, name: column.name};
+      return { id: column.key, name: column.name };
     });
     let active = '';
     if (columns.length === 0) {
       const column = currentTable.columns[0];
       active = column.name;
-      columnSettings.unshift({id: column.key, name: column.name});
+      columnSettings.unshift({ id: column.key, name: column.name });
     } else {
       active = activeColumn ? activeColumn.name : columns[0].name;
     }
@@ -453,11 +453,11 @@ class App extends React.Component {
     });
 
     let columnSettings = columns.map(column => {
-      return {id: column.key, name: column.name};
+      return { id: column.key, name: column.name };
     });
 
     let active = '';
-    columnSettings.unshift({id: 'not_used', name: intl.get('Not_used')}, {id: 'rows_color', name: intl.get('Row_color')});
+    columnSettings.unshift({ id: 'not_used', name: intl.get('Not_used') }, { id: 'rows_color', name: intl.get('Row_color') });
     if (dependence === 'rows_color') {
       active = intl.get('Row_color');
     } else {
@@ -477,9 +477,9 @@ class App extends React.Component {
       return column.type === 'text' || column.type === 'single-select';
     });
     let columnSettings = columns.map(column => {
-      return {id: column.key, name: column.name};
+      return { id: column.key, name: column.name };
     });
-    columnSettings.unshift({id: '', name: intl.get('Not_used')});
+    columnSettings.unshift({ id: '', name: intl.get('Not_used') });
 
     // need options: checkout map column
     let active = activeColumn ? activeColumn.name : columnSettings[0].name;
@@ -497,10 +497,10 @@ class App extends React.Component {
       return column.type === 'image';
     });
     let columnSettings = columns.map(column => {
-      return {id: column.key, name: column.name};
+      return { id: column.key, name: column.name };
     });
 
-    columnSettings.unshift({id: 'not_used', name: intl.get('Not_used')});
+    columnSettings.unshift({ id: 'not_used', name: intl.get('Not_used') });
     let active = activeColumn ? activeColumn.name : columnSettings[0].name;
     return {
       type: 'image_column',
@@ -519,7 +519,7 @@ class App extends React.Component {
   };
 
   onSaveSetting = () => {
-    let { selectedViewIdx, configSettings} = this.state;
+    let { selectedViewIdx, configSettings } = this.state;
     const settingItem = generateSettingsByConfig(configSettings, this.state.settings[selectedViewIdx]);
     const settings = replaceSettingItem(this.state.settings, settingItem, selectedViewIdx);
     this.toggleSettingDialog();
@@ -530,13 +530,13 @@ class App extends React.Component {
     const center = {};
     if (this.map) {
       const position = this.map.getCenter();
-      center.position = {lat: position.lat, lng: position.lng};
+      center.position = { lat: position.lat, lng: position.lng };
       center.zoom = this.map.getZoom();
       window.localStorage.setItem('dtable-map-plugin-center', JSON.stringify(center));
     }
     this.map = null;
     setTimeout(() => {
-      this.setState({showDialog: false});
+      this.setState({ showDialog: false });
     }, 500);
     window.app.onClosePlugin && window.app.onClosePlugin();
   };
@@ -575,7 +575,7 @@ class App extends React.Component {
   createMarkerCluster = (locations) => {
     if (!this.clusterMarkers) {
       this.clusterMarkers = L.markerClusterGroup({
-        iconCreateFunction: function(cluster) {
+        iconCreateFunction: function (cluster) {
           const markers = cluster.getAllChildMarkers();
           let imgCount = 0, markerUrl = '';
           markers.forEach((marker) => {
@@ -636,7 +636,7 @@ class App extends React.Component {
     let address;
     const value = locationItem.location;
     if (GEOCODING_FORMAT.includes(locationItem.type) && typeof value === 'object') {
-      address = formatGeolocactionValue(value, locationItem.type);
+      address = formatGeolocationValue(value, locationItem.type);
     } else {
       address = locationItem.location;
     }
@@ -653,7 +653,7 @@ class App extends React.Component {
           let lat = points[0].geometry.location.lat();
           let lng = points[0].geometry.location.lng();
           if (mapMode === MAP_MODE.IMAGE) {
-            this.geocodingLocations.push({imgUrl: locationItem.imgUrl, location: {lat, lng}});
+            this.geocodingLocations.push({ imgUrl: locationItem.imgUrl, location: { lat, lng } });
           } else {
             this.addMarker(locationItem, lat, lng, address);
           }
@@ -748,7 +748,7 @@ class App extends React.Component {
   };
 
   toggleSettingDialog = () => {
-    this.setState({showSettingDialog: !this.state.showSettingDialog});
+    this.setState({ showSettingDialog: !this.state.showSettingDialog });
   };
 
   // move view, update `selectedViewIdx`
@@ -768,7 +768,7 @@ class App extends React.Component {
     const originalIndex = updatedViews.indexOf(targetView);
     let targetIndex = updatedViews.indexOf(targetIndexView);
     // `relativePosition`: 'before'|'after'
-    targetIndex += relativePosition == 'before' ? 0 : 1;
+    targetIndex += relativePosition === 'before' ? 0 : 1;
 
     if (originalIndex < targetIndex) {
       if (targetIndex < updatedViews.length) {
@@ -785,7 +785,7 @@ class App extends React.Component {
 
     const newSelectedViewIndex = updatedViews.indexOf(selectedView);
 
-    //plugin_settings.views = updatedViews;
+    // plugin_settings.views = updatedViews;
     this.setState({
       settings: plugin_settings,
       selectedViewIdx: newSelectedViewIndex
@@ -824,7 +824,7 @@ class App extends React.Component {
 
   onRenameView = (name) => {
     let { selectedViewIdx, settings } = this.state;
-    const newSettingItem = Object.assign({}, settings[selectedViewIdx], {name: name});
+    const newSettingItem = Object.assign({}, settings[selectedViewIdx], { name: name });
     settings.splice(selectedViewIdx, 1, newSettingItem);
     window.dtableSDK.updatePluginSettings(PLUGIN_NAME, settings);
   };

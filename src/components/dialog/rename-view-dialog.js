@@ -24,7 +24,7 @@ class RenameViewDialog extends Component {
     if (value === viewName) {
       return;
     } else {
-      this.setState({viewName: value});
+      this.setState({ viewName: value });
     }
   };
 
@@ -40,7 +40,7 @@ class RenameViewDialog extends Component {
     let { viewName } = this.state;
     viewName = viewName.trim();
     if (!viewName) {
-      this.setState({errMessage: 'Name_is_required'});
+      this.setState({ errMessage: 'Name_is_required' });
       return;
     }
     this.props.onRenameView(viewName);

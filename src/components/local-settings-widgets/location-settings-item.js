@@ -22,7 +22,7 @@ class LocationSettingsItem extends Component {
       return ({
         label: (<span className='select-option-name null-select-option-name'>{name}</span>),
         value: name,
-        style: {color: 'rgba(0, 0, 0, .25)'}
+        style: { color: 'rgba(0, 0, 0, .25)' }
       });
     }
 
