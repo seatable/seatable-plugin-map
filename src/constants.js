@@ -5,11 +5,12 @@ export const IMAGE_PATH = '//cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.4/images
 
 export const UNKNOWN_TYPE = 'unknown';
 
+export const IS_MOBILE = (typeof (window) !== 'undefined') && (window.innerWidth < 768 || navigator.userAgent.toLowerCase().match(/(ipod|ipad|iphone|android|coolpad|mmp|smartphone|midp|wap|xoom|symbian|j2me|blackberry|wince)/i) != null);
+
 export const EVENT_BUS_TYPE = {
   CLOSE_LOCATION_DETAILS: 'close_location_details',
   SHOW_LOCATION_DETAILS: 'show_location_details',
 };
-
 
 export const PLUGIN_NAME = 'map-en';
 

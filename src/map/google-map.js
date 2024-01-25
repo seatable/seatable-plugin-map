@@ -6,7 +6,7 @@ import {
   GEOCODING_FORMAT,
   MAP_MODE,
   EVENT_BUS_TYPE,
-
+  IS_MOBILE,
 } from '../constants';
 import getConfigItemByType from '../utils/get-config-item-by-type';
 import COLORS from '../marker-color';
@@ -15,6 +15,7 @@ import intl from 'react-intl-universal';
 import { eventBus } from '../utils/event-bus';
 import pluginContext from '../plugin-context';
 import { getTableColumnByName } from 'dtable-utils';
+
 
 
 
@@ -299,7 +300,7 @@ export class GoogleMap {
         });
       }
       let marker = new L.Marker([lat, lng], { icon: myIcon, riseOnHover: true });
-      marker.bindPopup(tooltipLabelContent);
+
       if (directShownLabel) {
         marker.bindTooltip(directShownLabel, {
           direction: 'right',
@@ -309,22 +310,34 @@ export class GoogleMap {
           className: 'plugin-en-tooltip'
         }).openTooltip();
       }
-      marker.on('mouseover', () => {
-        marker.openPopup();
-      });
-      marker.on('mouseout', () => {
-        marker.closePopup();
-      });
-      marker.on('click', () => {
-        eventBus.dispatch(EVENT_BUS_TYPE.SHOW_LOCATION_DETAILS, marker.getLatLng());
-      });
+
+      if (IS_MOBILE) {
+        marker.addEventListener('touchend', () => {
+          eventBus.dispatch(EVENT_BUS_TYPE.SHOW_LOCATION_DETAILS, marker.getLatLng());
+        });
+        marker.on('click', () => {
+          eventBus.dispatch(EVENT_BUS_TYPE.SHOW_LOCATION_DETAILS, marker.getLatLng());
+        });
+      } else {
+        marker.bindPopup(tooltipLabelContent);
+        marker.on('mouseover', () => {
+          marker.openPopup();
+        });
+        marker.on('mouseout', () => {
+          marker.closePopup();
+        });
+        marker.on('click', () => {
+          eventBus.dispatch(EVENT_BUS_TYPE.SHOW_LOCATION_DETAILS, marker.getLatLng());
+        });
+      }
+
       this.markers.push(marker);
       this.map.addLayer(marker);
     }
     // }
   };
 
-  useGeocoder = async (latlng) => {
+  useGeocoder = async (latlng, cb) => {
     if (!this.geocoder) {
       this.geocoder = new window.google.maps.Geocoder();
     }
@@ -336,6 +349,10 @@ export class GoogleMap {
       console.log('====================================');
       console.log('geocodeError: ', err);
       console.log('====================================');
+    }
+    // call the cbs
+    if (cb) {
+      cb(res);
     }
     return res;
   };
@@ -353,10 +370,5 @@ export class GoogleMap {
     if (!this.userInfo) return;
 
   }
-
-
-
-
-
 
 }

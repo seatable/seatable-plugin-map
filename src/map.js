@@ -3,29 +3,20 @@ import PropTypes from 'prop-types';
 import intl from 'react-intl-universal';
 import L from 'leaflet';
 import 'leaflet.markercluster/dist/leaflet.markercluster-src';
-import {
-  getTableByName, getViewByName, getTableColumnByName, getNonArchiveViews, getViewShownColumns,
-} from 'dtable-utils';
 import LocationSettings from './components/location-settings';
 import Loading from './components/loading';
 import { getLocations } from './utils/location-utils';
 import ViewTabs from './components/view-tabs';
 import { generateSettingsByConfig } from './utils/generate-settings-config';
-import { replaceSettingItemByType } from './utils/repalce-setting-item-by-type';
-import { generatorViewId, getSelectedViewIds, replaceSettingItem, setSelectedViewIds } from './utils/common-utils';
+import {  replaceSettingItem, setSelectedViewIds } from './utils/common-utils';
 import getConfigItemByType from './utils/get-config-item-by-type';
 import onCapture from './utils/capture';
-import removeSettingByType from './utils/remove-setting-by-type';
 import { toaster } from 'dtable-ui-component';
 
 import {
   IMAGE_PATH,
   PLUGIN_NAME,
-  CONFIG_TYPE,
   KEY_SELECTED_VIEW_IDS,
-  MAP_MODE,
-  SHOWN_COLUMN_TYPES,
-  SETTING_TITLE,
   EVENT_BUS_TYPE
 } from './constants';
 
@@ -39,7 +30,6 @@ import pluginContext from './plugin-context';
 import { GoogleMap } from './map/google-map';
 
 
-L.Icon.Default.imagePath = IMAGE_PATH;
 
 class App extends React.Component {
 
@@ -62,8 +52,6 @@ class App extends React.Component {
     this.markers = [];
     this.timer = null;
     this.clusterMarkers = null;
-    this.geocodingLocations = [];
-    // this.sameLocationList = {};
     this.userInfo = null;
     this.mapInstance = new GoogleMap({ mapKey: window.dtable.dtableGoogleMapKey, errorHandler: toaster.danger });
   }
@@ -108,6 +96,13 @@ class App extends React.Component {
     }
     this.unsubscribeLocalDtableChanged();
     this.unsubscribeRemoteDtableChanged();
+  };
+
+  getLocations = (configSettings) => {
+    const tables = window.dtableSDK.getTables();
+    return getLocations(tables, configSettings, {
+      collaborators: window.app.state.collaborators,
+    });
   };
 
   // all init settings
@@ -162,12 +157,12 @@ class App extends React.Component {
   }
 
 
-  getLocations = (configSettings) => {
-    const tables = window.dtableSDK.getTables();
-    return getLocations(tables, configSettings, {
-      collaborators: window.app.state.collaborators,
-    });
-  };
+  // getLocations = (configSettings) => {
+  //   const tables = window.dtableSDK.getTables();
+  //   return getLocations(tables, configSettings, {
+  //     collaborators: window.app.state.collaborators,
+  //   });
+  // };
 
   onDTableConnect() {
     this.unsubscribeLocalDtableChanged = window.dtableSDK.subscribe('local-dtable-changed', () => { this.onDTableChanged(); });
@@ -596,7 +591,6 @@ class App extends React.Component {
   onSelectChange = (option, type) => {
     let { settings, selectedViewIdx, configSettings: oldConfigSettings } = this.state;
     let configSettings = pluginContext.updateSelectedSettings(type, option, oldConfigSettings);
-
     let settingItem = generateSettingsByConfig(configSettings, settings[selectedViewIdx]);
     settings = replaceSettingItem(settings, settingItem, selectedViewIdx);
     window.dtableSDK.updatePluginSettings(PLUGIN_NAME, settings);

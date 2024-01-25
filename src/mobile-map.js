@@ -23,8 +23,12 @@ import { IMAGE_PATH,
   CONFIG_TYPE,
   KEY_SELECTED_VIEW_IDS,
   GEOCODING_FORMAT,
-  MAP_MODE
+  MAP_MODE,
+  EVENT_BUS_TYPE
 } from './constants';
+import { toaster } from 'dtable-ui-component';
+import MobileLocationDetailList from './components/mobile/mobile-location-detail-list';
+
 
 import './locale';
 
@@ -32,6 +36,9 @@ import logo from './image/map.png';
 
 import styles from './css/mobile-en.module.css';
 import 'leaflet/dist/leaflet.css';
+import pluginContext from './plugin-context';
+import { GoogleMap } from './map/google-map'; // Replace './path/to/GoogleMap' with the actual path to the GoogleMap module
+import { eventBus } from './utils/event-bus';
 
 L.Icon.Default.imagePath = IMAGE_PATH;
 
@@ -47,18 +54,28 @@ class App extends React.Component {
       configSettings: null,
       isFullScreen: false,
       selectedViewIdx: 0,
-      settings: null
+      settings: null,
+      clickPoint: {},
+      showLocationDetail: false,
+      isShowSameLocationDetails: false,
+
     };
     this.map = null;
     this.geocoder = null;
     this.markers = [];
     this.timer = null;
     this.clusterMarkers = null;
-    this.geocodingLocations = [];
+    this.userInfo = null;
+    this.cellValueUtils = pluginContext.cellValueUtils;
+    this.mapInstance = new GoogleMap({ mapKey: window.dtable.dtableGoogleMapKey, errorHandler: toaster.danger });
+
   }
 
-  componentDidMount() {
-    this.loadMapScript();
+  async componentDidMount() {
+    this.unsubscribeShowDetails = eventBus.subscribe(EVENT_BUS_TYPE.SHOW_LOCATION_DETAILS, this.showLocationDetails);
+    // load google map
+    await this.mapInstance.loadMap();
+    this.initPluginDTableData();
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
@@ -72,14 +89,19 @@ class App extends React.Component {
   }
 
   componentDidUpdate(preProps, preState) {
+    const { showLocationDetail, clickPoint, locations, configSettings } = this.state;
+    const { showLocationDetail: preShowLocationDetail, clickPoint: prevClickPoint } = preState;
     if (this.state.showSettingDialog !== preState.showSettingDialog) return;
-    if (window.google && this.state.showDialog) {
+
+    if ((window.google && this.state.showDialog) && (showLocationDetail === preShowLocationDetail) && (clickPoint === prevClickPoint)) {
       // render locations after the container rendered in the dom tree
       requestAnimationFrame(() => {
-        this.renderLocations(this.state.locations);
+        this.resetLocationDetails();
+        this.mapInstance.renderLocations(locations, configSettings);
       });
     }
   }
+
 
   onExit = () => {
     if (this.timer) {
@@ -92,20 +114,50 @@ class App extends React.Component {
 
   getLocations = (configSettings) => {
     const tables = window.dtableSDK.getTables();
-    return getLocations(tables, configSettings);
+    return getLocations(tables, configSettings, {
+      collaborators: window.app.state.collaborators,
+    });
+  };
+
+  // all init settings
+  getInitPluginSettings = () => {
+    const { showSettingDialog, pluginSettings: settings, selectedViewSettings, selectedViewIdx } = pluginContext.initPluginSettings();
+    const configSettings = pluginContext.initSelectedSettings(selectedViewSettings);
+    const locations = this.getLocations(configSettings);
+    if (showSettingDialog) {
+      this.setState({ showSettingDialog });
+    }
+    return { settings, configSettings, selectedViewSettings, locations, selectedViewIdx };
   };
 
   async initPluginDTableData() {
     if (this.props.isDevelopment) {
-      window.dtableSDK.subscribe('dtable-connect', () => { this.onDTableConnect(); });
+      this.unsubscribeLocalDtableChanged = window.dtableSDK.subscribe('local-dtable-changed', () => { this.onDTableChanged(); });
+      this.unsubscribeRemoteDtableChanged = window.dtableSDK.subscribe('remote-dtable-changed', () => { this.onDTableChanged(); });
+      // const settings = this.initPluginSettings();
+      // let selectedViewIdx = getSelectedViewIds(KEY_SELECTED_VIEW_IDS) || 0;
+      // selectedViewIdx = selectedViewIdx > settings.length - 1 ? 0 : selectedViewIdx;
+      // const configSettings = this.initSelectedSettings(settings[selectedViewIdx]);
+      // const locations = this.getLocations(configSettings);
+      const { settings, configSettings, selectedViewSettings, locations, selectedViewIdx } = this.getInitPluginSettings();
+      this.setState({
+        configSettings,
+        isDataLoaded: true,
+        locations,
+        settings,
+        selectedViewIdx
+      }, async () => {
+        await this.mapInstance.renderMap(locations);
+      });
     } else {
       this.unsubscribeLocalDtableChanged = window.dtableSDK.subscribe('local-dtable-changed', () => { this.onDTableChanged(); });
       this.unsubscribeRemoteDtableChanged = window.dtableSDK.subscribe('remote-dtable-changed', () => { this.onDTableChanged(); });
-      const settings = this.initPluginSettings();
-      let selectedViewIdx = getSelectedViewIds(KEY_SELECTED_VIEW_IDS) || 0;
-      selectedViewIdx = selectedViewIdx > settings.length - 1 ? 0 : selectedViewIdx;
-      const configSettings = this.initSelectedSettings(settings[selectedViewIdx]);
-      const locations = this.getLocations(configSettings);
+      // const settings = this.initPluginSettings();
+      // let selectedViewIdx = getSelectedViewIds(KEY_SELECTED_VIEW_IDS) || 0;
+      // selectedViewIdx = selectedViewIdx > settings.length - 1 ? 0 : selectedViewIdx;
+      // const configSettings = this.initSelectedSettings(settings[selectedViewIdx]);
+      // const locations = this.getLocations(configSettings);
+      const { settings, configSettings, selectedViewSettings, locations, selectedViewIdx } = this.getInitPluginSettings();
       this.setState({
         configSettings,
         isDataLoaded: true,
@@ -164,16 +216,17 @@ class App extends React.Component {
   onDTableConnect() {
     this.unsubscribeLocalDtableChanged = window.dtableSDK.subscribe('local-dtable-changed', () => { this.onDTableChanged(); });
     this.unsubscribeRemoteDtableChanged = window.dtableSDK.subscribe('remote-dtable-changed', () => { this.onDTableChanged(); });
-    const pluginSettings = this.initPluginSettings();
-    let selectedViewIdx = getSelectedViewIds(KEY_SELECTED_VIEW_IDS) || 0;
-    selectedViewIdx = selectedViewIdx > pluginSettings.length - 1 ? 0 : selectedViewIdx;
-    const configSettings = this.initSelectedSettings(pluginSettings[selectedViewIdx]);
-    const locations = this.getLocations(configSettings);
+    // const pluginSettings = this.initPluginSettings();
+    // let selectedViewIdx = getSelectedViewIds(KEY_SELECTED_VIEW_IDS) || 0;
+    // selectedViewIdx = selectedViewIdx > pluginSettings.length - 1 ? 0 : selectedViewIdx;
+    // const configSettings = this.initSelectedSettings(pluginSettings[selectedViewIdx]);
+    // const locations = this.getLocations(configSettings);
+    const { settings, configSettings, locations, selectedViewIdx } = this.getInitPluginSettings();
     this.setState({
       configSettings,
       locations,
       isDataLoaded: true,
-      settings: pluginSettings,
+      settings,
       selectedViewIdx
     }, () => {
       this.renderMap();
@@ -181,341 +234,384 @@ class App extends React.Component {
   }
 
   onDTableChanged() {
-    const pluginSettings = this.initPluginSettings();
-    let selectedViewIdx = getSelectedViewIds(KEY_SELECTED_VIEW_IDS) || 0;
-    selectedViewIdx = selectedViewIdx > pluginSettings.length - 1 ? 0 : selectedViewIdx;
-    const configSettings = this.initSelectedSettings(pluginSettings[selectedViewIdx]);
-    const locations = this.getLocations(configSettings);
+    // const pluginSettings = this.initPluginSettings();
+    // let selectedViewIdx = getSelectedViewIds(KEY_SELECTED_VIEW_IDS) || 0;
+    // selectedViewIdx = selectedViewIdx > pluginSettings.length - 1 ? 0 : selectedViewIdx;
+    // const configSettings = this.initSelectedSettings(pluginSettings[selectedViewIdx]);
+    // const locations = this.getLocations(configSettings);
+    const { settings, configSettings, locations, selectedViewIdx } = this.getInitPluginSettings();
     this.setState({
       locations,
       configSettings,
       selectedViewIdx,
-      settings: pluginSettings
+      settings
     });
   }
 
-  initPluginSettings = () => {
-    let pluginSettings = window.dtableSDK.getPluginSettings(PLUGIN_NAME);
-    if (Array.isArray(pluginSettings)) {
-      const newPluginSettings = pluginSettings.filter((settingItem) => {
-        return this.isValidSettingItem(settingItem);
+  // initPluginSettings = () => {
+  //   let pluginSettings = window.dtableSDK.getPluginSettings(PLUGIN_NAME);
+  //   if (Array.isArray(pluginSettings)) {
+  //     const newPluginSettings = pluginSettings.filter((settingItem) => {
+  //       return this.isValidSettingItem(settingItem);
+  //     });
+  //     if (newPluginSettings.length !== pluginSettings.length) {
+  //       if (newPluginSettings.length === 0) {
+  //         newPluginSettings.push(this.getInitSettingItem());
+  //       }
+  //       pluginSettings = newPluginSettings;
+  //     }
+  //   } else {
+  //     const initSettingItem = this.getInitSettingItem();
+  //     if (pluginSettings && this.isValidSettingItem(pluginSettings)) {
+  //       const { name, id } = initSettingItem;
+  //       pluginSettings = [{ ...pluginSettings, name, id }];
+  //     } else {
+  //       pluginSettings = [initSettingItem];
+  //     }
+  //   }
+  //   return pluginSettings;
+  // };
+
+  // getInitSettingItem = (name = intl.get('Default_View')) => {
+  //   const activeTable = window.dtableSDK.getActiveTable();
+  //   const activeView = window.dtableSDK.getActiveView();
+  //   return {
+  //     id: generatorViewId(),
+  //     tableName: activeTable.name,
+  //     viewName: activeView.name,
+  //     columnName: null,
+  //     markDependence: null,
+  //     directShownColumn: null,
+  //     name,
+  //   };
+  // };
+
+  // isValidSettingItem = (pluginSettings) => {
+  //   const { mapMode, tableName, viewName, columnName, markDependence, directShownColumnName, imageColumnName } = pluginSettings;
+  //   const tables = window.dtableSDK.getTables();
+  //   const table = getTableByName(tables, tableName);
+  //   if (!table) return false;
+  //   const view = getViewByName(table.views, viewName);
+  //   if (!view || view.type === 'archive') return false;
+  //   const column = getTableColumnByName(table, columnName);
+  //   if (!column && columnName) return false;
+  //   if (mapMode === MAP_MODE.DEFAULT) {
+  //     const markColumn = getTableColumnByName(table, markDependence);
+  //     if (!markColumn && markDependence && markDependence !== 'rows_color') return false;
+  //     const directShownColumn = getTableColumnByName(table, directShownColumnName);
+  //     if (!directShownColumn && directShownColumnName) return false;
+  //   } else {
+  //     const imageColumn = getTableColumnByName(table, imageColumnName);
+  //     if (!imageColumn && imageColumnName) return false;
+  //   }
+  //   return true;
+  // };
+
+  // initSelectedSettings = (settings) => {
+  //   const tables = window.dtableSDK.getTables();
+  //   let configSettings = [];
+  //   let { mapMode, tableName, viewName, columnName, markDependence, directShownColumnName, imageColumnName } = settings;
+  //   const mapSettings = this.getMapSetting(mapMode);
+  //   configSettings.push(mapSettings);
+  //   let activeTable = getTableByName(tables, tableName);
+  //   let tableSettings = this.getTableSettings(activeTable);
+  //   let activeView = getViewByName(activeTable.views, viewName);
+  //   let viewSettings = this.getViewSettings(activeTable, activeView);
+  //   configSettings.push(tableSettings, viewSettings);
+  //   let activeColumn = getTableColumnByName(activeTable, columnName);
+  //   let columnSettings = this.getColumnSettings(activeTable, activeView, activeColumn);
+  //   configSettings.push(columnSettings);
+  //   if (mapMode === MAP_MODE.IMAGE) {
+  //     let activeImageColumn = getTableColumnByName(activeTable, imageColumnName);
+  //     const imageColumnSettings = this.getImageColumnsSetting(activeTable, activeView, activeImageColumn);
+  //     configSettings.push(imageColumnSettings);
+  //     return configSettings;
+  //   }
+  //   let markColumnSettings = this.getMarkColumnSetting(activeTable, activeView, markDependence);
+  //   let directShownColumn = getTableColumnByName(activeTable, directShownColumnName);
+  //   let directShownColumnSetting = this.getDirectShownColumnSetting(activeTable, activeView, directShownColumn);
+  //   configSettings.push(markColumnSettings, directShownColumnSetting);
+  //   return configSettings;
+  // };
+
+  // updateSelectedSettings = (type, option) => {
+  //   let { configSettings } = this.state;
+  //   const tables = window.dtableSDK.getTables();
+  //   switch (type) {
+  //     case CONFIG_TYPE.MAP_MODE: {
+  //       const tableName = getConfigItemByType(configSettings, 'table').active;
+  //       const viewName = getConfigItemByType(configSettings, 'view').active;
+  //       const mapMode = option.name;
+  //       const currentMapMode = configSettings[0].active;
+  //       const currentTable = getTableByName(tables, tableName);
+  //       const currentView = getViewByName(currentTable.views, viewName);
+  //       if (currentMapMode === mapMode) return configSettings;
+  //       let newConfigSettings = [];
+  //       const mapSettings = this.getMapSetting(mapMode);
+  //       configSettings[0] = mapSettings;
+  //       if (mapMode === MAP_MODE.IMAGE) {
+  //         const imageColumnSetting = this.getImageColumnsSetting(currentTable, currentView, );
+  //         configSettings.forEach((setting) => {
+  //           const type = setting.type;
+  //           if (type === 'column') {
+  //             newConfigSettings.push(setting, imageColumnSetting);
+  //             return;
+  //           }
+  //           newConfigSettings.push(setting);
+  //         });
+  //         newConfigSettings = removeSettingByType(newConfigSettings, [CONFIG_TYPE.MARK_DEPENDENCE, CONFIG_TYPE.DIECT_SHOWN_COLUMN]);
+  //       } else {
+  //         newConfigSettings = removeSettingByType(configSettings, CONFIG_TYPE.IMAGE_COLUMN);
+  //         newConfigSettings.push(this.getMarkColumnSetting(currentTable, currentView), this.getDirectShownColumnSetting(currentTable, currentView));
+  //       }
+  //       return newConfigSettings;
+  //     }
+  //     case CONFIG_TYPE.TABLE: {
+  //       const mapModeSettings = getConfigItemByType(configSettings, CONFIG_TYPE.MAP_MODE);
+  //       let currentTable = getTableByName(tables, option.name);
+  //       let currentView = getNonArchiveViews(currentTable.views)[0];
+  //       let tableSettings = this.getTableSettings(currentTable);
+  //       let viewSettings = this.getViewSettings(currentTable);
+  //       let columnSetting = this.getColumnSettings(currentTable, currentView);
+  //       if (configSettings[0].active === MAP_MODE.IMAGE) {
+  //         let imageColumnSetting = this.getImageColumnsSetting(currentTable, currentView);
+  //         return [mapModeSettings, tableSettings, viewSettings, columnSetting, imageColumnSetting];
+  //       }
+  //       let markColumnSetting = this.getMarkColumnSetting(currentTable, currentView);
+  //       let directShownColumnSetting = this.getDirectShownColumnSetting(currentTable, currentView);
+  //       return [mapModeSettings, tableSettings, viewSettings, columnSetting, markColumnSetting, directShownColumnSetting];
+  //     }
+  //     case CONFIG_TYPE.VIEW: {
+  //       const mapModeSettings = getConfigItemByType(configSettings, CONFIG_TYPE.MAP_MODE);
+  //       const tableSettings = getConfigItemByType(configSettings, 'table');
+  //       const tableName = tableSettings.active;
+  //       let currentTable = getTableByName(tables, tableName);
+  //       let currentView = getViewByName(currentTable.views, option.name);
+  //       let viewSettings = this.getViewSettings(currentTable, currentView);
+  //       let columnSetting = this.getColumnSettings(currentTable, currentView);
+  //       if (configSettings[0].active === MAP_MODE.IMAGE) {
+  //         let imageColumnSetting = this.getImageColumnsSetting(currentTable, currentView);
+  //         return [mapModeSettings, tableSettings, viewSettings, columnSetting, imageColumnSetting];
+  //       }
+  //       let markColumnSetting = this.getMarkColumnSetting(currentTable, currentView);
+  //       let directShownColumnSetting = this.getDirectShownColumnSetting(currentTable, currentView);
+  //       return [mapModeSettings, tableSettings, viewSettings, columnSetting, markColumnSetting, directShownColumnSetting];
+  //     }
+  //     case CONFIG_TYPE.COLUMN: {
+  //       const tableName = getConfigItemByType(configSettings, 'table').active;
+  //       const viewName = getConfigItemByType(configSettings, 'view').active;
+  //       let currentTable = getTableByName(tables, tableName);
+  //       let currentView = getViewByName(currentTable.views, viewName);
+  //       let currentColumn = getTableColumnByName(currentTable, option.name);
+  //       let columnSettings = this.getColumnSettings(currentTable, currentView, currentColumn);
+  //       replaceSettingItemByType(configSettings, 'column', columnSettings);
+  //       return configSettings;
+  //     }
+  //     case CONFIG_TYPE.MARK_DEPENDENCE: {
+  //       const tableName = getConfigItemByType(configSettings, 'table').active;
+  //       const viewName = getConfigItemByType(configSettings, 'view').active;
+  //       let currentTable = getTableByName(tables, tableName);
+  //       let currentView = getViewByName(currentTable.views, viewName);
+  //       let columnSetting = this.getMarkColumnSetting(currentTable, currentView, option.name);
+  //       replaceSettingItemByType(configSettings, 'mark_dependence', columnSetting);
+  //       return configSettings;
+  //     }
+  //     case CONFIG_TYPE.DIECT_SHOWN_COLUMN: {
+  //       const tableName = getConfigItemByType(configSettings, 'table').active;
+  //       const viewName = getConfigItemByType(configSettings, 'view').active;
+  //       let currentTable = getTableByName(tables, tableName);
+  //       let currentView = getViewByName(currentTable.views, viewName);
+  //       let column = getTableColumnByName(currentTable, option.name);
+  //       let directShownColumnSetting = this.getDirectShownColumnSetting(currentTable, currentView, column);
+  //       replaceSettingItemByType(configSettings, 'direct_shown_column', directShownColumnSetting);
+  //       return configSettings;
+  //     }
+  //     case CONFIG_TYPE.IMAGE_COLUMN: {
+  //       const tableName = getConfigItemByType(configSettings, 'table').active;
+  //       const viewName = getConfigItemByType(configSettings, 'view').active;
+  //       let currentTable = getTableByName(tables, tableName);
+  //       let currentView = getViewByName(currentTable.views, viewName);
+  //       let column = getTableColumnByName(currentTable, option.name);
+  //       let imageColumnSetting = this.getImageColumnsSetting(currentTable, currentView, column);
+  //       replaceSettingItemByType(configSettings, CONFIG_TYPE.IMAGE_COLUMN, imageColumnSetting);
+  //       return configSettings;
+  //     }
+  //     default: {
+  //       return this.state.configSettings;
+  //     }
+  //   }
+  // };
+
+  // getMapSetting = (mapType = MAP_MODE.DEFAULT) => {
+  //   return { name: intl.get('Map_type'), active: mapType, type: 'map_mode', settings: [{ name: MAP_MODE.DEFAULT, id: 'map' }, { name: MAP_MODE.IMAGE, id: 'image' }] };
+  // };
+
+  // getTableSettings = (activeTable = null) => {
+  //   const tables = window.dtableSDK.getTables();
+  //   let tableSettings = tables.map(table => {
+  //     return { id: table._id, name: table.name };
+  //   });
+  //   let active = activeTable ? activeTable.name : tables[0].name;
+  //   return {
+  //     type: CONFIG_TYPE.TABLE,
+  //     name: intl.get('Table'),
+  //     settings: tableSettings,
+  //     active,
+  //   };
+  // };
+
+  // getViewSettings = (currentTable, activeView = null) => {
+  //   const views = getNonArchiveViews(currentTable.views);
+  //   let viewSettings = views.map(view => {
+  //     return { id: view._id, name: view.name };
+  //   }).filter(Boolean);
+  //   let active = activeView ? activeView.name : views[0].name;
+  //   return {
+  //     type: CONFIG_TYPE.VIEW,
+  //     name: intl.get('View'),
+  //     settings: viewSettings,
+  //     active,
+  //   };
+  // };
+
+  // getColumnSettings = (currentTable, currentView, activeColumn = null) => {
+  //   let columns = getViewShownColumns(currentView, currentTable.columns);
+
+  //   // need options: checkout map column
+  //   columns = columns.filter(column => {
+  //     return column.type === 'text' || column.type === 'geolocation';
+  //   });
+  //   let columnSettings = columns.map(column => {
+  //     return { id: column.key, name: column.name };
+  //   });
+  //   let active = '';
+  //   if (columns.length === 0) {
+  //     const column = currentTable.columns[0];
+  //     active = column.name;
+  //     columnSettings.unshift({ id: column.key, name: column.name });
+  //   } else {
+  //     active = activeColumn ? activeColumn.name : columns[0].name;
+  //   }
+  //   return {
+  //     type: CONFIG_TYPE.COLUMN,
+  //     name: intl.get('Address_field'),
+  //     settings: columnSettings,
+  //     active,
+  //   };
+  // };
+
+  // getMarkColumnSetting = (currentTable, currentView, dependence = null) => {
+  //   let columns = getViewShownColumns(currentView, currentTable.columns);
+  //   columns = columns.filter(column => {
+  //     return column.type === 'single-select';
+  //   });
+
+  //   let columnSettings = columns.map(column => {
+  //     return { id: column.key, name: column.name };
+  //   });
+
+  //   let active = '';
+  //   columnSettings.unshift({ id: 'not_used', name: intl.get('Not_used') }, { id: 'rows_color', name: intl.get('Row_color') });
+  //   if (dependence === 'rows_color') {
+  //     active = intl.get('Row_color');
+  //   } else {
+  //     active = dependence ? dependence : columnSettings[0].name;
+  //   }
+  //   return {
+  //     type: 'mark_dependence',
+  //     name: intl.get('Marker_colored_by'),
+  //     settings: columnSettings,
+  //     active,
+  //   };
+  // };
+
+  // getDirectShownColumnSetting = (currentTable, currentView, activeColumn = null) => {
+  //   let columns = getViewShownColumns(currentView, currentTable.columns);
+  //   columns = columns.filter(column => {
+  //     return column.type === 'text' || column.type === 'single-select';
+  //   });
+  //   let columnSettings = columns.map(column => {
+  //     return { id: column.key, name: column.name };
+  //   });
+  //   columnSettings.unshift({ id: '', name: intl.get('Not_used') });
+
+  //   // need options: checkout map column
+  //   let active = activeColumn ? activeColumn.name : columnSettings[0].name;
+  //   return {
+  //     type: 'direct_shown_column',
+  //     name: intl.get('Display_field'),
+  //     settings: columnSettings,
+  //     active,
+  //   };
+  // };
+
+  // getImageColumnsSetting = (currentTable, currentView, activeColumn = null) => {
+  //   let columns = getViewShownColumns(currentView, currentTable.columns);
+  //   columns = columns.filter(column => {
+  //     return column.type === 'image';
+  //   });
+  //   let columnSettings = columns.map(column => {
+  //     return { id: column.key, name: column.name };
+  //   });
+
+  //   columnSettings.unshift({ id: 'not_used', name: intl.get('Not_used') });
+  //   let active = activeColumn ? activeColumn.name : columnSettings[0].name;
+  //   return {
+  //     type: 'image_column',
+  //     name: intl.get('Image_field'),
+  //     settings: columnSettings,
+  //     active,
+  //   };
+  // };
+
+  showLocationDetail = (point) => {
+    const { clickPoint, showLocationDetail } = this.state;
+    if (clickPoint.lng === point.lng && clickPoint.lat === point.lat) {
+      this.setState({
+        showLocationDetail: !this.state.showLocationDetail
       });
-      if (newPluginSettings.length !== pluginSettings.length) {
-        if (newPluginSettings.length === 0) {
-          newPluginSettings.push(this.getInitSettingItem());
-        }
-        pluginSettings = newPluginSettings;
-      }
+      return;
+    }
+    if (showLocationDetail) {
+      this.setState({
+        clickPoint: point
+      });
     } else {
-      const initSettingItem = this.getInitSettingItem();
-      if (pluginSettings && this.isValidSettingItem(pluginSettings)) {
-        const { name, id } = initSettingItem;
-        pluginSettings = [{ ...pluginSettings, name, id }];
-      } else {
-        pluginSettings = [initSettingItem];
-      }
-    }
-    return pluginSettings;
-  };
-
-  getInitSettingItem = (name = intl.get('Default_View')) => {
-    const activeTable = window.dtableSDK.getActiveTable();
-    const activeView = window.dtableSDK.getActiveView();
-    return {
-      id: generatorViewId(),
-      tableName: activeTable.name,
-      viewName: activeView.name,
-      columnName: null,
-      markDependence: null,
-      directShownColumn: null,
-      name,
-    };
-  };
-
-  isValidSettingItem = (pluginSettings) => {
-    const { mapMode, tableName, viewName, columnName, markDependence, directShownColumnName, imageColumnName } = pluginSettings;
-    const tables = window.dtableSDK.getTables();
-    const table = getTableByName(tables, tableName);
-    if (!table) return false;
-    const view = getViewByName(table.views, viewName);
-    if (!view || view.type === 'archive') return false;
-    const column = getTableColumnByName(table, columnName);
-    if (!column && columnName) return false;
-    if (mapMode === MAP_MODE.DEFAULT) {
-      const markColumn = getTableColumnByName(table, markDependence);
-      if (!markColumn && markDependence && markDependence !== 'rows_color') return false;
-      const directShownColumn = getTableColumnByName(table, directShownColumnName);
-      if (!directShownColumn && directShownColumnName) return false;
-    } else {
-      const imageColumn = getTableColumnByName(table, imageColumnName);
-      if (!imageColumn && imageColumnName) return false;
-    }
-    return true;
-  };
-
-  initSelectedSettings = (settings) => {
-    const tables = window.dtableSDK.getTables();
-    let configSettings = [];
-    let { mapMode, tableName, viewName, columnName, markDependence, directShownColumnName, imageColumnName } = settings;
-    const mapSettings = this.getMapSetting(mapMode);
-    configSettings.push(mapSettings);
-    let activeTable = getTableByName(tables, tableName);
-    let tableSettings = this.getTableSettings(activeTable);
-    let activeView = getViewByName(activeTable.views, viewName);
-    let viewSettings = this.getViewSettings(activeTable, activeView);
-    configSettings.push(tableSettings, viewSettings);
-    let activeColumn = getTableColumnByName(activeTable, columnName);
-    let columnSettings = this.getColumnSettings(activeTable, activeView, activeColumn);
-    configSettings.push(columnSettings);
-    if (mapMode === MAP_MODE.IMAGE) {
-      let activeImageColumn = getTableColumnByName(activeTable, imageColumnName);
-      const imageColumnSettings = this.getImageColumnsSetting(activeTable, activeView, activeImageColumn);
-      configSettings.push(imageColumnSettings);
-      return configSettings;
-    }
-    let markColumnSettings = this.getMarkColumnSetting(activeTable, activeView, markDependence);
-    let directShownColumn = getTableColumnByName(activeTable, directShownColumnName);
-    let directShownColumnSetting = this.getDirectShownColumnSetting(activeTable, activeView, directShownColumn);
-    configSettings.push(markColumnSettings, directShownColumnSetting);
-    return configSettings;
-  };
-
-  updateSelectedSettings = (type, option) => {
-    let { configSettings } = this.state;
-    const tables = window.dtableSDK.getTables();
-    switch (type) {
-      case CONFIG_TYPE.MAP_MODE: {
-        const tableName = getConfigItemByType(configSettings, 'table').active;
-        const viewName = getConfigItemByType(configSettings, 'view').active;
-        const mapMode = option.name;
-        const currentMapMode = configSettings[0].active;
-        const currentTable = getTableByName(tables, tableName);
-        const currentView = getViewByName(currentTable.views, viewName);
-        if (currentMapMode === mapMode) return configSettings;
-        let newConfigSettings = [];
-        const mapSettings = this.getMapSetting(mapMode);
-        configSettings[0] = mapSettings;
-        if (mapMode === MAP_MODE.IMAGE) {
-          const imageColumnSetting = this.getImageColumnsSetting(currentTable, currentView, );
-          configSettings.forEach((setting) => {
-            const type = setting.type;
-            if (type === 'column') {
-              newConfigSettings.push(setting, imageColumnSetting);
-              return;
-            }
-            newConfigSettings.push(setting);
-          });
-          newConfigSettings = removeSettingByType(newConfigSettings, [CONFIG_TYPE.MARK_DEPENDENCE, CONFIG_TYPE.DIECT_SHOWN_COLUMN]);
-        } else {
-          newConfigSettings = removeSettingByType(configSettings, CONFIG_TYPE.IMAGE_COLUMN);
-          newConfigSettings.push(this.getMarkColumnSetting(currentTable, currentView), this.getDirectShownColumnSetting(currentTable, currentView));
-        }
-        return newConfigSettings;
-      }
-      case CONFIG_TYPE.TABLE: {
-        const mapModeSettings = getConfigItemByType(configSettings, CONFIG_TYPE.MAP_MODE);
-        let currentTable = getTableByName(tables, option.name);
-        let currentView = getNonArchiveViews(currentTable.views)[0];
-        let tableSettings = this.getTableSettings(currentTable);
-        let viewSettings = this.getViewSettings(currentTable);
-        let columnSetting = this.getColumnSettings(currentTable, currentView);
-        if (configSettings[0].active === MAP_MODE.IMAGE) {
-          let imageColumnSetting = this.getImageColumnsSetting(currentTable, currentView);
-          return [mapModeSettings, tableSettings, viewSettings, columnSetting, imageColumnSetting];
-        }
-        let markColumnSetting = this.getMarkColumnSetting(currentTable, currentView);
-        let directShownColumnSetting = this.getDirectShownColumnSetting(currentTable, currentView);
-        return [mapModeSettings, tableSettings, viewSettings, columnSetting, markColumnSetting, directShownColumnSetting];
-      }
-      case CONFIG_TYPE.VIEW: {
-        const mapModeSettings = getConfigItemByType(configSettings, CONFIG_TYPE.MAP_MODE);
-        const tableSettings = getConfigItemByType(configSettings, 'table');
-        const tableName = tableSettings.active;
-        let currentTable = getTableByName(tables, tableName);
-        let currentView = getViewByName(currentTable.views, option.name);
-        let viewSettings = this.getViewSettings(currentTable, currentView);
-        let columnSetting = this.getColumnSettings(currentTable, currentView);
-        if (configSettings[0].active === MAP_MODE.IMAGE) {
-          let imageColumnSetting = this.getImageColumnsSetting(currentTable, currentView);
-          return [mapModeSettings, tableSettings, viewSettings, columnSetting, imageColumnSetting];
-        }
-        let markColumnSetting = this.getMarkColumnSetting(currentTable, currentView);
-        let directShownColumnSetting = this.getDirectShownColumnSetting(currentTable, currentView);
-        return [mapModeSettings, tableSettings, viewSettings, columnSetting, markColumnSetting, directShownColumnSetting];
-      }
-      case CONFIG_TYPE.COLUMN: {
-        const tableName = getConfigItemByType(configSettings, 'table').active;
-        const viewName = getConfigItemByType(configSettings, 'view').active;
-        let currentTable = getTableByName(tables, tableName);
-        let currentView = getViewByName(currentTable.views, viewName);
-        let currentColumn = getTableColumnByName(currentTable, option.name);
-        let columnSettings = this.getColumnSettings(currentTable, currentView, currentColumn);
-        replaceSettingItemByType(configSettings, 'column', columnSettings);
-        return configSettings;
-      }
-      case CONFIG_TYPE.MARK_DEPENDENCE: {
-        const tableName = getConfigItemByType(configSettings, 'table').active;
-        const viewName = getConfigItemByType(configSettings, 'view').active;
-        let currentTable = getTableByName(tables, tableName);
-        let currentView = getViewByName(currentTable.views, viewName);
-        let columnSetting = this.getMarkColumnSetting(currentTable, currentView, option.name);
-        replaceSettingItemByType(configSettings, 'mark_dependence', columnSetting);
-        return configSettings;
-      }
-      case CONFIG_TYPE.DIECT_SHOWN_COLUMN: {
-        const tableName = getConfigItemByType(configSettings, 'table').active;
-        const viewName = getConfigItemByType(configSettings, 'view').active;
-        let currentTable = getTableByName(tables, tableName);
-        let currentView = getViewByName(currentTable.views, viewName);
-        let column = getTableColumnByName(currentTable, option.name);
-        let directShownColumnSetting = this.getDirectShownColumnSetting(currentTable, currentView, column);
-        replaceSettingItemByType(configSettings, 'direct_shown_column', directShownColumnSetting);
-        return configSettings;
-      }
-      case CONFIG_TYPE.IMAGE_COLUMN: {
-        const tableName = getConfigItemByType(configSettings, 'table').active;
-        const viewName = getConfigItemByType(configSettings, 'view').active;
-        let currentTable = getTableByName(tables, tableName);
-        let currentView = getViewByName(currentTable.views, viewName);
-        let column = getTableColumnByName(currentTable, option.name);
-        let imageColumnSetting = this.getImageColumnsSetting(currentTable, currentView, column);
-        replaceSettingItemByType(configSettings, CONFIG_TYPE.IMAGE_COLUMN, imageColumnSetting);
-        return configSettings;
-      }
-      default: {
-        return this.state.configSettings;
-      }
+      this.setState({
+        showLocationDetail: !this.state.showLocationDetail,
+        clickPoint: point
+      });
     }
   };
 
-  getMapSetting = (mapType = MAP_MODE.DEFAULT) => {
-    return { name: intl.get('Map_type'), active: mapType, type: 'map_mode', settings: [{ name: MAP_MODE.DEFAULT, id: 'map' }, { name: MAP_MODE.IMAGE, id: 'image' }] };
+  closeLocationDetail = () => {
+    if (!this.state.showLocationDetail) return;
+    this.setState({ showLocationDetail: false });
   };
 
-  getTableSettings = (activeTable = null) => {
-    const tables = window.dtableSDK.getTables();
-    let tableSettings = tables.map(table => {
-      return { id: table._id, name: table.name };
+  showLocationDetailToggle = () => {
+    this.setState({
+      showLocationDetail: !this.state.showLocationDetail,
     });
-    let active = activeTable ? activeTable.name : tables[0].name;
-    return {
-      type: CONFIG_TYPE.TABLE,
-      name: intl.get('Table'),
-      settings: tableSettings,
-      active,
-    };
   };
 
-  getViewSettings = (currentTable, activeView = null) => {
-    const views = getNonArchiveViews(currentTable.views);
-    let viewSettings = views.map(view => {
-      return { id: view._id, name: view.name };
-    }).filter(Boolean);
-    let active = activeView ? activeView.name : views[0].name;
-    return {
-      type: CONFIG_TYPE.VIEW,
-      name: intl.get('View'),
-      settings: viewSettings,
-      active,
-    };
-  };
-
-  getColumnSettings = (currentTable, currentView, activeColumn = null) => {
-    let columns = getViewShownColumns(currentView, currentTable.columns);
-
-    // need options: checkout map column
-    columns = columns.filter(column => {
-      return column.type === 'text' || column.type === 'geolocation';
-    });
-    let columnSettings = columns.map(column => {
-      return { id: column.key, name: column.name };
-    });
-    let active = '';
-    if (columns.length === 0) {
-      const column = currentTable.columns[0];
-      active = column.name;
-      columnSettings.unshift({ id: column.key, name: column.name });
-    } else {
-      active = activeColumn ? activeColumn.name : columns[0].name;
+  resetLocationDetails = () => {
+    this.mapInstance.sameLocationList = {};
+    if (this.state.showLocationDetail) {
+      this.setState({
+        showLocationDetail: false
+      });
     }
-    return {
-      type: CONFIG_TYPE.COLUMN,
-      name: intl.get('Address_field'),
-      settings: columnSettings,
-      active,
-    };
-  };
-
-  getMarkColumnSetting = (currentTable, currentView, dependence = null) => {
-    let columns = getViewShownColumns(currentView, currentTable.columns);
-    columns = columns.filter(column => {
-      return column.type === 'single-select';
-    });
-
-    let columnSettings = columns.map(column => {
-      return { id: column.key, name: column.name };
-    });
-
-    let active = '';
-    columnSettings.unshift({ id: 'not_used', name: intl.get('Not_used') }, { id: 'rows_color', name: intl.get('Row_color') });
-    if (dependence === 'rows_color') {
-      active = intl.get('Row_color');
-    } else {
-      active = dependence ? dependence : columnSettings[0].name;
-    }
-    return {
-      type: 'mark_dependence',
-      name: intl.get('Marker_colored_by'),
-      settings: columnSettings,
-      active,
-    };
-  };
-
-  getDirectShownColumnSetting = (currentTable, currentView, activeColumn = null) => {
-    let columns = getViewShownColumns(currentView, currentTable.columns);
-    columns = columns.filter(column => {
-      return column.type === 'text' || column.type === 'single-select';
-    });
-    let columnSettings = columns.map(column => {
-      return { id: column.key, name: column.name };
-    });
-    columnSettings.unshift({ id: '', name: intl.get('Not_used') });
-
-    // need options: checkout map column
-    let active = activeColumn ? activeColumn.name : columnSettings[0].name;
-    return {
-      type: 'direct_shown_column',
-      name: intl.get('Display_field'),
-      settings: columnSettings,
-      active,
-    };
-  };
-
-  getImageColumnsSetting = (currentTable, currentView, activeColumn = null) => {
-    let columns = getViewShownColumns(currentView, currentTable.columns);
-    columns = columns.filter(column => {
-      return column.type === 'image';
-    });
-    let columnSettings = columns.map(column => {
-      return { id: column.key, name: column.name };
-    });
-
-    columnSettings.unshift({ id: 'not_used', name: intl.get('Not_used') });
-    let active = activeColumn ? activeColumn.name : columnSettings[0].name;
-    return {
-      type: 'image_column',
-      name: intl.get('Image_field'),
-      settings: columnSettings,
-      active,
-    };
   };
 
   onSelectChange = (type, option) => {
-    let configSettings = this.updateSelectedSettings(type, option);
-    let { settings, selectedViewIdx } = this.state;
+    option = { name: option };
+    let { settings, selectedViewIdx, configSettings: oldConfigSettings } = this.state;
+    let configSettings = pluginContext.updateSelectedSettings(type, option, oldConfigSettings);
     let settingItem = generateSettingsByConfig(configSettings, settings[selectedViewIdx]);
     settings = replaceSettingItem(settings, settingItem, selectedViewIdx);
     window.dtableSDK.updatePluginSettings(PLUGIN_NAME, settings);
+    this.setState({ configSettings: [...configSettings], settings });
   };
 
   onSaveSetting = () => {
@@ -541,210 +637,79 @@ class App extends React.Component {
     window.app.onClosePlugin && window.app.onClosePlugin();
   };
 
-  removeLayers = () => {
-    if (this.markers.length > 0) {
-      this.markers.forEach((m) => {
-        m.remove();
-      });
-      this.markers = [];
-    }
+  getRowByConfigSettings = (cfgSettings, rowId) => {
+    const tableName = getConfigItemByType(cfgSettings, 'table').active;
+    const currentTable = pluginContext.getTableByName(tableName);
+    const row = pluginContext.getRow(currentTable, rowId);
+    return row;
   };
 
-  renderLocations = (locations) => {
-    // clear previous layers
-    this.removeLayers();
-    if (this.timer) {
-      clearTimeout(this.timer);
-      this.timer = null;
-    }
-    this.geocodingLocations = [];
-    const locationItem = locations[0] || {};
-    const addressType = locationItem.type;
-    if (!addressType) return;
-    if (GEOCODING_FORMAT.includes(addressType)) {
-      this.geocoding(locations, 1, 0);
-    } else {
-      if (this.state.configSettings[0].active === MAP_MODE.IMAGE) {
-        this.createMarkerCluster(locations);
-        return;
-      }
-      renderMarkByPosition(locations, this.addMarker);
-    }
-  };
 
-  createMarkerCluster = (locations) => {
-    if (!this.clusterMarkers) {
-      this.clusterMarkers = L.markerClusterGroup({
-        iconCreateFunction: function (cluster) {
-          const markers = cluster.getAllChildMarkers();
-          let imgCount = 0, markerUrl = '';
-          markers.forEach((marker) => {
-            const icon = marker.options.icon;
-            const urls = icon.options.imgUrl;
-            imgCount += urls.length;
-            if (!markerUrl) {
-              markerUrl = urls[0];
-            }
-          });
-          const imageElement = `<img src=${markerUrl} width="72" height="72" />`;
-          return L.divIcon({
-            html: `
-            <div class="map-plugin-custom-image-container">
-              ${markerUrl ? imageElement : '<div class="map-plugin-empty-custom-image-wrapper"></div>' }
-              <span class="map-plugin-custom-image-number">${imgCount}</span>
-              <i class='plugin-map-image-label-arrow dtable-font dtable-icon-drop-down'></i>
-            </div>
-          `,
-            iconAnchor: [48, 55],
-          });
-        },
-        showCoverageOnHover: false
-      });
-    }
-    this.clusterMarkers.clearLayers();
-    const list = [];
-    locations.forEach((item) => {
-      const { imgUrl, location } = item;
-      const { lat, lng } = location;
-      if (lng && lat) {
-        const imageElement = `<img src=${imgUrl[0]} width="72" height="72" />`;
-        const htmlString =  `
-          <div class="map-plugin-custom-image-container">
-            ${imgUrl.length > 0 ? `<span class="map-plugin-custom-image-number">${imgUrl.length}</span> ${imageElement}` : '<div class="map-plugin-empty-custom-image-wrapper"></div>' }
-            <i class='plugin-map-image-label-arrow dtable-font dtable-icon-drop-down'></i>
-          </div>
-        `;
-        let markIcon = L.divIcon({
-          html: htmlString,
-          imgUrl,
-          iconAnchor: [48, 55],
-        });
-        let marker = new L.Marker([lat, lng], { icon: markIcon });
-        list.push(marker);
+  onMoveColumn = (sourceColumnName, columnName) => {
+    this.resetLocationDetails();
+    const { configSettings } = this.state;
+    const shownColumnSetting = getConfigItemByType(configSettings, 'shown_columns');
+    let columns = shownColumnSetting.settings;
+    let sourceIndex, targetIndex, movedColumnName, unMovedColumnsName = [];
+    columns.forEach((column, index) => {
+      if (column.columnName === sourceColumnName) {
+        sourceIndex = index;
+        movedColumnName = column;
+      } else {
+        if (column.columnName === columnName) {
+          targetIndex = index;
+        }
+        unMovedColumnsName.push(column);
       }
     });
-    this.clusterMarkers.addLayers(list);
-    this.map.addLayer(this.clusterMarkers);
-  };
 
-  geocoding = (locations, resolutionTimes, index) => {
-    const locationItem = locations[index];
-    if (!locationItem) {
-      this.createMarkerCluster(this.geocodingLocations);
-      return;
+    let target_index = unMovedColumnsName.findIndex(column => column.columnName === columnName);
+
+    if (sourceIndex < targetIndex) {
+      target_index = target_index + 1;
     }
-    let address;
-    const value = locationItem.location;
-    if (GEOCODING_FORMAT.includes(locationItem.type) && typeof value === 'object') {
-      address = formatGeolocationValue(value, locationItem.type);
-    } else {
-      address = locationItem.location;
-    }
-    if (!address) {
-      this.geocoding(locations, 1, ++index);
-      return;
-    }
-    const activeColumn = this.state.configSettings[3].active;
-    const mapMode = this.state.configSettings[0].active;
-    this.geocoder.geocode({ 'address': address }, (points, status) => {
-      if (locationItem.columnName !== activeColumn) return;
-      switch (status) {
-        case window.google.maps.GeocoderStatus.OK: {
-          let lat = points[0].geometry.location.lat();
-          let lng = points[0].geometry.location.lng();
-          if (mapMode === MAP_MODE.IMAGE) {
-            this.geocodingLocations.push({ imgUrl: locationItem.imgUrl, location: { lat, lng } });
-          } else {
-            this.addMarker(locationItem, lat, lng, address);
-          }
-          this.geocoding(locations, 1, ++index);
-          break;
-        }
-        case window.google.maps.GeocoderStatus.OVER_QUERY_LIMIT: {
-          this.timer =  setTimeout(() => {
-            clearTimeout(this.timer);
-            this.timer = null;
-            if (resolutionTimes < 3) {
-              this.geocoding(locations, ++resolutionTimes, index);
-            } else {
-              // eslint-disable-next-line
-              console.log(intl.get('Your_Google_Maps_key_has_exceeded_quota'));
-              this.geocoding(locations, 1, ++index);
-            }
-          }, resolutionTimes * 1000);
-          break;
-        }
-        case window.google.maps.GeocoderStatus.UNKNOWN_ERROR:
-        case window.google.maps.GeocoderStatus.ERROR: {
-          this.timer = setTimeout(() => {
-            clearTimeout(this.timer);
-            this.timer = null;
-            this.geocoding(locations, 0, index);
-          }, 1000);
-          break;
-        }
-        case window.google.maps.GeocoderStatus.INVALID_REQUEST:
-        case window.google.maps.GeocoderStatus.REQUEST_DENIED: {
-          break;
-        }
-        default: {
-          // eslint-disable-next-line
-          console.log(intl.get('address_was_not_found', { address: address }));
-          break;
-        }
-      }
+
+    unMovedColumnsName.splice(target_index, 0, movedColumnName);
+    shownColumnSetting.settings = unMovedColumnsName;
+    let { settings, selectedViewIdx } = this.state;
+    const settingItem = generateSettingsByConfig(configSettings, settings[selectedViewIdx]);
+    settings = replaceSettingItem(settings, settingItem, selectedViewIdx);
+    this.setState({
+      configSettings: [...configSettings],
+      settings
     });
   };
 
-  addMarker = (location, lat, lng, address) => {
-    const { color, name, directShownLabel, mapMode } = location;
-    if (!this.markers.find(marker => marker._latlng.lat === lat && marker._latlng.lng === lng)) {
-      let describe = `<p>${address || ''}</p><p>${name}</p>`;
-      let myIcon;
-      if (mapMode === MAP_MODE.DEFAULT) {
-        if (color) {
-          const colorIndex = COLORS.findIndex((item) => color === item.COLOR);
-          if (colorIndex > -1) {
-            myIcon = L.icon({
-              iconUrl: [image['image' + (colorIndex + 1)]],
-              iconSize: [25, 41],
-            });
-          } else {
-            myIcon = L.icon({
-              iconUrl: [image['marker']],
-              iconSize: [25, 41],
-            });
-          }
-        } else {
-          myIcon = L.icon({
-            iconUrl: [image['marker']],
-            iconSize: [25, 41],
-          });
-        }
-        let marker = new L.Marker([lat, lng], { icon: myIcon, riseOnHover: true });
-        marker.bindPopup(describe);
-        if (directShownLabel) {
-          marker.bindTooltip(directShownLabel, {
-            direction: 'right',
-            permanent: true,
-            offset: L.point(14, 0),
-            opacity: 1,
-            className: 'plugin-en-tooltip'
-          }).openTooltip();
-        }
-        marker.on('mouseover', () => {
-          marker.openPopup();
-        });
-        marker.on('mouseout', () => {
-          marker.closePopup();
-        });
-        marker.on('click', () => {
-          return;
-        });
-        this.markers.push(marker);
-        this.map.addLayer(marker);
-      }
-    }
+  onColumnItemClick = (column, value) => {
+    this.resetLocationDetails();
+    const { configSettings } = this.state;
+    column.active = value;
+    let { settings, selectedViewIdx } = this.state;
+    const settingItem = generateSettingsByConfig(configSettings, settings[selectedViewIdx]);
+    settings = replaceSettingItem(settings, settingItem, selectedViewIdx);
+    this.setState({
+      configSettings: [...configSettings],
+      settings
+    });
+  };
+
+
+  toggleAllColumns = (isSelectAll) => {
+    this.resetLocationDetails();
+    const { configSettings } = this.state;
+    const showColumnSettings = getConfigItemByType(configSettings, 'hover_display_columns');
+    const columnSettings = showColumnSettings.settings;
+    columnSettings.forEach((columnSetting) => {
+      columnSetting.active = !isSelectAll;
+    });
+    let { settings, selectedViewIdx } = this.state;
+    const settingItem = generateSettingsByConfig(configSettings, settings[selectedViewIdx]);
+    settings = replaceSettingItem(settings, settingItem, selectedViewIdx);
+
+    this.setState({
+      configSettings: [...configSettings],
+      settings
+    });
   };
 
   toggleSettingDialog = () => {
@@ -840,9 +805,66 @@ class App extends React.Component {
     });
   };
 
+  showLocationDetails = (point) => {
+    const { clickPoint, isShowSameLocationDetails } = this.state;
+    if (clickPoint.lng === point.lng && clickPoint.lat === point.lat) {
+      this.setState({
+        isShowSameLocationDetails: !this.state.isShowSameLocationDetails,
+        clickPoint: {}
+      });
+      return;
+    }
+    if (isShowSameLocationDetails) {
+      this.setState({
+        clickPoint: point
+      });
+    } else {
+      this.setState({
+        isShowSameLocationDetails: !this.state.isShowSameLocationDetails,
+        clickPoint: point
+      });
+    }
+  };
+
+  showLocationDetailsToggle = () => {
+    this.setState({
+      isShowSameLocationDetails: !this.state.isShowSameLocationDetails,
+      clickPoint: {}
+    });
+  };
+
+  // show user location toggle
+  onShowUserPositionToggle = async (value) => {
+    // if (!this.currentMap) return;
+    const checked = value.currentTarget.checked;
+    const selectedViewSetting = this.state.settings[this.state.selectedViewIdx];
+    selectedViewSetting.showUserLocation = checked;
+    const { settings } = this.state;
+    window.dtableSDK.updatePluginSettings(PLUGIN_NAME, settings);
+    // the first time ,do locate and init marker
+    if (!this.userInfo) {
+      this.userInfo = await pluginContext.getUserInfo();
+      // TODO
+      // this.currentMap.setUserInfo(this.userInfo);
+      this.setState({
+        showUserLocationChecked: checked,
+      }, () => {
+        this.currentMap.locateAndInitMarker();
+      });
+      return;
+    }
+    // after mark inited ,add them to the map
+    this.setState({
+      showUserLocationChecked: checked,
+    });
+  };
+
+
+
   render() {
-    const { showSettingDialog, showDialog, configSettings, isDataLoaded, settings, selectedViewIdx } = this.state;
+    const { showSettingDialog, showDialog, configSettings, isDataLoaded, settings, selectedViewIdx, showUserLocationChecked, isShowSameLocationDetails } = this.state;
     const mapKey = window.dtable.dtableGoogleMapKey;
+    const { useGeocoder } = this.mapInstance;
     if (!showDialog) return null;
     return (
       <div className={styles['mobile-map-container']}>
@@ -883,7 +905,7 @@ class App extends React.Component {
               <span className="alert-danger">{intl.get('The_map_plugin_is_not_properly_configured_contact_the_administrator')}</span>
             </div>
           )}
-          {(isDataLoaded && mapKey) && <div id="map-container" className={styles['map-container']}></div>}
+          {mapKey && <div id="map-container" className={styles['map-container']}></div>}
           {
             showSettingDialog &&
             <Settings
@@ -894,6 +916,18 @@ class App extends React.Component {
               onSelectChange={this.onSelectChange}
               toggleAllColumns={this.toggleAllColumns}
               onSaveSetting={this.onSaveSetting}
+              onSwitchChange={this.onShowUserPositionToggle}
+              showUserLocationChecked={showUserLocationChecked}
+            />
+          }
+          {isShowSameLocationDetails &&
+            <MobileLocationDetailList
+              toggle={this.showLocationDetailsToggle}
+              sameLocationList={this.mapInstance.sameLocationList}
+              clickPoint={this.state.clickPoint}
+              configSettings={configSettings}
+              cellValueUtils={this.cellValueUtils}
+              getLocation={useGeocoder}
             />
           }
         </div>
