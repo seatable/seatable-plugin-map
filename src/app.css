@@ -315,3 +315,30 @@
 .plugin-map-en-loading {
   padding-top: 50px;
 }
+
+.map-single-select-formatter {
+  color: #3d1e1e;
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 14px;
+}
+
+.plugin-label-arrow {
+  position: absolute;
+  bottom: 3px;
+  transform: translate(-50%, 100%);
+  left: 50%;
+  color: #ffffff;
+  display: inline-block;
+  height: 9px;
+  line-height: 9px;
+}
+
+.row-cell-empty {
+  height: 8px;
+  width: 32px;
+  display: inline-block;
+  background-color: #f1f1f1;
+  border-radius: 4px;
+}
+

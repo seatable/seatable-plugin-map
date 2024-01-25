@@ -1,0 +1,115 @@
+.location-detail-list {
+  position: absolute;
+  top: 80px;
+  left: 60px;
+  max-height: calc(100vh - 170px);
+  width: 350px;
+  background: #fff;
+  border-radius: 5px;
+  box-shadow: 0 -0 12px rgb(0 0 0 / 30%);
+  z-index: 2000;
+}
+
+.location-detail-list .location-detail-header {
+  height: 50px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  font-size: 14px;
+  border-radius: 5px 5px 0 0;
+  border-bottom: 1px solid #ddd;
+}
+
+.location-detail-list .location-detail-header-container {
+  display: flex;
+  align-items: center;
+}
+
+.location-detail-list .location-detail-header .dtable-font {
+  color: #999;
+}
+
+.location-detail-list .location-detail-address {
+  margin-left: 0.25rem;
+  max-width: 200px;
+  overflow: hidden;
+  display: inline-block;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-weight: 500;
+  color: #222;
+}
+
+.location-detail-list .locatuon-detail-records {
+  margin-left: 5px;
+}
+
+.location-detail-list .location-detail-container {
+  overflow: auto;
+  border-radius: 0 0 5px 5px;
+}
+
+.location-detail-list .location-detail-list-container {
+  padding: 16px;
+  background: #f2f2f2;
+}
+
+.location-detail-list .location-detail-header .change-detail-height {
+  display: flex;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: flex-end;
+  font-size: 13px;
+  color: #aaa;
+}
+
+.location-detail-list .location-detail-header .change-detail-height:hover {
+  color: #666;
+}
+
+.location-detail-list .location-detail-list .row-cell-empty {
+  height: 8px;
+  width: 20px;
+  background-color: #f1f1f1;
+  border-radius: 4px;
+}
+
+@keyframes minToMaxDisplay {
+
+  from {
+    max-height: 0;
+  }
+
+  to {
+    max-height: calc(100vh - 220px);
+  }
+
+}
+
+@keyframes maxToMinHide {
+
+  from {
+    max-height: calc(100vh - 220px);
+  }
+
+  to {
+    max-height: 0;
+  }
+
+}
+
+.location-detail-list .min-to-max-display {
+  animation: minToMaxDisplay .3s;
+  animation-timing-function: cubic-bezier(0.42, 0, 0.58, 1.0); /* ease-in-out */
+  animation-fill-mode: forwards;
+}
+
+.location-detail-list .max-to-min-hide {
+  animation: maxToMinHide .3s;
+  animation-timing-function: cubic-bezier(0.42, 0, 0.58, 1.0); /* ease-in-out */
+  animation-fill-mode: forwards;
+}
