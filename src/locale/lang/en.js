@@ -25,11 +25,14 @@ const en = {
   "Submit": "Submit",
   "Default_View": "Default View",
   "Row_color": "Row color",
-  "Show_user_location":"Show user's Current Location",
-  "Hover_display_field":"Hover Display Field",
-  'Field':'Field',
-  "Display_all":'Display All',
-  "Hide_all":'Hide All',
+  "Show_user_location": "Show user's Current Location",
+  "Hover_display_field": "Hover Display Field",
+  'Field': 'Field',
+  "Display_all": 'Display All',
+  "Hide_all": 'Hide All',
+  "Records": "Records",
+  "Back":"Back",
+  "Total_records":"{num} in total"
 };
 
 export default en;

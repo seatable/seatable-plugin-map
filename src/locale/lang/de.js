@@ -30,6 +30,9 @@ const de = {
   'Field':'Feld',
   "Display_all":'Alle anzeigen',
   "Hide_all":'Alle ausblenden',
+  "Records": "Datensätze",
+  "Back": "Zurück",
+  "Total_records":"{num} insgesamt"
 };
 
 export default de;

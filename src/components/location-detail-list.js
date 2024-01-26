@@ -8,6 +8,7 @@ import RowCard from './row-card';
 import pluginContext from '../plugin-context';
 
 import '../css/location-detail-list.css';
+import intl from 'react-intl-universal';
 
 class LocationDetailList extends React.Component {
 
@@ -43,7 +44,6 @@ class LocationDetailList extends React.Component {
     // use the longest address as the location cause it is more accurate
     let maxLengthRes;
     res.results.forEach((item) => {
-      item.formatted_address = item.formatted_address.replace(/^[^\u4e00-\u9fa5]*/, '');
       if (!maxLengthRes) maxLengthRes = item.formatted_address;
       if (item.formatted_address.length > maxLengthRes.length) {
         maxLengthRes = item.formatted_address;
@@ -139,7 +139,7 @@ class LocationDetailList extends React.Component {
           <div className="location-detail-header-container">
             <i className='dtable-font dtable-icon-location'></i>
             <span className="location-detail-address" title={address}>{address}</span>
-            <span className="locatuon-detail-records">({rows.length}条记录)</span>
+            <span className="locatuon-detail-records">{(rows.length + ' ' + intl.get('Records'))}</span>
           </div>
           <i className={`dtable-font dtable-icon-${isWillHide ? 'up' : 'down'} change-detail-height`} onClick={this.onChangeDeitailHeight}></i>
         </div>

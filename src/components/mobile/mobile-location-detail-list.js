@@ -5,6 +5,7 @@ import getConfigItemByType from '../../utils/get-config-item-by-type';
 import RowCard from '../row-card';
 import styles from '../../css/mobile.module.css';
 import pluginContext from '../../plugin-context';
+import intl from 'react-intl-universal';
 
 class MobileLocationDetailList extends React.Component {
 
@@ -37,7 +38,6 @@ class MobileLocationDetailList extends React.Component {
     // use the longest address as the location cause it is more accurate
     let maxLengthRes;
     res.results.forEach((item) => {
-      // item.formatted_address = item.formatted_address.replace(/^[^\u4e00-\u9fa5]*/, '');
       if (!maxLengthRes) maxLengthRes = item.formatted_address;
       if (item.formatted_address.length > maxLengthRes.length) {
         maxLengthRes = item.formatted_address;
@@ -114,12 +114,12 @@ class MobileLocationDetailList extends React.Component {
       <div className={styles['setting']}>
         <div className={styles['dtable-map-plugin-header']}>
           <div className={styles['dtable-map-plugin-title']}>
-            <span onClick={toggle} className={`${styles['dtable-map-plugin-header-btn']} text-left`}>返回</span>
+            <span onClick={toggle} className={`${styles['dtable-map-plugin-header-btn']} text-left`}>{intl.get('Back')}</span>
           </div>
           <h4 className={styles['location-detail-title']}>{address}</h4>
         </div>
         <div className={styles['location-detail-list']}>
-          <div className={`${styles['location-detail-records-length']} mb-2`}>共有 {rows.length} 条记录</div>
+          <div className={`${styles['location-detail-records-length']} mb-2`}>{ intl.get('Total_records', { num: rows.length }) }</div>
           {rows.map((row, rowIdx) => {
             return (
               <RowCard

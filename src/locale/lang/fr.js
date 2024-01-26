@@ -29,7 +29,10 @@ const fr = {
   "Hover_display_field": "Champ d'affichage au survol",
   'Field': 'Champ',
   "Display_all": 'Afficher tout',
-  "Hide_all": 'Masquer tout'
+  "Hide_all": 'Masquer tout',
+  "Records": "Enregistrements",
+  "Back": "Retour",
+  "Total_records": "Total de {num} enregistrements"
 };
 
 export default fr;

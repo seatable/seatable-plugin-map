@@ -30,6 +30,9 @@ const zh_CN = {
   'Field':'字段',
   "Display_all":'展示全部',
   "Hide_all":'隐藏全部',
+  "Records": "记录",
+  "Back":"返回",
+  'Total_records':'共有{num}条'
 };
 
 export default zh_CN;
