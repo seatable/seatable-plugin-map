@@ -36,8 +36,7 @@ export const generateSettingsByConfig = (configSettings, currentSettingItem) => 
     } else if (config.type === 'image_column') {
       settings[SETTING_MIRROR[config.type]] = config.active;
     } else if (config.type === 'show_user_location') {
-      // set showUserLocation as active (value is true or false)
-      settings[config.type] = config.active;
+      return;
     }  else {
       let value = config.active;
       if (value === intl.get('Not_used')){

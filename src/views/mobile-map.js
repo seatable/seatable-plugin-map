@@ -18,12 +18,8 @@ import { IMAGE_PATH,
 } from '../constants';
 import { toaster } from 'dtable-ui-component';
 import MobileLocationDetailList from '../components/mobile/mobile-location-detail-list';
-
-
 import '../locale';
-
 import logo from '../image/map.png';
-
 import styles from '../css/mobile-en.module.css';
 import 'leaflet/dist/leaflet.css';
 import pluginContext from '../plugin-context';
@@ -48,7 +44,7 @@ class App extends React.Component {
       clickPoint: {},
       showLocationDetail: false,
       isShowSameLocationDetails: false,
-
+      showUserLocationChecked: true,
     };
     this.map = null;
     this.geocoder = null;
@@ -58,7 +54,6 @@ class App extends React.Component {
     this.userInfo = null;
     this.cellValueUtils = pluginContext.cellValueUtils;
     this.mapInstance = new GoogleMap({ mapKey: window.dtable.dtableGoogleMapKey, errorHandler: toaster.danger });
-
   }
 
   async componentDidMount() {
@@ -79,16 +74,16 @@ class App extends React.Component {
   }
 
   componentDidUpdate(preProps, preState) {
-    const { showLocationDetail, clickPoint, locations, configSettings } = this.state;
+    const { showLocationDetail, clickPoint, locations, configSettings, showUserLocationChecked } = this.state;
     const { showLocationDetail: preShowLocationDetail, clickPoint: prevClickPoint } = preState;
     if (this.state.showSettingDialog !== preState.showSettingDialog) return;
 
     if ((window.google && this.state.showDialog) && (showLocationDetail === preShowLocationDetail) && (clickPoint === prevClickPoint)) {
       // render locations after the container rendered in the dom tree
-      requestAnimationFrame(() => {
-        this.resetLocationDetails();
-        this.mapInstance.renderLocations(locations, configSettings);
-      });
+      // requestAnimationFrame(() => {
+      this.resetLocationDetails();
+      this.mapInstance.renderLocations(locations, configSettings, showUserLocationChecked);
+      // });
     }
   }
 
@@ -111,52 +106,55 @@ class App extends React.Component {
 
   // all init settings
   getInitPluginSettings = () => {
-    const { showSettingDialog, pluginSettings: settings, selectedViewSettings, selectedViewIdx } = pluginContext.initPluginSettings();
+    const { showSettingDialog, pluginSettings: settings, selectedViewSettings, selectedViewIdx, shouldFetchUserInfo } = pluginContext.initPluginSettings();
     const configSettings = pluginContext.initSelectedSettings(selectedViewSettings);
     const locations = this.getLocations(configSettings);
     if (showSettingDialog) {
       this.setState({ showSettingDialog });
     }
-    return { settings, configSettings, selectedViewSettings, locations, selectedViewIdx };
+    return { settings, configSettings, selectedViewSettings, locations, selectedViewIdx, shouldFetchUserInfo };
   };
 
   async initPluginDTableData() {
     if (this.props.isDevelopment) {
       this.unsubscribeLocalDtableChanged = window.dtableSDK.subscribe('local-dtable-changed', () => { this.onDTableChanged(); });
       this.unsubscribeRemoteDtableChanged = window.dtableSDK.subscribe('remote-dtable-changed', () => { this.onDTableChanged(); });
-      // const settings = this.initPluginSettings();
-      // let selectedViewIdx = getSelectedViewIds(KEY_SELECTED_VIEW_IDS) || 0;
-      // selectedViewIdx = selectedViewIdx > settings.length - 1 ? 0 : selectedViewIdx;
-      // const configSettings = this.initSelectedSettings(settings[selectedViewIdx]);
-      // const locations = this.getLocations(configSettings);
-      const { settings, configSettings, selectedViewSettings, locations, selectedViewIdx } = this.getInitPluginSettings();
+      const { settings, configSettings, locations, selectedViewIdx, shouldFetchUserInfo } = this.getInitPluginSettings();
+      if (shouldFetchUserInfo) {
+        this.userInfo = await pluginContext.getUserInfo();
+        this.mapInstance.setUserInfo(this.userInfo);
+      }
       this.setState({
         configSettings,
         isDataLoaded: true,
         locations,
         settings,
-        selectedViewIdx
+        selectedViewIdx,
+        showUserLocationChecked: shouldFetchUserInfo
       }, async () => {
         await this.mapInstance.renderMap(locations);
+        if (!this.userInfo) return;
+        this.mapInstance.locateAndInitMarker();
       });
     } else {
       this.unsubscribeLocalDtableChanged = window.dtableSDK.subscribe('local-dtable-changed', () => { this.onDTableChanged(); });
       this.unsubscribeRemoteDtableChanged = window.dtableSDK.subscribe('remote-dtable-changed', () => { this.onDTableChanged(); });
-      // const settings = this.initPluginSettings();
-      // let selectedViewIdx = getSelectedViewIds(KEY_SELECTED_VIEW_IDS) || 0;
-      // selectedViewIdx = selectedViewIdx > settings.length - 1 ? 0 : selectedViewIdx;
-      // const configSettings = this.initSelectedSettings(settings[selectedViewIdx]);
-      // const locations = this.getLocations(configSettings);
-      const { settings, configSettings, selectedViewSettings, locations, selectedViewIdx } = this.getInitPluginSettings();
+      const { settings, configSettings, locations, selectedViewIdx, shouldFetchUserInfo } = this.getInitPluginSettings();
+      if (shouldFetchUserInfo) {
+        this.userInfo = await pluginContext.getUserInfo();
+        this.mapInstance.setUserInfo(this.userInfo);
+      }
       this.setState({
         configSettings,
         isDataLoaded: true,
         locations,
         settings,
-        selectedViewIdx
+        selectedViewIdx,
+        showUserLocationChecked: shouldFetchUserInfo
       }, async () => {
-        await this.renderMap();
-        this.renderLocations(locations);
+        await this.mapInstance.renderMap(locations);
+        if (!this.userInfo) return;
+        this.mapInstance.locateAndInitMarker();
       });
     }
   }
@@ -206,7 +204,6 @@ class App extends React.Component {
   onDTableConnect() {
     this.unsubscribeLocalDtableChanged = window.dtableSDK.subscribe('local-dtable-changed', () => { this.onDTableChanged(); });
     this.unsubscribeRemoteDtableChanged = window.dtableSDK.subscribe('remote-dtable-changed', () => { this.onDTableChanged(); });
-
     const { settings, configSettings, locations, selectedViewIdx } = this.getInitPluginSettings();
     this.setState({
       configSettings,
@@ -220,7 +217,6 @@ class App extends React.Component {
   }
 
   onDTableChanged() {
-
     const { settings, configSettings, locations, selectedViewIdx } = this.getInitPluginSettings();
     this.setState({
       locations,
@@ -499,9 +495,8 @@ class App extends React.Component {
     });
   };
 
-  // show user location toggle
-  onShowUserPositionToggle = async (value) => {
-    // if (!this.currentMap) return;
+  // show user location
+  showUserLocationSwitchChange = async (value) => {
     const checked = value.currentTarget.checked;
     const selectedViewSetting = this.state.settings[this.state.selectedViewIdx];
     selectedViewSetting.showUserLocation = checked;
@@ -510,12 +505,11 @@ class App extends React.Component {
     // the first time ,do locate and init marker
     if (!this.userInfo) {
       this.userInfo = await pluginContext.getUserInfo();
-      // TODO
-      // this.currentMap.setUserInfo(this.userInfo);
+      this.mapInstance.setUserInfo(this.userInfo);
       this.setState({
         showUserLocationChecked: checked,
       }, () => {
-        this.currentMap.locateAndInitMarker();
+        this.mapInstance.locateAndInitMarker();
       });
       return;
     }
@@ -524,8 +518,6 @@ class App extends React.Component {
       showUserLocationChecked: checked,
     });
   };
-
-
 
   render() {
     const { showSettingDialog, showDialog, configSettings, isDataLoaded, settings, selectedViewIdx, showUserLocationChecked, isShowSameLocationDetails } = this.state;
@@ -582,9 +574,8 @@ class App extends React.Component {
               onSelectChange={this.onSelectChange}
               toggleAllColumns={this.toggleAllColumns}
               onSaveSetting={this.onSaveSetting}
-              onSwitchChange={this.onShowUserPositionToggle}
               showUserLocationChecked={showUserLocationChecked}
-              onChange={this.props.showUserLocationSwitchChange}
+              showUserLocationSwitchChange={this.showUserLocationSwitchChange}
             />
           }
           {isShowSameLocationDetails &&

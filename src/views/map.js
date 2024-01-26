@@ -154,21 +154,9 @@ class App extends React.Component {
   }
 
 
-  // getLocations = (configSettings) => {
-  //   const tables = window.dtableSDK.getTables();
-  //   return getLocations(tables, configSettings, {
-  //     collaborators: window.app.state.collaborators,
-  //   });
-  // };
-
   onDTableConnect() {
     this.unsubscribeLocalDtableChanged = window.dtableSDK.subscribe('local-dtable-changed', () => { this.onDTableChanged(); });
     this.unsubscribeRemoteDtableChanged = window.dtableSDK.subscribe('remote-dtable-changed', () => { this.onDTableChanged(); });
-    // const pluginSettings = this.initPluginSettings();
-    // let selectedViewIdx = getSelectedViewIds(KEY_SELECTED_VIEW_IDS) || 0;
-    // selectedViewIdx = selectedViewIdx > pluginSettings.length - 1 ? 0 : selectedViewIdx;
-    // const configSettings = this.initSelectedSettings(pluginSettings[selectedViewIdx]);
-    // const locations = this.getLocations(configSettings);
     const { settings, configSettings, locations, selectedViewIdx } = this.getInitPluginSettings();
     this.setState({
       configSettings,
@@ -182,18 +170,12 @@ class App extends React.Component {
   }
 
   onDTableChanged() {
-    // const pluginSettings = this.initPluginSettings();
-    // let selectedViewIdx = getSelectedViewIds(KEY_SELECTED_VIEW_IDS) || 0;
-    // selectedViewIdx = selectedViewIdx > pluginSettings.length - 1 ? 0 : selectedViewIdx;
-    // const configSettings = this.initSelectedSettings(pluginSettings[selectedViewIdx]);
-    // const locations = this.getLocations(configSettings);
     const { settings, configSettings, locations, selectedViewIdx } = this.getInitPluginSettings();
-
     this.setState({
       configSettings,
       locations,
       selectedViewIdx,
-      settings
+      settings,
     });
   }
 
