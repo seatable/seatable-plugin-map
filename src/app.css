@@ -342,3 +342,22 @@
   border-radius: 4px;
 }
 
+.plugin-map-dialog-en .plugin-map-show-location {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* remove dtable switch  */
+.plugin-map-dialog-en .plugin-map-show-location .custom-switch {
+  display: unset;
+  position: relative;
+}
+
+.plugin-map-dialog-en .plugin-map-show-location .custom-switch-indicator {
+  position: absolute;
+  top: 50%;
+  right: -6px;
+  transform: translateY(-50%);
+}
+

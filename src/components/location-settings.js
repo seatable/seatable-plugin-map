@@ -133,6 +133,24 @@ class LocationSettings extends Component {
             if (this.isImageMapMode() && HIDDEN_SETTING_ITEM.includes(configSetting.type)) {
               return null;
             }
+
+            // switch
+            if (configSetting.type === 'show_user_location') {
+              return (
+                <Fragment key={configSetting.type}>
+                  <div className="setting-divider"></div>
+                  <div className="plugin-map-show-location">
+                    <div>显示用户当前位置</div>
+                    <DTableSwitch
+                      id="showlocation"
+                      checked={this.props.showUserLocationChecked}
+                      onChange={(e) => this.props.onSwitchChange(e)}
+                    />
+                  </div>
+                </Fragment>
+              );
+            }
+
             if (configSetting.type === 'mark_dependence') {
               return (
                 <Fragment key={configSetting.type}>
@@ -160,6 +178,7 @@ class LocationSettings extends Component {
                 </div>
               );
             }
+
             return (
               <LocationSettingsItem
                 key={configSetting.type}

@@ -1,6 +1,7 @@
 import { Loader } from '@googlemaps/js-api-loader';
 import L from 'leaflet';
 import { renderMarkByPosition, formatGeolocationValue, getInitialMapCenter, generateLabelContent } from '../utils/location-utils';
+import 'leaflet.markercluster/dist/leaflet.markercluster-src';
 import {
   IMAGE_PATH,
   GEOCODING_FORMAT,
@@ -15,9 +16,7 @@ import intl from 'react-intl-universal';
 import { eventBus } from '../utils/event-bus';
 import pluginContext from '../plugin-context';
 import { getTableColumnByName } from 'dtable-utils';
-
-
-
+import './user-avatar.css';
 
 L.Icon.Default.imagePath = IMAGE_PATH;
 
@@ -30,8 +29,8 @@ export class GoogleMap {
     this.markerClusterer = null;
     this.errorHandler = props.errorHandler;
 
-    this.avatarMarker = null;
-    this.userLocationPoint = null;
+    this.userAvatarMarker = null;
+    this.userLocationCoords = null;
 
     this.markers = [];
     this.timer = null;
@@ -83,7 +82,7 @@ export class GoogleMap {
     }
   }
 
-  renderLocations = (locations, configSettings) => {
+  renderLocations = (locations, configSettings, shouldRenderUserLocation) => {
     // clear previous layers
     this.removeLayers();
     this.clearClusterMarkers();
@@ -95,6 +94,15 @@ export class GoogleMap {
     const locationItem = locations[0] || {};
     const addressType = locationItem.type;
     if (!addressType) return;
+
+    if (this.userAvatarMarker) {
+      if (shouldRenderUserLocation) {
+        this.addUserAvatarMarker();
+      } else {
+        this.removeUserAvatarMarker();
+      }
+    }
+
     if (GEOCODING_FORMAT.includes(addressType)) {
       this.geocoding(locations, 1, 0, configSettings);
     } else {
@@ -237,7 +245,6 @@ export class GoogleMap {
     });
   };
 
-
   removeLayers = () => {
     if (this.markers.length > 0) {
       this.markers.forEach((m) => {
@@ -357,18 +364,66 @@ export class GoogleMap {
     return res;
   };
 
+  addUserAvatarMarker = () => {
+    this.userAvatarMarker.addTo(this.map);
+  };
+
+  removeUserAvatarMarker = () => {
+    this.map.removeLayer(this.userAvatarMarker);
+  };
+
+  createUserAvatarMarkerAndPantoIt = () => {
+    const customIcon = L.divIcon({
+      className: 'custom-marker',
+      html: `<div class="plugin-map-en-avatar-marker"><img class='plugin-map-en-avatar' src="${this.userInfo.avatar_url}"></div>`, // 自定义的 HTML 内容
+      iconSize: [20, 20],
+      iconAnchor: [10, 10]
+    });
+
+    this.userAvatarMarker = L.marker([this.userLocationCoords.lat, this.userLocationCoords.lng], { icon: customIcon }).addTo(this.map);
+    this.map.flyTo({ ...this.userLocationCoords }, 5, { animiate: true, duration: 1 });
+  };
+
   setUserInfo = (userInfo) => {
     this.userInfo = userInfo;
   };
 
+  onLocateScccuess = (position) => {
+    this.userLocationCoords = { lng: position.coords.longitude, lat: position.coords.latitude };
+  };
 
   async getUserLocation() {
-
+    if (!navigator.geolocation) return Promise.reject('浏览器不支持定位');
+    const getOptions = {
+      // use GPS
+      enableHighAccuracy: true,
+    };
+    return new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(
+        (res) =>  {this.onLocateScccuess(res); resolve();},
+        (error) =>  reject(error),
+        getOptions
+      );
+    });
   }
 
   renderUserLocation() {
-    if (!this.userInfo) return;
+    // if (!this.userInfo) return;
 
+  }
+
+  async locateAndInitMarker() {
+    try {
+      await this.getUserLocation();
+      this.createUserAvatarMarkerAndPantoIt();
+    } catch (err) {
+      let errMessage;
+      if (typeof err !== 'string') {
+        errMessage = err.message || JSON.stringify(err);
+      }
+      this.errorHandler(errMessage);
+      throw err;
+    }
   }
 
 }

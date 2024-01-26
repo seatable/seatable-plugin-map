@@ -8,7 +8,6 @@ import intl from 'react-intl-universal';
 import { MAP_MODE, SETTING_TITLE, EVENT_BUS_TYPE } from '../../constants';
 import Switch from './mobile-switch';
 
-
 const HIDE_SETTING_ITEM = ['direct_shown_column', 'numeric_column', 'mark_dependence', 'shown_columns'];
 
 

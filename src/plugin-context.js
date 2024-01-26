@@ -87,7 +87,8 @@ class PluginContext {
     selectedViewIdx = selectedViewIdx > pluginSettings.length - 1 ? 0 : selectedViewIdx;
 
     const selectedViewSettings = pluginSettings[selectedViewIdx];
-    return { showSettingDialog, pluginSettings, selectedViewSettings, selectedViewIdx };
+    const shouldFetchUserInfo = typeof selectedViewSettings.showUserLocation !== 'boolean' || selectedViewSettings.showUserLocation === true;
+    return { showSettingDialog, pluginSettings, selectedViewSettings, selectedViewIdx, shouldFetchUserInfo };
   };
 
   initSelectedSettings = (settings) => {
@@ -134,10 +135,10 @@ class PluginContext {
     configSettings.push(directShownColumnSetting, shownColumnsSettings);
 
     // show user location，just for display
-    // configSettings.push({
-    //   type: 'show_user_location',
-    //   name: SETTING_TITLE.SHOW_USER_LOCATION,
-    // });
+    configSettings.push({
+      type: 'show_user_location',
+      name: SETTING_TITLE.SHOW_USER_LOCATION,
+    });
 
     return configSettings;
   };

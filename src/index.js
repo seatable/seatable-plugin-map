@@ -20,6 +20,7 @@ class TaskList {
     };
     await dtableSDK.init(window.dtablePluginConfig);
     await dtableSDK.syncWithServer();
+    await dtableSDK.dtableWebAPI.login();
 
     window.app.collaborators = dtableSDK.dtableStore.collaborators;
     window.app.collaboratorsCache = {};
