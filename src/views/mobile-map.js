@@ -309,16 +309,6 @@ class App extends React.Component {
     this.resetLocationDetails();
     let { configSettings } = this.state;
     column.active = value;
-    // column = { ...column };
-    // configSettings = configSettings.map(item => {
-    //   if (item.type === column.type) {
-    //     return column;
-    //   }
-    //   return item;
-    // });
-    // let { settings, selectedViewIdx } = this.state;
-    // const settingItem = generateSettingsByConfig(configSettings, settings[selectedViewIdx]);
-    // settings = replaceSettingItem(settings, settingItem, selectedViewIdx);
     this.setState({
       configSettings: [...configSettings],
     });
