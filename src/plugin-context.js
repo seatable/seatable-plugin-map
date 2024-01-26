@@ -1,13 +1,11 @@
 import { getTableByName, getViewByName, getTableColumnByName, getNonArchiveViews, getViewShownColumns, getRowById, getNonPrivateViews } from 'dtable-utils';
 import CellValueUtils from './utils/cell-value-utils';
-import { MAP_MODE, SETTING_TITLE, GEOLOCATION_COLUMN_NAME, SHOWN_COLUMN_TYPES, EMPTY_MARK_DEPENDENCE,
-  CONFIG_TYPE, DEPENDENT_ROW_COLOR, EMPTY_NUMERIC_COLUMN_NAME, EMPTY_IMAGE_COLUMN, PLUGIN_NAME, KEY_SELECTED_VIEW_IDS } from './constants';
+import { MAP_MODE, SETTING_TITLE, GEOLOCATION_COLUMN_NAME, SHOWN_COLUMN_TYPES, CONFIG_TYPE, PLUGIN_NAME, KEY_SELECTED_VIEW_IDS } from './constants';
 import getConfigItemByType from './utils/get-config-item-by-type';
 import removeSettingByType from './utils/remove-setting-by-type';
 import { replaceSettingItemByType } from './utils/repalce-setting-item-by-type';
 import { generatorViewId, getSelectedViewIds } from './utils/common-utils';
 import intl from 'react-intl-universal';
-
 
 class PluginContext {
 
@@ -23,17 +21,8 @@ class PluginContext {
     return window.dtable[key] || '';
   };
 
-  getUserCommonInfo = (email, avatar_size) => {
-    return window.dtableWebAPI.getUserCommonInfo(email, avatar_size);
-  };
-
-  getUserInfo = async () => {
-    const username = this.getSetting('username');
-    const userInfo = await this.getUserCommonInfo(
-      username,
-      '30'
-    );
-    return userInfo.data;
+  getUserCommonInfo = async (email, avatar_size = '30') => {
+    return  window.dtableWebAPI.getUserCommonInfo(email || this.getSetting('username'), avatar_size);
   };
 
   getMapConfig = () => {
@@ -194,185 +183,6 @@ class PluginContext {
     return { type: 'column', name: SETTING_TITLE.GEO_COLUMN, active: active, settings: columnSettings };
   };
 
-
-
-  // initSelectedSettings = (settings) => {
-  //   const tables = window.dtableSDK.getTables();
-  //   let configSettings = [];
-  //   let { mapMode, tableName, viewName, columnName, markDependence, directShownColumnName, imageColumnName, shownColumns, showUserLocation } = settings;
-  //   const mapSettings = this.getMapSetting(mapMode);
-  //   configSettings.push(mapSettings);
-  //   let activeTable = getTableByName(tables, tableName);
-  //   let tableSettings = this.getTableSettings(activeTable);
-  //   let activeView = getViewByName(activeTable.views, viewName);
-  //   let viewSettings = this.getViewSettings(activeTable, activeView);
-  //   configSettings.push(tableSettings, viewSettings);
-  //   let activeColumn = getTableColumnByName(activeTable, columnName);
-  //   let columnSettings = this.getColumnSettings(activeTable, activeView, activeColumn);
-  //   configSettings.push(columnSettings);
-  //   if (mapMode === MAP_MODE.IMAGE) {
-  //     let activeImageColumn = getTableColumnByName(activeTable, imageColumnName);
-  //     const imageColumnSettings = this.getImageColumnsSetting(activeTable, activeView, activeImageColumn);
-  //     configSettings.push(imageColumnSettings);
-  //     return configSettings;
-  //   }
-  //   let markColumnSettings = this.getMarkColumnSetting(activeTable, activeView, markDependence);
-  //   configSettings.push(markColumnSettings);
-  //   let directShownColumn = getTableColumnByName(activeTable, directShownColumnName);
-  //   let directShownColumnSetting = this.getDirectShownColumnSetting(activeTable, activeView, directShownColumn);
-  //   configSettings.push(directShownColumnSetting);
-
-  //   let mergedHoverDisplaySettings;
-  //   if (shownColumns) {
-  //     mergedHoverDisplaySettings = this.mergeOldMarkerHoverSettings(configSettings, activeTable, activeView, columnSettings.active, shownColumns);
-  //   }
-  //   // config setting is a config object
-  //   const hoverDisplayConfigSettings = this.getMarkerHoverSettings(activeTable, activeView, columnName, mergedHoverDisplaySettings);
-  //   configSettings.push(hoverDisplayConfigSettings);
-  //   // show user location，just for display
-  //   // configSettings.push({
-  //   //   type: 'show_user_location',
-  //   //   name: SETTING_TITLE.SHOW_USER_LOCATION,
-  //   //   active: typeof showUserLocation === 'boolean' ? showUserLocation : true,
-  //   // });
-  //   return configSettings;
-  // };
-
-  // getUpdateSelectedSettings = (oldConfigSettings, type, option) => {
-  //   let configSettings = oldConfigSettings;
-  //   if (type === 'map_mode') {
-  //     const tableName = getConfigItemByType(configSettings, 'table').active;
-  //     const viewName = getConfigItemByType(configSettings, 'view').active;
-  //     const mapMode = option.value;
-  //     const currentMapMode = configSettings[0].active;
-  //     let currentTable = this.getTableByName(tableName);
-  //     let currentView = getViewByName(currentTable.views, viewName);
-  //     if (currentMapMode === mapMode) return configSettings;
-  //     let newConfigSettings = [];
-  //     const mapSettings = this.getMapSetting(mapMode);
-  //     configSettings[0] = mapSettings;
-  //     if (mapMode === MAP_MODE.BUBBLE) {
-  //       const numericColumnSetting = this.getNumericColumnSetting(currentTable, currentView);
-  //       const bubbleSetting = this.getBubbleSetting();
-  //       configSettings.forEach((setting) => {
-  //         const type = setting.type;
-  //         if (type === 'mark_dependence') {
-  //           newConfigSettings.push(setting, numericColumnSetting, bubbleSetting);
-  //           return;
-  //         }
-  //         newConfigSettings.push(setting);
-  //       });
-  //       newConfigSettings = removeSettingByType(newConfigSettings, ['image_column']);
-  //     } else if (mapMode === MAP_MODE.DEFAULT) {
-  //       newConfigSettings = removeSettingByType(configSettings, ['numeric_column', 'bubble_size', 'image_column']);
-  //     } else if (mapMode === MAP_MODE.IMAGE) {
-  //       const imageColumnSetting = this.getImageColumnsSetting(currentTable, currentView);
-  //       configSettings.forEach((setting) => {
-  //         const type = setting.type;
-  //         if (type === 'column') {
-  //           newConfigSettings.push(setting, imageColumnSetting);
-  //           return;
-  //         }
-  //         newConfigSettings.push(setting);
-  //       });
-  //       newConfigSettings = removeSettingByType(newConfigSettings, ['numeric_column', 'bubble_size']);
-  //     }
-  //     return newConfigSettings;
-  //   }
-
-  //   if (type === 'table') {
-  //     let currentTable = this.getTableByName(option.value);
-  //     let currentView = getNonArchiveViews(currentTable.views)[0];
-  //     let tableSetting = this.getTableSetting(currentTable);
-  //     let viewSetting = this.getViewSetting(currentTable);
-  //     let markColumnSetting = this.getMarkColumnSetting(currentTable, currentView);
-  //     let columnSetting = this.getColumnSetting(currentTable, currentView);
-  //     let shownColumnSetting = this.getShowColumnSetting(currentTable, currentView, columnSetting.active);
-  //     let directShownColumnSetting = this.getDirectShownColumnSetting(currentTable, currentView);
-  //     const currentMapMode = configSettings[0].active;
-  //     if (currentMapMode === MAP_MODE.BUBBLE) {
-  //       let numericColumnSetting = this.getNumericColumnSetting(currentTable, currentView);
-  //       const bubbleSizeSetting = getConfigItemByType(configSettings, 'bubble_size');
-  //       return [configSettings[0], tableSetting, viewSetting, columnSetting, markColumnSetting, numericColumnSetting, bubbleSizeSetting, directShownColumnSetting, shownColumnSetting];
-  //     } else if (currentMapMode === MAP_MODE.IMAGE) {
-  //       const imageColumnSetting = this.getImageColumnsSetting(currentTable, currentView);
-  //       return [configSettings[0], tableSetting, viewSetting, columnSetting, imageColumnSetting, markColumnSetting, directShownColumnSetting, shownColumnSetting];
-  //     } else {
-  //       return [configSettings[0], tableSetting, viewSetting, columnSetting, markColumnSetting, directShownColumnSetting, shownColumnSetting];
-  //     }
-  //   }
-
-  //   if (type === 'view') {
-  //     const tableSetting = getConfigItemByType(configSettings, 'table');
-  //     const tableName = tableSetting.active;
-  //     let currentTable = this.getTableByName(tableName);
-  //     let currentView = getViewByName(currentTable.views, option.value);
-  //     let viewSetting = this.getViewSetting(currentTable, currentView);
-  //     let markColumnSetting = this.getMarkColumnSetting(currentTable, currentView);
-  //     let columnSetting = this.getColumnSetting(currentTable, currentView);
-  //     let shownColumns = this.mergeColumnSetting(configSettings, currentTable, currentView, columnSetting.active);
-  //     let shownColumnSetting = this.getShowColumnSetting(currentTable, currentView, columnSetting.active, shownColumns);
-  //     let directShownColumnSetting = this.getDirectShownColumnSetting(currentTable, currentView);
-  //     const currentMapMode = configSettings[0].active;
-  //     if (currentMapMode === MAP_MODE.BUBBLE) {
-  //       let numericColumnSetting = this.getNumericColumnSetting(currentTable, currentView);
-  //       configSettings.splice(2, 6, viewSetting, columnSetting, markColumnSetting, numericColumnSetting, directShownColumnSetting, shownColumnSetting);
-  //     } else if (currentMapMode === MAP_MODE.IMAGE) {
-  //       let imageColumnSetting = this.getImageColumnsSetting(currentTable, currentView);
-  //       configSettings.splice(2, 6, viewSetting, columnSetting, imageColumnSetting, markColumnSetting, directShownColumnSetting, shownColumnSetting);
-  //     } else {
-  //       configSettings.splice(2, 5, viewSetting, columnSetting, markColumnSetting, directShownColumnSetting, shownColumnSetting);
-  //     }
-  //     return configSettings;
-  //   }
-
-  //   const tableName = getConfigItemByType(configSettings, 'table').active;
-  //   const viewName = getConfigItemByType(configSettings, 'view').active;
-  //   let currentTable = this.getTableByName(tableName);
-  //   let currentView = getViewByName(currentTable.views, viewName);
-
-  //   if (type === 'column') {
-  //     let currentColumn = getTableColumnByName(currentTable, option.value);
-  //     let columnSetting = this.getColumnSetting(currentTable, currentView, currentColumn);
-  //     let shownColumns = this.mergeColumnSetting(configSettings, currentTable, currentView, columnSetting.active);
-  //     let shownColumnSetting = this.getShowColumnSetting(currentTable, currentView, columnSetting.active, shownColumns);
-  //     replaceSettingItemByType(configSettings, 'column', columnSetting);
-  //     replaceSettingItemByType(configSettings, 'shown_columns', shownColumnSetting);
-  //     return configSettings;
-  //   }
-
-  //   if (type === 'mark_dependence') {
-  //     let columnSetting = this.getMarkColumnSetting(currentTable, currentView, option.value);
-  //     replaceSettingItemByType(configSettings, 'mark_dependence', columnSetting);
-  //     return configSettings;
-  //   }
-
-  //   if (type === 'direct_shown_column') {
-  //     let column = getTableColumnByName(currentTable, option.value);
-  //     let directShownColumnSetting = this.getDirectShownColumnSetting(currentTable, currentView, column);
-  //     replaceSettingItemByType(configSettings, 'direct_shown_column', directShownColumnSetting);
-  //     return configSettings;
-  //   }
-
-  //   if (type === 'numeric_column') {
-  //     let currentTable = this.getTableByName(tableName);
-  //     let currentColumn = getTableColumnByName(currentTable, option.value);
-  //     let currentView = getViewByName(currentTable.views, viewName);
-  //     let numericColumnSetting = this.getNumericColumnSetting(currentTable, currentView, currentColumn);
-  //     replaceSettingItemByType(configSettings, 'numeric_column', numericColumnSetting);
-  //     return configSettings;
-  //   }
-  //   if (type === 'image_column') {
-  //     const currentTable = this.getTableByName(tableName);
-  //     const currentColumn = getTableColumnByName(currentTable, option.value);
-  //     const currentView = getViewByName(currentTable.views, viewName);
-  //     const imageColumnSetting = this.getImageColumnsSetting(currentTable, currentView, currentColumn);
-  //     replaceSettingItemByType(configSettings, 'image_column', imageColumnSetting);
-  //     return configSettings;
-  //   }
-  // };
-
-
   updateSelectedSettings = (type, option, configSettings) => {
     const tables = window.dtableSDK.getTables();
     switch (type) {
@@ -520,15 +330,6 @@ class PluginContext {
     return setting;
   };
 
-  // getShowColumnSetting = (currentTable, currentView, locationColumn, shownColumns) => {
-  //   if (shownColumns) {
-  //     return { type: 'shown_columns', name: SETTING_TITLE.SHOWN_COLUMNS, settings: shownColumns };
-  //   } else {
-  //     const columnSettings = this.getViewShowColumns(currentTable, currentView, locationColumn);
-  //     return { type: 'shown_columns', name: SETTING_TITLE.SHOWN_COLUMNS, settings: columnSettings };
-  //   }
-  // };
-
   getMarkerHoverSettings = ( currentTable, currentView, locationColumn, hoverDisplayColumns) => {
     if (hoverDisplayColumns) {
       return { type: 'hover_display_columns', name: SETTING_TITLE.HOVER_DISPLAY_COLUMNS, settings: hoverDisplayColumns };
@@ -538,21 +339,11 @@ class PluginContext {
     }
   };
 
-  // getMapSetting = (mapType = MAP_MODE.DEFAULT) => {
-  //   return { name: SETTING_TITLE.MAP_MODE, active: mapType, type: 'map_mode', settings: [{ name: MAP_MODE.DEFAULT, id: 'map' }, { name: MAP_MODE.BUBBLE, id: 'bubble' }, { name: MAP_MODE.IMAGE, id: 'image' }] };
-  // };
   getMapSetting = (mapType = MAP_MODE.DEFAULT) => {
-    return { name: intl.get('Map_type'), active: mapType, type: 'map_mode', settings: [{ name: MAP_MODE.DEFAULT, id: 'map' }, { name: MAP_MODE.IMAGE, id: 'image' }] };
+    return { name: SETTING_TITLE.MAP_MODE, active: mapType, type: 'map_mode', settings: [{ name: MAP_MODE.DEFAULT, id: 'map' }, { name: MAP_MODE.IMAGE, id: 'image' }] };
   };
 
-  // getTableSetting = (activeTable = null) => {
-  //   let tables = window.dtableSDK.getTables();
-  //   let tableSettings = tables.map(table => {
-  //     return { id: table._id, name: table.name };
-  //   });
-  //   let active = activeTable ? activeTable.name : tables[0].name;
-  //   return { type: 'table', name: SETTING_TITLE.TABLE, active: active, settings: tableSettings };
-  // };
+
   getTableSettings = (activeTable = null) => {
     const tables = window.dtableSDK.getTables();
     const tableSettings = tables.map(table => {
@@ -561,21 +352,12 @@ class PluginContext {
     const active = activeTable ? activeTable.name : tables[0].name;
     return {
       type: CONFIG_TYPE.TABLE,
-      name: intl.get('Table'),
+      name: SETTING_TITLE.TABLE,
       settings: tableSettings,
       active,
     };
   };
 
-  // getViewSetting = (currentTable, activeView = null) => {
-  //   let views = getNonPrivateViews(getNonArchiveViews(currentTable.views));
-  //   let viewSettings = views.map(view => {
-  //     return { id: view._id, name: view.name };
-  //   }).filter(Boolean);
-
-  //   let active = activeView ? activeView.name : views[0].name;
-  //   return { type: 'view', name: SETTING_TITLE.VIEW, active: active, settings: viewSettings };
-  // };
   getViewSettings = (currentTable, activeView = null) => {
     const views = getNonArchiveViews(currentTable.views);
     const viewSettings = views.map(view => {
@@ -584,43 +366,12 @@ class PluginContext {
     const active = activeView ? activeView.name : views[0].name;
     return {
       type: CONFIG_TYPE.VIEW,
-      name: intl.get('View'),
+      name: SETTING_TITLE.VIEW,
       settings: viewSettings,
       active,
     };
   };
 
-
-  // getColumnSetting = (currentTable, currentView, activeColumn = null) => {
-  //   let columns = getViewShownColumns(currentView, currentTable.columns);
-  //   // need options: checkout map column
-  //   columns = columns.filter(column => {
-  //     const { type } = column;
-  //     if (type === 'text') return true;
-  //     if (type === 'geolocation') {
-  //       const { data } = column;
-  //       const { geo_format } = data || {};
-  //       if (geo_format !== 'country_region') {
-  //         return true;
-  //       }
-  //     }
-  //     return false;
-  //   });
-
-  //   let columnSettings = columns.map(column => {
-  //     return { id: column.key, name: column.name };
-  //   });
-
-  //   if (columns.length === 0) {
-  //     const column = currentTable.columns[0];
-  //     columnSettings.unshift({ id: column.key, name: column.name });
-  //   }
-  //   columnSettings.unshift({ id: '', name: GEOLOCATION_COLUMN_NAME });
-  //   let active = activeColumn ? activeColumn.name : columnSettings[0].name;
-
-  //   // need options: checkout map column
-  //   return { type: 'column', name: SETTING_TITLE.GEO_COLUMN, active: active, settings: columnSettings };
-  // };
 
   getColumnSettings = (currentTable, currentView, activeColumn = null) => {
     let columns = getViewShownColumns(currentView, currentTable.columns);
@@ -642,14 +393,14 @@ class PluginContext {
     }
     return {
       type: CONFIG_TYPE.COLUMN,
-      name: intl.get('Address_field'),
+      name: SETTING_TITLE.GEO_COLUMN,
       settings: columnSettings,
       active,
     };
   };
 
-  mergeOldMarkerHoverSettings = (configSettings, currentTable, currentView, locationColumn, oldSettings = null) => {
-    if (!oldSettings) {
+  mergeOldMarkerHoverSettings = (configSettings, currentTable, currentView, locationColumn, oldSettings = []) => {
+    if (!oldSettings.length) {
       const hoverDisplaySettings =  getConfigItemByType(configSettings, 'hover_display_columns');
       if (hoverDisplaySettings) oldSettings = hoverDisplaySettings.settings;
     }
@@ -675,26 +426,7 @@ class PluginContext {
     return settings;
   };
 
-  // getMarkColumnSetting = (currentTable, currentView, dependence = null) => {
-  //   let columns = getViewShownColumns(currentView, currentTable.columns);
-  //   // n\ed options: checkout map column
-  //   columns = columns.filter(column => {
-  //     return column.type === 'single-select';
-  //   });
 
-  //   let columnSettings = columns.map(column => {
-  //     return { id: column.key, name: column.name };
-  //   });
-
-  //   columnSettings.unshift({ id: '', name: EMPTY_MARK_DEPENDENCE }, { id: 'rows_color', name: DEPENDENT_ROW_COLOR });
-  //   let active = '';
-  //   if (dependence === 'rows_color') {
-  //     active = DEPENDENT_ROW_COLOR;
-  //   } else {
-  //     active = dependence ? dependence : columnSettings[0].name;
-  //   }
-  //   return { type: 'mark_dependence', name: SETTING_TITLE.COLOR_COLUMN, active, settings: columnSettings };
-  // };
   getMarkColumnSetting = (currentTable, currentView, dependence = null) => {
     let columns = getViewShownColumns(currentView, currentTable.columns);
     // need options: checkout map column
@@ -715,25 +447,12 @@ class PluginContext {
     }
     return {
       type: 'mark_dependence',
-      name: intl.get('Marker_colored_by'),
+      name: SETTING_TITLE.COLOR_COLUMN,
       settings: columnSettings,
       active,
     };
   };
 
-  // getDirectShownColumnSetting = (currentTable, currentView, activeColumn = null) => {
-  //   let columns = getViewShownColumns(currentView, currentTable.columns);
-  //   columns = columns.filter(column => {
-  //     return column.type === 'text' || column.type === 'single-select';
-  //   });
-  //   let columnSettings = columns.map(column => {
-  //     return { id: column.key, name: column.name };
-  //   });
-  //   columnSettings.unshift({ id: '', name: EMPTY_MARK_DEPENDENCE });
-  //   // need options: checkout map column
-  //   let active = activeColumn ? activeColumn.name : columnSettings[0].name;
-  //   return { type: 'direct_shown_column', name: SETTING_TITLE.DIECT_SHOWN_COLUMN, active: active, settings: columnSettings };
-  // };
 
   getDirectShownColumnSetting = (currentTable, currentView, activeColumn = null) => {
     let columns = getViewShownColumns(currentView, currentTable.columns);
@@ -748,28 +467,11 @@ class PluginContext {
     let active = activeColumn ? activeColumn.name : columnSettings[0].name;
     return {
       type: 'direct_shown_column',
-      name: intl.get('Display_field'),
+      name: SETTING_TITLE.DIECT_SHOWN_COLUMN,
       settings: columnSettings,
       active,
     };
   };
-
-  // getNumericColumnSetting = (currentTable, currentView, activeColumn = null) => {
-  //   let columns = getViewShownColumns(currentView, currentTable.columns);
-  //   columns = columns.filter(column => {
-  //     const { data } = column || {};
-  //     return column.type === 'number' || (column.type === 'formula' && data.format === 'number');
-  //   });
-
-  //   let columnSettings = columns.map(column => {
-  //     return { id: column.key, name: column.name };
-  //   });
-
-  //   columnSettings.unshift({ id: '', name: EMPTY_NUMERIC_COLUMN_NAME });
-
-  //   let active = activeColumn ? activeColumn.name : columnSettings[0].name;
-  //   return { type: 'numeric_column', name: SETTING_TITLE.NUMERIC_COLUMN, active: active, settings: columnSettings };
-  // };
 
   getImageColumnsSetting = (currentTable, currentView, activeColumn = null) => {
     let columns = getViewShownColumns(currentView, currentTable.columns);
@@ -784,7 +486,7 @@ class PluginContext {
     let active = activeColumn ? activeColumn.name : columnSettings[0].name;
     return {
       type: 'image_column',
-      name: intl.get('Image_field'),
+      name: SETTING_TITLE.IMAGE_COLUMN,
       settings: columnSettings,
       active,
     };

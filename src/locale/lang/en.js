@@ -24,7 +24,12 @@ const en = {
   "Name_is_required": "Name is required",
   "Submit": "Submit",
   "Default_View": "Default View",
-  "Row_color": "Row color"
+  "Row_color": "Row color",
+  "Show_user_location":"Show user's Current Location",
+  "Hover_display_field":"Hover Display Field",
+  'Field':'Field',
+  "Display_all":'Display All',
+  "Hide_all":'Hide All',
 };
 
 export default en;

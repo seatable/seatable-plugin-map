@@ -5,101 +5,6 @@ import { MAP_MODE, DEFAULT_MARK_COLOR, ADDRESS_REG, PROVINCIAL_CAPITAL } from '.
 import { FormulaFormatter } from 'dtable-ui-component';
 import ReactDOMServer from 'react-dom/server';
 
-const getMarkColor = (markColumn, row) => {
-  const key = markColumn.key;
-  if (!markColumn.data) return '';
-  const options = markColumn.data.options;
-  if (!options) return '';
-
-  const currentOption = options.find((option) => {
-    return option.id === row[key];
-  });
-  if (!currentOption) return '';
-  return currentOption.color;
-};
-
-// export const getLocations = (tables, configSettings) => {
-//   let locations = [];
-//   const mapModeSetting = getConfigItemByType(configSettings, 'map_mode') || {};
-//   const mapMode = mapModeSetting.active || MAP_MODE.DEFAULT;
-//   const tableName = getConfigItemByType(configSettings, 'table').active;
-//   const viewName = getConfigItemByType(configSettings, 'view').active;
-//   let currentTable = getTableByName(tables, tableName);
-//   let currentView = getViewByName(currentTable.views, viewName);
-//   const columnName = getConfigItemByType(configSettings, 'column').active;
-//   let currentColumn = getTableColumnByName(currentTable, columnName);
-//   let rowsColor = {};
-//   let directShownLabel = '', color = '', directShownColumn, currentMarkColumn, isRowColor, imageColumn;
-//   if (mapMode === MAP_MODE.DEFAULT) {
-//     const markDependence = getConfigItemByType(configSettings, 'mark_dependence').active;
-//     currentMarkColumn = getTableColumnByName(currentTable, markDependence);
-//     isRowColor = markDependence === intl.get('Row_color');
-//     if (isRowColor) {
-//       const viewRows = window.dtableSDK.getViewRows(currentView, currentTable);
-//       rowsColor = window.dtableSDK.getViewRowsColor(viewRows, currentView, currentTable);
-//     }
-//     const directShownColumnName = getConfigItemByType(configSettings, 'direct_shown_column').active;
-//     directShownColumn = getTableColumnByName(currentTable, directShownColumnName);
-//   } else {
-//     let imageColumnName = getConfigItemByType(configSettings, 'image_column').active;
-//     imageColumn = getTableColumnByName(currentTable, imageColumnName) || {};
-//   }
-
-//   let locationNameKey = currentTable.columns[0].key;
-//   let rows = window.dtableSDK.getViewRows(currentView, currentTable);
-//   if (!currentColumn) {
-//     return [];
-//   }
-
-//   if (currentView.rows.length > 0) {
-//     // get view's rows and filtered null object
-//     rows = currentView.rows.map(rowId => currentTable['id_row_map'][rowId]).filter(Boolean);
-//   }
-
-//   if (rows.length === 0) return [];
-
-//   const columnData = currentColumn.data || {};
-//   let addressType = columnData.geo_format || 'geolocation';
-//   let locationValueKey = currentColumn.key;
-
-//   rows.forEach(row => {
-//     if (mapMode === MAP_MODE.DEFAULT) {
-//       if (isRowColor) {
-//         color = getRowColor(rowsColor, row);
-//       } else if (currentMarkColumn) {
-//         color = getMarkColor(currentMarkColumn, row) || color;
-//       }
-//       if (directShownColumn) {
-//         directShownLabel = getDirectShownLabel(row, directShownColumn);
-//       }
-//     }
-//     const value = row[locationValueKey] || {};
-//     let locationItem;
-//     if (mapMode === MAP_MODE.DEFAULT) {
-//       locationItem = {
-//         type: addressType,
-//         location: value,
-//         name: row[locationNameKey] || '',
-//         color,
-//         columnName,
-//         directShownLabel,
-//         mapMode
-//       };
-//     } else {
-//       locationItem = {
-//         type: addressType,
-//         location: value,
-//         name: row[locationNameKey] || '',
-//         columnName,
-//         imgUrl: row[imageColumn.key] || [],
-//         mapMode
-//       };
-//     }
-//     locations.push(locationItem);
-//   });
-//   return locations;
-// };
-
 export const getLocations = (tables, configSettings, { collaborators }) => {
   let locations = [];
   const mapType = getConfigItemByType(configSettings, 'map_mode').active;
@@ -420,8 +325,7 @@ export const getCityLocation = (locationItem) => {
   return newCity;
 };
 
-
-
+// TODO
 export const generateLabelContent = (location) => {
   const labels = location.labels;
   const labelHtml = labels.reduce((content, label) => {

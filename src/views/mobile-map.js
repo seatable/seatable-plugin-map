@@ -51,14 +51,12 @@ class App extends React.Component {
     this.markers = [];
     this.timer = null;
     this.clusterMarkers = null;
-    this.userInfo = null;
     this.cellValueUtils = pluginContext.cellValueUtils;
     this.mapInstance = new GoogleMap({ mapKey: window.dtable.dtableGoogleMapKey, errorHandler: toaster.danger });
   }
 
   async componentDidMount() {
     this.unsubscribeShowDetails = eventBus.subscribe(EVENT_BUS_TYPE.SHOW_LOCATION_DETAILS, this.showLocationDetails);
-    // load google map
     await this.mapInstance.loadMap();
     this.initPluginDTableData();
   }
@@ -74,16 +72,14 @@ class App extends React.Component {
   }
 
   componentDidUpdate(preProps, preState) {
-    const { showLocationDetail, clickPoint, locations, configSettings, showUserLocationChecked } = this.state;
+    const { showLocationDetail, clickPoint, locations, configSettings } = this.state;
     const { showLocationDetail: preShowLocationDetail, clickPoint: prevClickPoint } = preState;
     if (this.state.showSettingDialog !== preState.showSettingDialog) return;
 
     if ((window.google && this.state.showDialog) && (showLocationDetail === preShowLocationDetail) && (clickPoint === prevClickPoint)) {
       // render locations after the container rendered in the dom tree
-      // requestAnimationFrame(() => {
       this.resetLocationDetails();
-      this.mapInstance.renderLocations(locations, configSettings, showUserLocationChecked);
-      // });
+      this.mapInstance.renderLocations(locations, configSettings);
     }
   }
 
@@ -120,10 +116,6 @@ class App extends React.Component {
       this.unsubscribeLocalDtableChanged = window.dtableSDK.subscribe('local-dtable-changed', () => { this.onDTableChanged(); });
       this.unsubscribeRemoteDtableChanged = window.dtableSDK.subscribe('remote-dtable-changed', () => { this.onDTableChanged(); });
       const { settings, configSettings, locations, selectedViewIdx, shouldFetchUserInfo } = this.getInitPluginSettings();
-      if (shouldFetchUserInfo) {
-        this.userInfo = await pluginContext.getUserInfo();
-        this.mapInstance.setUserInfo(this.userInfo);
-      }
       this.setState({
         configSettings,
         isDataLoaded: true,
@@ -132,18 +124,12 @@ class App extends React.Component {
         selectedViewIdx,
         showUserLocationChecked: shouldFetchUserInfo
       }, async () => {
-        await this.mapInstance.renderMap(locations);
-        if (!this.userInfo) return;
-        this.mapInstance.locateAndInitMarker();
+        await this.mapInstance.renderMap(locations, shouldFetchUserInfo);
       });
     } else {
       this.unsubscribeLocalDtableChanged = window.dtableSDK.subscribe('local-dtable-changed', () => { this.onDTableChanged(); });
       this.unsubscribeRemoteDtableChanged = window.dtableSDK.subscribe('remote-dtable-changed', () => { this.onDTableChanged(); });
       const { settings, configSettings, locations, selectedViewIdx, shouldFetchUserInfo } = this.getInitPluginSettings();
-      if (shouldFetchUserInfo) {
-        this.userInfo = await pluginContext.getUserInfo();
-        this.mapInstance.setUserInfo(this.userInfo);
-      }
       this.setState({
         configSettings,
         isDataLoaded: true,
@@ -152,31 +138,8 @@ class App extends React.Component {
         selectedViewIdx,
         showUserLocationChecked: shouldFetchUserInfo
       }, async () => {
-        await this.mapInstance.renderMap(locations);
-        if (!this.userInfo) return;
-        this.mapInstance.locateAndInitMarker();
+        await this.mapInstance.renderMap(locations, shouldFetchUserInfo);
       });
-    }
-  }
-
-  async loadMapScript() {
-    let AUTH_KEY = window.dtable.dtableGoogleMapKey;
-    if (!AUTH_KEY) {
-      return;
-    }
-    if (!window.google) {
-      var script = document.createElement('script');
-      // register global render function of map
-      script.type = 'text/javascript';
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${AUTH_KEY}&libraries=places`;
-      document.body.appendChild(script);
-      script.onload = () => {
-        this.geocoder = new window.google.maps.Geocoder();
-        this.initPluginDTableData();
-      };
-    } else {
-      this.geocoder = new window.google.maps.Geocoder();
-      this.initPluginDTableData();
     }
   }
 
@@ -217,10 +180,9 @@ class App extends React.Component {
   }
 
   onDTableChanged() {
-    const { settings, configSettings, locations, selectedViewIdx } = this.getInitPluginSettings();
+    const { settings,  locations, selectedViewIdx } = this.getInitPluginSettings();
     this.setState({
       locations,
-      configSettings,
       selectedViewIdx,
       settings
     });
@@ -273,15 +235,16 @@ class App extends React.Component {
     let settingItem = generateSettingsByConfig(configSettings, settings[selectedViewIdx]);
     settings = replaceSettingItem(settings, settingItem, selectedViewIdx);
     window.dtableSDK.updatePluginSettings(PLUGIN_NAME, settings);
-    this.setState({ configSettings: [...configSettings], settings });
+    this.setState({ configSettings: [...configSettings] });
   };
 
   onSaveSetting = () => {
     let { selectedViewIdx, configSettings } = this.state;
     const settingItem = generateSettingsByConfig(configSettings, this.state.settings[selectedViewIdx]);
     const settings = replaceSettingItem(this.state.settings, settingItem, selectedViewIdx);
-    this.toggleSettingDialog();
-    window.dtableSDK.updatePluginSettings(PLUGIN_NAME, settings);
+    this.setState({ showSettingDialog: !this.state.showSettingDialog }, () => {
+      window.dtableSDK.updatePluginSettings(PLUGIN_NAME, settings);
+    });
   };
 
   toggle = () => {
@@ -344,15 +307,22 @@ class App extends React.Component {
 
   onColumnItemClick = (column, value) => {
     this.resetLocationDetails();
-    const { configSettings } = this.state;
+    let { configSettings } = this.state;
     column.active = value;
-    let { settings, selectedViewIdx } = this.state;
-    const settingItem = generateSettingsByConfig(configSettings, settings[selectedViewIdx]);
-    settings = replaceSettingItem(settings, settingItem, selectedViewIdx);
+    // column = { ...column };
+    // configSettings = configSettings.map(item => {
+    //   if (item.type === column.type) {
+    //     return column;
+    //   }
+    //   return item;
+    // });
+    // let { settings, selectedViewIdx } = this.state;
+    // const settingItem = generateSettingsByConfig(configSettings, settings[selectedViewIdx]);
+    // settings = replaceSettingItem(settings, settingItem, selectedViewIdx);
     this.setState({
       configSettings: [...configSettings],
-      settings
     });
+
   };
 
 
@@ -367,10 +337,8 @@ class App extends React.Component {
     let { settings, selectedViewIdx } = this.state;
     const settingItem = generateSettingsByConfig(configSettings, settings[selectedViewIdx]);
     settings = replaceSettingItem(settings, settingItem, selectedViewIdx);
-
     this.setState({
       configSettings: [...configSettings],
-      settings
     });
   };
 
@@ -502,20 +470,10 @@ class App extends React.Component {
     selectedViewSetting.showUserLocation = checked;
     const { settings } = this.state;
     window.dtableSDK.updatePluginSettings(PLUGIN_NAME, settings);
-    // the first time ,do locate and init marker
-    if (!this.userInfo) {
-      this.userInfo = await pluginContext.getUserInfo();
-      this.mapInstance.setUserInfo(this.userInfo);
-      this.setState({
-        showUserLocationChecked: checked,
-      }, () => {
-        this.mapInstance.locateAndInitMarker();
-      });
-      return;
-    }
-    // after mark inited ,add them to the map
     this.setState({
       showUserLocationChecked: checked,
+    }, () => {
+      this.mapInstance.resetUserLocationMarker(checked);
     });
   };
 

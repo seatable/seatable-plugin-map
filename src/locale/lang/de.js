@@ -24,7 +24,12 @@ const de = {
   "Name_is_required": "Der Name ist erforderlich.",
   "Submit": "Absenden",
   "Default_View": "Standardansicht",
-  "Row_color": "Zeilenfarbe"
+  "Row_color": "Zeilenfarbe",
+  "Show_user_location":"Zeige die Position des Benutzers",
+  "Hover_display_field":"Hover-Anzeigefeld",
+  'Field':'Feld',
+  "Display_all":'Alle anzeigen',
+  "Hide_all":'Alle ausblenden',
 };
 
 export default de;

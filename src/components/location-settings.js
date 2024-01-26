@@ -114,9 +114,9 @@ class LocationSettings extends Component {
     const showAllFields = shownColumnFields.every((item) => item.shown);
     const textProperties = {
       titleValue: SETTING_TITLE.HOVER_DISPLAY_COLUMNS,
-      bannerValue: '字段',
-      hideValue: '隐藏全部',
-      showValue: '显示全部',
+      bannerValue: intl.get('Field'),
+      hideValue: intl.get('Hide_all'),
+      showValue: intl.get('Display_all'),
     };
 
     return (
@@ -141,7 +141,7 @@ class LocationSettings extends Component {
                 <Fragment key={configSetting.type}>
                   <div className="setting-divider"></div>
                   <div className="plugin-map-show-location">
-                    <div>显示用户当前位置</div>
+                    <div>{intl.get('Show_user_location')}</div>
                     <DTableSwitch
                       id="showlocation"
                       checked={this.props.showUserLocationChecked}

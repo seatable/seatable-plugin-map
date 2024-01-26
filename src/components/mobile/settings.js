@@ -5,7 +5,7 @@ import MobileSettingItem from './mobile-setting-item';
 import MobileShownColumns from './mobile-shown-columns';
 import MobileSelectOption from './mobile-select-option';
 import intl from 'react-intl-universal';
-import { MAP_MODE, SETTING_TITLE, EVENT_BUS_TYPE } from '../../constants';
+import { MAP_MODE } from '../../constants';
 import Switch from './mobile-switch';
 
 const HIDE_SETTING_ITEM = ['direct_shown_column', 'numeric_column', 'mark_dependence', 'shown_columns'];
@@ -60,7 +60,7 @@ class Settings extends Component {
           <span onClick={this.props.onSaveSetting} className={`${styles['dtable-map-plugin-header-btn-highlight']} ${styles['dtable-map-plugin-header-btn']}`}>{intl.get('Save')}</span>
         </div>
         <div className={styles['dtable-map-plugin-setting-wrapper']}>
-          {configSettings.map(configSetting => {
+          {configSettings && configSettings.map(configSetting => {
             if (this.isImageMapMode() && HIDE_SETTING_ITEM.includes(configSetting.type)) {
               return null;
             }
@@ -77,13 +77,13 @@ class Settings extends Component {
 
             if (configSetting.type === 'show_user_location') {
               let placeholder = (
-                <span>显示用户当前位置</span>
+                <span>{intl.get('Show_user_location')}</span>
               );
 
               return (
                 <div className={`${styles['mobile-settting-item']}`} key={configSetting.type}>
                   <div className={`${styles['mobile-setting-title']}`}>
-                    显示用户当前位置
+                    {intl.get('Show_user_location')}
                   </div>
                   <div className={`${styles['mobile-column-setting-item']}`}>
                     <Switch

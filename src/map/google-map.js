@@ -60,7 +60,7 @@ export class GoogleMap {
     }
   };
 
-  async renderMap(locations) {
+  async renderMap(locations, showUserLocation) {
     const lang = (window.dtable && window.dtable.lang) ? window.dtable.lang : 'en';
     const url = `http://mt0.google.com/vt/lyrs=m@160000000&hl=${lang}&gl=${lang}&src=app&y={y}&x={x}&z={z}&s=Ga`;
     if (!document.getElementById('map-container')) return;
@@ -80,9 +80,17 @@ export class GoogleMap {
         minZoom: 2
       }).addTo(this.map);
     }
+
+    if (showUserLocation) {
+      this.initUserLocationAvatar();
+    }
+
+    if (!this.handlerAdded && !IS_MOBILE) {
+      this.addPanByHandler();
+    }
   }
 
-  renderLocations = (locations, configSettings, shouldRenderUserLocation) => {
+  renderLocations = (locations, configSettings) => {
     // clear previous layers
     this.removeLayers();
     this.clearClusterMarkers();
@@ -94,14 +102,6 @@ export class GoogleMap {
     const locationItem = locations[0] || {};
     const addressType = locationItem.type;
     if (!addressType) return;
-
-    if (this.userAvatarMarker) {
-      if (shouldRenderUserLocation) {
-        this.addUserAvatarMarker();
-      } else {
-        this.removeUserAvatarMarker();
-      }
-    }
 
     if (GEOCODING_FORMAT.includes(addressType)) {
       this.geocoding(locations, 1, 0, configSettings);
@@ -283,7 +283,6 @@ export class GoogleMap {
     // create only one marker for same location
     if (existsPoint.length > 1)  return;
 
-    // if (!this.markers.find(marker => marker._latlng.lat === lat && marker._latlng.lng === lng)) {
     const tooltipLabelContent = generateLabelContent(location);
     let myIcon;
     if (mapMode === MAP_MODE.DEFAULT) {
@@ -341,21 +340,30 @@ export class GoogleMap {
       this.markers.push(marker);
       this.map.addLayer(marker);
     }
-    // }
+  };
+
+  addPanByHandler = () => {
+    const up = document.getElementById('up-arrow');
+    const down = document.getElementById('down-arrow');
+    const left = document.getElementById('left-arrow');
+    const right = document.getElementById('right-arrow');
+    up.onclick = () => {this.map.panBy([0, -100]);};
+    down.onclick = () => this.map.panBy([0, 100]);
+    left.onclick = () => this.map.panBy([-100, 0]);
+    right.onclick = () => this.map.panBy([100, 0]);
+    this.handlerAdded = true;
   };
 
   useGeocoder = async (latlng, cb) => {
     if (!this.geocoder) {
       this.geocoder = new window.google.maps.Geocoder();
     }
-    const currentLanguage = navigator.language || navigator.userLanguage;
-    let res;
+    const lang = (window.dtable && window.dtable.lang) ? window.dtable.lang : 'en';
+    let res = { results: [] };
     try {
-      res = await this.geocoder.geocode({ 'location': latlng, language: currentLanguage });
+      res = await this.geocoder.geocode({ 'location': latlng, language: lang });
     } catch (err) {
-      console.log('====================================');
       console.log('geocodeError: ', err);
-      console.log('====================================');
     }
     // call the cbs
     if (cb) {
@@ -366,13 +374,14 @@ export class GoogleMap {
 
   addUserAvatarMarker = () => {
     this.userAvatarMarker.addTo(this.map);
+    this.map.flyTo({ ...this.userLocationCoords }, 5, { animiate: true, duration: 1 });
   };
 
   removeUserAvatarMarker = () => {
     this.map.removeLayer(this.userAvatarMarker);
   };
 
-  createUserAvatarMarkerAndPantoIt = () => {
+  loadUserAvatarMarker = () => {
     const customIcon = L.divIcon({
       className: 'custom-marker',
       html: `<div class="plugin-map-en-avatar-marker"><img class='plugin-map-en-avatar' src="${this.userInfo.avatar_url}"></div>`, // 自定义的 HTML 内容
@@ -380,42 +389,52 @@ export class GoogleMap {
       iconAnchor: [10, 10]
     });
 
-    this.userAvatarMarker = L.marker([this.userLocationCoords.lat, this.userLocationCoords.lng], { icon: customIcon }).addTo(this.map);
-    this.map.flyTo({ ...this.userLocationCoords }, 5, { animiate: true, duration: 1 });
+    this.userAvatarMarker = L.marker([this.userLocationCoords.lat, this.userLocationCoords.lng], { icon: customIcon });
   };
 
-  setUserInfo = (userInfo) => {
-    this.userInfo = userInfo;
-  };
-
-  onLocateScccuess = (position) => {
-    this.userLocationCoords = { lng: position.coords.longitude, lat: position.coords.latitude };
-  };
-
-  async getUserLocation() {
+  getUserLocation = () => {
     if (!navigator.geolocation) return Promise.reject('浏览器不支持定位');
-    const getOptions = {
-      // use GPS
-      enableHighAccuracy: true,
-    };
+    // use GPS
+    const getOptions = { enableHighAccuracy: true };
     return new Promise((resolve, reject) => {
       navigator.geolocation.getCurrentPosition(
-        (res) =>  {this.onLocateScccuess(res); resolve();},
-        (error) =>  reject(error),
+        (position) => {
+          const { longitude, latitude } = position.coords;
+          this.userLocationCoords = { lng: longitude, lat: latitude };
+          resolve();
+        },
+        reject,
         getOptions
       );
     });
-  }
+  };
 
-  renderUserLocation() {
-    // if (!this.userInfo) return;
+  resetUserLocationMarker = async (isShowMarker) => {
+    if (isShowMarker) {
+      try {
+        if (!this.userAvatarMarker) {
+          const result = await pluginContext.getUserCommonInfo();
+          this.userInfo = result.data;
+          await this.getUserLocation();
+          this.loadUserAvatarMarker(this.userInfo.avatar_url);
+        }
+        this.addUserAvatarMarker();
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.log(error);
+      }
+    } else {
+      this.removeUserAvatarMarker();
+    }
+  };
 
-  }
-
-  async locateAndInitMarker() {
+  async initUserLocationAvatar() {
     try {
+      const result = await pluginContext.getUserCommonInfo();
+      this.userInfo = result.data;
       await this.getUserLocation();
-      this.createUserAvatarMarkerAndPantoIt();
+      this.loadUserAvatarMarker(this.userInfo.avatar_url);
+      this.addUserAvatarMarker();
     } catch (err) {
       let errMessage;
       if (typeof err !== 'string') {

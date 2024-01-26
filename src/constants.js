@@ -24,6 +24,8 @@ export const CONFIG_TYPE = {
   IMAGE_COLUMN: 'image_column'
 };
 
+export const ADDRESS_REG = /.+?(省|市|自治区|自治州|县|区|镇|乡|村)/g;
+
 export const GEOCODING_FORMAT = ['geolocation', 'country_region', 'province', 'province_city'];
 
 export const COLUMN_TYPES = ['geolocation', 'text'];
@@ -35,15 +37,8 @@ export const MAP_MODE = {
   IMAGE: intl.get('Image_map')
 };
 
-export const ADDRESS_REG = /.+?(省|市|自治区|自治州|县|区|镇|乡|村)/g;
-
-
-export const EMPTY_MARK_DEPENDENCE = '不使用';
-export const GEOLOCATION_COLUMN_NAME = '请选择';
-export const EMPTY_NUMERIC_COLUMN_NAME = '不使用数值列';
-export const EMPTY_IMAGE_COLUMN = '不使用图片列';
-export const DEPENDENT_ROW_COLOR = '';
-
+export const EMPTY_MARK_DEPENDENCE = intl.get('Not_used');
+export const GEOLOCATION_COLUMN_NAME = intl.get('Please_select');
 export const SHOWN_COLUMN_TYPES = [
   CellType.NUMBER,
   CellType.TEXT,
@@ -55,18 +50,28 @@ export const SHOWN_COLUMN_TYPES = [
 ];
 
 
+// export const SETTING_TITLE = {
+//   SHOW_USER_LOCATION: '显示用户当前位置',
+//   MAP_MODE: '图表类型',
+//   TABLE: '子表',
+//   VIEW: '视图',
+//   GEO_COLUMN: '地址信息字段',
+//   COLOR_COLUMN: '标签颜色来自',
+//   DIECT_SHOWN_COLUMN: '直接显示字段',
+//   HOVER_DISPLAY_COLUMNS: '鼠标悬浮时显示字段',
+//   IMAGE_COLUMN: '图片'
+// };
+
 export const SETTING_TITLE = {
-  SHOW_USER_LOCATION: '显示用户当前位置',
-  MAP_MODE: '图表类型',
-  TABLE: '子表',
-  VIEW: '视图',
-  GEO_COLUMN: '地址信息字段',
-  COLOR_COLUMN: '标签颜色来自',
-  NUMERIC_COLUMN: '数值字段',
-  BUBBLE_SIZE: '气泡大小',
-  DIECT_SHOWN_COLUMN: '直接显示字段',
-  HOVER_DISPLAY_COLUMNS: '鼠标悬浮时显示字段',
-  IMAGE_COLUMN: '图片'
+  SHOW_USER_LOCATION: intl.get('Show_user_position'),
+  MAP_MODE: intl.get('Map_type'),
+  TABLE: intl.get('Table'),
+  VIEW: intl.get('View'),
+  GEO_COLUMN: intl.get('Address_field'),
+  COLOR_COLUMN: intl.get('Marker_colored_by'),
+  DIECT_SHOWN_COLUMN: intl.get('Display_field'),
+  HOVER_DISPLAY_COLUMNS: intl.get('Hover_display_field'),
+  IMAGE_COLUMN: intl.get('Image_field')
 };
 
 export const DEFAULT_MARK_COLOR = { BG_COLOR: 'rgba(219, 65, 57, .6)', BORDER_COLOR: '#c43638' };

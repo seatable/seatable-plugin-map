@@ -24,7 +24,10 @@ const zh_CN = {
   "Name_is_required": "名称必须存在",
   "Submit": "提交",
   "Default_View": "默认视图",
-  "Row_color": "行颜色"
+  "Row_color": "行颜色",
+  'Field':'字段',
+  "Display_all":'展示全部',
+  "Hide_all":'隐藏全部',
 };
 
 export default zh_CN;

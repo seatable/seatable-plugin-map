@@ -361,3 +361,58 @@
   transform: translateY(-50%);
 }
 
+.control-panel {
+  width: 50px;
+  height: 50px;
+  background-color: #fff;
+  border-radius: 50%;
+  position: absolute;
+  z-index: 2001;
+  left: 60px;
+  top: 20px;
+}
+
+.control-panel div {
+  width: 10px;
+  height: 10px;
+  background-color: #fff;
+  border: none;
+  position: absolute;
+  cursor: pointer;
+}
+
+#up-arrow {
+  left: 20px;
+  top: 1.5px;
+}
+
+#down-arrow {
+  left: 20px;
+  top: 26px;
+}
+
+#left-arrow {
+  left: 6.5px;
+  top: 13px;
+}
+#right-arrow {
+  left: 31.5px;
+  top: 13px;
+}
+
+/* Unicode */
+#up-arrow::before {
+  content: '\2191'; 
+}
+
+#down-arrow::before {
+  content: '\2193'; 
+}
+
+#left-arrow::before {
+  content: '\2190'; 
+}
+
+#right-arrow::before {
+  content: '\2192'; 
+}

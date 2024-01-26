@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import ColumnSettingItem from './mobile-column-setting-item';
 import styles from '../../css/mobile.module.css';
+import intl from 'react-intl-universal';
 
 class MobileShownColumns extends Component {
 
@@ -21,9 +22,9 @@ class MobileShownColumns extends Component {
   renderChooseFields = () => {
     const hasUnactiveColumn = this.hasUnactiveColumn();
     if (hasUnactiveColumn) {
-      return <span onClick={() => this.toggleSelectAll(false)}>显示全部</span>;
+      return <span onClick={() => this.toggleSelectAll(false)}>{ intl.get('Display_all') }</span>;
     } else {
-      return <span onClick={() => this.toggleSelectAll(true)}>隐藏全部</span>;
+      return <span onClick={() => this.toggleSelectAll(true)}>{ intl.get('Hide_all') }</span>;
     }
   };
 

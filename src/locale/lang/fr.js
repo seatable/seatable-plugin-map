@@ -24,7 +24,12 @@ const fr = {
   "Name_is_required": "Le nom est nécessaire.",
   "Submit": "Soumettre",
   "Default_View": "Vue standard",
-  "Row_color": "Couleur de la ligne"
+  "Row_color": "Couleur de la ligne",
+  "Show_user_location": "Afficher l'emplacement de l'utilisateur",
+  "Hover_display_field": "Champ d'affichage au survol",
+  'Field': 'Champ',
+  "Display_all": 'Afficher tout',
+  "Hide_all": 'Masquer tout'
 };
 
 export default fr;
