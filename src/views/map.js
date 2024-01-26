@@ -261,9 +261,8 @@ class App extends React.Component {
   toggleFullScreen = () => {
     this.setState({
       isFullScreen: !this.state.isFullScreen
-    }, () => {
-      this.map.invalidateSize();
     });
+    this.mapInstance.map.invalidateSize();
   };
 
   getDialogStyle = () => {
