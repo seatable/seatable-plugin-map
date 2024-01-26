@@ -7,7 +7,7 @@ let config = {
   server: 'http://127.0.0.1:80',
   workspaceID: '1',
   dtableName: 'test-1',
-  lang: 'zh-cn'
+  lang: 'zh-CN'
 };
 
 /** (2/5) load local development settings ./setting.local.js (if exist) */
