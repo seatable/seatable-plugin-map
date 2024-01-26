@@ -67,6 +67,7 @@ class LocationSettings extends Component {
     const { configSettings } = props;
     let columnsKeyMap = {};
     let columnsNameMap = {};
+    if (!configSettings.length) return { columnsKeyMap, columnsNameMap };
     const tableName = getConfigItemByType(configSettings, 'table').active;
     const viewName = getConfigItemByType(configSettings, 'view').active;
     const tables = window.dtableSDK.getTables();

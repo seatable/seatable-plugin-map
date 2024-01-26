@@ -33,7 +33,7 @@ class App extends React.Component {
       locations: [],
       showSettingDialog: false,
       isDataLoaded: false,
-      configSettings: null,
+      configSettings: [],
       isFullScreen: false,
       selectedViewIdx: 0,
       settings: null,
