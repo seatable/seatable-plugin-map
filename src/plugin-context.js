@@ -650,7 +650,8 @@ class PluginContext {
 
   mergeOldMarkerHoverSettings = (configSettings, currentTable, currentView, locationColumn, oldSettings = null) => {
     if (!oldSettings) {
-      oldSettings = getConfigItemByType(configSettings, 'hover_display_columns').settings;
+      const hoverDisplaySettings =  getConfigItemByType(configSettings, 'hover_display_columns');
+      if (hoverDisplaySettings) oldSettings = hoverDisplaySettings.settings;
     }
 
     let shownColumns = getViewShownColumns(currentView, currentTable.columns).filter(column => {
