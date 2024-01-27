@@ -1,24 +1,29 @@
 import { getTableByName, getViewByName, getTableColumnByName, getNonArchiveViews, getViewShownColumns, getRowById, getNonPrivateViews } from 'dtable-utils';
+import intl from 'react-intl-universal';
 import CellValueUtils from './utils/cell-value-utils';
 import { MAP_MODE, SETTING_TITLE, GEOLOCATION_COLUMN_NAME, SHOWN_COLUMN_TYPES, CONFIG_TYPE, PLUGIN_NAME, KEY_SELECTED_VIEW_IDS } from './constants';
 import getConfigItemByType from './utils/get-config-item-by-type';
 import removeSettingByType from './utils/remove-setting-by-type';
 import { replaceSettingItemByType } from './utils/repalce-setting-item-by-type';
 import { generatorViewId, getSelectedViewIds } from './utils/common-utils';
-import intl from 'react-intl-universal';
 
 class PluginContext {
 
   constructor() {
+    this.settings = window.dtable ? window.dtable : window.dtablePluginConfig;
     this.cellValueUtils = new CellValueUtils();
   }
 
   getConfig = () => {
-    return window.dtable;
+    return this.settings;
   };
 
   getSetting = (key) => {
-    return window.dtable[key] || '';
+    return this.settings[key] || '';
+  };
+
+  getLanguage = () => {
+    return this.settings['lang'] || 'en';
   };
 
   getUserCommonInfo = async (email, avatar_size = '30') => {

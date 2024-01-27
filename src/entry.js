@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import './locale';
 import App from './app';
 
 class TaskList {

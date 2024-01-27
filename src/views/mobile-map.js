@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import intl from 'react-intl-universal';
 import L from 'leaflet';
 import 'leaflet.markercluster/dist/leaflet.markercluster-src';
+import pluginContext from '../plugin-context';
 import Settings from '../components/mobile/settings';
 import Loading from '../components/loading';
 import { getLocations, getInitialMapCenter } from '../utils/location-utils';
@@ -20,7 +21,6 @@ import { toaster } from 'dtable-ui-component';
 import '../locale';
 import MobileLocationDetailList from '../components/mobile/mobile-location-detail-list';
 import logo from '../image/map.png';
-import pluginContext from '../plugin-context';
 import { GoogleMap } from '../map/google-map'; // Replace './path/to/GoogleMap' with the actual path to the GoogleMap module
 import { eventBus } from '../utils/event-bus';
 
@@ -53,7 +53,8 @@ class App extends React.Component {
     this.timer = null;
     this.clusterMarkers = null;
     this.cellValueUtils = pluginContext.cellValueUtils;
-    this.mapInstance = new GoogleMap({ mapKey: window.dtable.dtableGoogleMapKey, errorHandler: toaster.danger });
+    this.mapKey = pluginContext.getSetting('dtableGoogleMapKey');
+    this.mapInstance = new GoogleMap({ mapKey: this.mapKey, errorHandler: toaster.danger });
   }
 
   async componentDidMount() {
@@ -145,7 +146,7 @@ class App extends React.Component {
   }
 
   async renderMap() {
-    let lang = (window.dtable && window.dtable.lang) ? window.dtable.lang : 'en';
+    let lang = pluginContext.getLanguage();
     let url = `http://mt0.google.com/vt/lyrs=m@160000000&hl=${lang}&gl=${lang}&src=app&y={y}&x={x}&z={z}&s=Ga`;
     if (!document.getElementById('map-container')) return;
     window.L = L;
@@ -470,7 +471,7 @@ class App extends React.Component {
 
   render() {
     const { showSettingDialog, showDialog, configSettings, isDataLoaded, settings, selectedViewIdx, showUserLocationChecked, isShowSameLocationDetails } = this.state;
-    const mapKey = window.dtable.dtableGoogleMapKey;
+    const mapKey = this.mapKey;
     const { useGeocoder } = this.mapInstance;
     if (!showDialog) return null;
     return (

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import intl from 'react-intl-universal';
 import 'leaflet.markercluster/dist/leaflet.markercluster-src';
 import { toaster } from 'dtable-ui-component';
-import '../locale';
+import pluginContext from '../plugin-context';
 import LocationSettings from '../components/location-settings';
 import Loading from '../components/loading';
 import ViewTabs from '../components/view-tabs';
@@ -20,7 +20,6 @@ import {
 import logo from '../image/map.png';
 import { eventBus } from '../utils/event-bus';
 import LocationDetailList from '../components/location-detail-list';
-import pluginContext from '../plugin-context';
 import { GoogleMap } from '../map/google-map';
 
 import '../app.css';
@@ -48,7 +47,8 @@ class App extends React.Component {
     this.markers = [];
     this.timer = null;
     this.clusterMarkers = null;
-    this.mapInstance = new GoogleMap({ mapKey: window.dtable.dtableGoogleMapKey, errorHandler: toaster.danger });
+    this.mapKey = pluginContext.getSetting('dtableGoogleMapKey');
+    this.mapInstance = new GoogleMap({ mapKey: this.mapKey, errorHandler: toaster.danger });
   }
 
   async componentDidMount() {
@@ -437,7 +437,7 @@ class App extends React.Component {
 
   render() {
     const { isDataLoaded, showSettingDialog, configSettings, isFullScreen, showDialog, settings, selectedViewIdx, showLocationDetail, showUserLocationChecked } = this.state;
-    const mapKey = window.dtable.dtableGoogleMapKey;
+    const mapKey = this.mapKey;
     const { sameLocationList, useGeocoder } = this.mapInstance;
 
     if (!showDialog) return '';
