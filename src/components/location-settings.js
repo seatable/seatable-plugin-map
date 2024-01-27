@@ -2,7 +2,6 @@ import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import LocationSettingsItem from './local-settings-widgets/location-settings-item';
 import intl from 'react-intl-universal';
-import '../locale/index.js';
 import { getTableByName, getViewByName, getViewShownColumns } from 'dtable-utils';
 import { FieldDisplaySetting, DTableSwitch } from 'dtable-ui-component';
 import { MAP_MODE, SETTING_TITLE } from '../constants.js';

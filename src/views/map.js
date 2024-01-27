@@ -2,27 +2,29 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import intl from 'react-intl-universal';
 import 'leaflet.markercluster/dist/leaflet.markercluster-src';
+import { toaster } from 'dtable-ui-component';
+import '../locale';
 import LocationSettings from '../components/location-settings';
 import Loading from '../components/loading';
-import { getLocations } from '../utils/location-utils';
 import ViewTabs from '../components/view-tabs';
+import { getLocations } from '../utils/location-utils';
 import { generateSettingsByConfig } from '../utils/generate-settings-config';
 import {  replaceSettingItem, setSelectedViewIds } from '../utils/common-utils';
 import getConfigItemByType from '../utils/get-config-item-by-type';
 import onCapture from '../utils/capture';
-import { toaster } from 'dtable-ui-component';
 import {
   PLUGIN_NAME,
   KEY_SELECTED_VIEW_IDS,
   EVENT_BUS_TYPE
 } from '../constants';
 import logo from '../image/map.png';
-import '../app.css';
-import 'leaflet/dist/leaflet.css';
 import { eventBus } from '../utils/event-bus';
 import LocationDetailList from '../components/location-detail-list';
 import pluginContext from '../plugin-context';
 import { GoogleMap } from '../map/google-map';
+
+import '../app.css';
+import 'leaflet/dist/leaflet.css';
 
 class App extends React.Component {
 

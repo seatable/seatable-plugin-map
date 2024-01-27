@@ -17,14 +17,15 @@ import { IMAGE_PATH,
   EVENT_BUS_TYPE
 } from '../constants';
 import { toaster } from 'dtable-ui-component';
-import MobileLocationDetailList from '../components/mobile/mobile-location-detail-list';
 import '../locale';
+import MobileLocationDetailList from '../components/mobile/mobile-location-detail-list';
 import logo from '../image/map.png';
-import styles from '../css/mobile-en.module.css';
-import 'leaflet/dist/leaflet.css';
 import pluginContext from '../plugin-context';
 import { GoogleMap } from '../map/google-map'; // Replace './path/to/GoogleMap' with the actual path to the GoogleMap module
 import { eventBus } from '../utils/event-bus';
+
+import styles from '../css/mobile-en.module.css';
+import 'leaflet/dist/leaflet.css';
 
 L.Icon.Default.imagePath = IMAGE_PATH;
 
