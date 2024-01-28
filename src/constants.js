@@ -49,19 +49,6 @@ export const SHOWN_COLUMN_TYPES = [
   CellType.LINK_FORMULA,
 ];
 
-
-// export const SETTING_TITLE = {
-//   SHOW_USER_LOCATION: '显示用户当前位置',
-//   MAP_MODE: '图表类型',
-//   TABLE: '子表',
-//   VIEW: '视图',
-//   GEO_COLUMN: '地址信息字段',
-//   COLOR_COLUMN: '标签颜色来自',
-//   DIECT_SHOWN_COLUMN: '直接显示字段',
-//   HOVER_DISPLAY_COLUMNS: '鼠标悬浮时显示字段',
-//   IMAGE_COLUMN: '图片'
-// };
-
 export const SETTING_TITLE = {
   SHOW_USER_LOCATION: intl.get('Show_user_position'),
   MAP_MODE: intl.get('Map_type'),

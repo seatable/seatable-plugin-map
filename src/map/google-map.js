@@ -384,8 +384,7 @@ export class GoogleMap {
   loadUserAvatarMarker = () => {
     const customIcon = L.divIcon({
       className: 'custom-marker',
-      html: `<div class="plugin-map-en-avatar-marker"><img class='plugin-map-en-avatar' src="${this.userInfo.avatar_url}"></div>`, // 自定义的 HTML 内容
-      iconSize: [20, 20],
+      html: `<div class="plugin-map-en-avatar-marker"><img class='plugin-map-en-avatar' src="${this.userInfo.avatar_url}"></div>`,
       iconAnchor: [10, 10]
     });
 
@@ -393,7 +392,7 @@ export class GoogleMap {
   };
 
   getUserLocation = () => {
-    if (!navigator.geolocation) return Promise.reject('浏览器不支持定位');
+    if (!navigator.geolocation) return Promise.reject(intl.get('Not_support_geo'));
     // use GPS
     const getOptions = { enableHighAccuracy: true };
     return new Promise((resolve, reject) => {

@@ -2,6 +2,7 @@ const fr = {
   "Map_plugin": "Carte",
   "Map_type": "Map type",
   "Default_map": "Default map",
+  "Default_view": "Default View",
   "Image_map": "Image map",
   "The_map_plugin_is_not_properly_configured_contact_the_administrator": "The map plugin is not properly configured. Contact the administrator.",
   "Table": "Tableau",
@@ -32,7 +33,8 @@ const fr = {
   "Hide_all": 'Masquer tout',
   "Records": "Enregistrements",
   "Back": "Retour",
-  "Total_records": "Total de {num} enregistrements"
+  "Total_records": "Total de {num} enregistrements",
+  "Not_support_geo":'Le navigateur ne prend pas en charge la géolocalisation.'
 };
 
 export default fr;

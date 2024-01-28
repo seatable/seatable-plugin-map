@@ -2,6 +2,7 @@ const de = {
   "Map_plugin": "Map",
   "Map_type": "Map type",
   "Default_map": "Default map",
+  "Default_view": "Default View",
   "Image_map": "Image map",
   "The_map_plugin_is_not_properly_configured_contact_the_administrator": "The map plugin is not properly configured. Contact the administrator.",
   "Table": "Tabelle",
@@ -32,7 +33,8 @@ const de = {
   "Hide_all":'Alle ausblenden',
   "Records": "Datensätze",
   "Back": "Zurück",
-  "Total_records":"{num} insgesamt"
+  "Total_records":"{num} insgesamt",
+  "Not_support_geo":'Der Browser unterstützt keine Geolokalisierung.'
 };
 
 export default de;

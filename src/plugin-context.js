@@ -293,10 +293,10 @@ class PluginContext {
   };
 
   getBubbleSetting = (size = 1) => {
-    return { name: '气泡大小', value: size, type: 'bubble_size' };
+    return { name: intl.get('Bubble_size'), value: size, type: 'bubble_size' };
   };
 
-  getInitSettingItem = (name = '默认视图') => {
+  getInitSettingItem = (name = intl.get('Default_view')) => {
     let activeTable = window.dtableSDK.getActiveTable();
     let activeView = window.dtableSDK.getActiveView();
     const shownColumns = this.getViewShowColumns(activeTable, activeView);
@@ -333,10 +333,9 @@ class PluginContext {
   getMarkerHoverSettings = ( currentTable, currentView, locationColumn, hoverDisplayColumns) => {
     if (hoverDisplayColumns) {
       return { type: 'hover_display_columns', name: SETTING_TITLE.HOVER_DISPLAY_COLUMNS, settings: hoverDisplayColumns };
-    } else {
-      const initialHoverDisplayColumns = this.getViewShowColumns(currentTable, currentView, locationColumn);
-      return { type: 'hover_display_columns', name: SETTING_TITLE.HOVER_DISPLAY_COLUMNS, settings: initialHoverDisplayColumns };
     }
+    const initialHoverDisplayColumns = this.getViewShowColumns(currentTable, currentView, locationColumn);
+    return { type: 'hover_display_columns', name: SETTING_TITLE.HOVER_DISPLAY_COLUMNS, settings: initialHoverDisplayColumns };
   };
 
   getMapSetting = (mapType = MAP_MODE.DEFAULT) => {
@@ -452,7 +451,6 @@ class PluginContext {
       active,
     };
   };
-
 
   getDirectShownColumnSetting = (currentTable, currentView, activeColumn = null) => {
     let columns = getViewShownColumns(currentView, currentTable.columns);

@@ -2,6 +2,7 @@ const zh_CN = {
   "Map_plugin": "地图插件",
   "Map_type": "图表类型",
   "Default_map": "普通地图",
+  "Default_view": "默认视图",
   "Image_map": "图片地图",
   "The_map_plugin_is_not_properly_configured_contact_the_administrator": "地图插件配置不正确。请与管理员联系。",
   "Table": "表格",
@@ -32,7 +33,8 @@ const zh_CN = {
   "Hide_all":'隐藏全部',
   "Records": "记录",
   "Back":"返回",
-  'Total_records':'共有{num}条'
+  'Total_records':'共有{num}条',
+  "Not_support_geo": "当前浏览器不支持定位"
 };
 
 export default zh_CN;

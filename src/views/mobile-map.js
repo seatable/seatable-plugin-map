@@ -11,20 +11,21 @@ import { generateSettingsByConfig } from '../utils/generate-settings-config';
 import {  replaceSettingItem, setSelectedViewIds } from '../utils/common-utils';
 import onCapture from '../utils/capture';
 import getConfigItemByType from '../utils/get-config-item-by-type';
+import { toaster } from 'dtable-ui-component';
 import { IMAGE_PATH,
   PLUGIN_NAME,
   KEY_SELECTED_VIEW_IDS,
   EVENT_BUS_TYPE
 } from '../constants';
-import { toaster } from 'dtable-ui-component';
 import MobileLocationDetailList from '../components/mobile/mobile-location-detail-list';
 import '../locale';
 import logo from '../image/map.png';
+import pluginContext from '../plugin-context';
+import { GoogleMap } from '../map/google-map';
+import { eventBus } from '../utils/event-bus';
+
 import styles from '../css/mobile-en.module.css';
 import 'leaflet/dist/leaflet.css';
-import pluginContext from '../plugin-context';
-import { GoogleMap } from '../map/google-map'; // Replace './path/to/GoogleMap' with the actual path to the GoogleMap module
-import { eventBus } from '../utils/event-bus';
 
 L.Icon.Default.imagePath = IMAGE_PATH;
 
@@ -314,7 +315,6 @@ class App extends React.Component {
     });
 
   };
-
 
   toggleAllColumns = (isSelectAll) => {
     this.resetLocationDetails();

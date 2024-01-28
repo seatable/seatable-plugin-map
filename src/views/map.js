@@ -17,12 +17,13 @@ import {
   EVENT_BUS_TYPE
 } from '../constants';
 import logo from '../image/map.png';
-import '../app.css';
-import 'leaflet/dist/leaflet.css';
 import { eventBus } from '../utils/event-bus';
 import LocationDetailList from '../components/location-detail-list';
 import pluginContext from '../plugin-context';
 import { GoogleMap } from '../map/google-map';
+
+import '../app.css';
+import 'leaflet/dist/leaflet.css';
 
 class App extends React.Component {
 
@@ -355,8 +356,6 @@ class App extends React.Component {
       window.dtableSDK.updatePluginSettings(PLUGIN_NAME, settings);
     });
   };
-
-
 
   onColumnItemClick = (column, value) => {
     // this.resetLocationDetails();
