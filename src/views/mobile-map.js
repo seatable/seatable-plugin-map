@@ -241,8 +241,9 @@ class App extends React.Component {
   };
 
   onSaveSetting = () => {
-    let { selectedViewIdx, configSettings } = this.state;
+    let { selectedViewIdx, configSettings, showUserLocationChecked } = this.state;
     const settingItem = generateSettingsByConfig(configSettings, this.state.settings[selectedViewIdx]);
+    settingItem.showUserLocation = showUserLocationChecked;
     const settings = replaceSettingItem(this.state.settings, settingItem, selectedViewIdx);
     this.setState({ showSettingDialog: !this.state.showSettingDialog }, () => {
       window.dtableSDK.updatePluginSettings(PLUGIN_NAME, settings);
