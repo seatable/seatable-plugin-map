@@ -61,7 +61,7 @@ export class GoogleMap {
   };
 
   async renderMap(locations, showUserLocation) {
-    const lang = (window.dtable && window.dtable.lang) ? window.dtable.lang : 'en';
+    const lang = pluginContext.getLanguage();
     const url = `http://mt0.google.com/vt/lyrs=m@160000000&hl=${lang}&gl=${lang}&src=app&y={y}&x={x}&z={z}&s=Ga`;
     if (!document.getElementById('map-container')) return;
     window.L = L;
@@ -358,7 +358,7 @@ export class GoogleMap {
     if (!this.geocoder) {
       this.geocoder = new window.google.maps.Geocoder();
     }
-    const lang = (window.dtable && window.dtable.lang) ? window.dtable.lang : 'en';
+    const lang = pluginContext.getLanguage();
     let res = { results: [] };
     try {
       res = await this.geocoder.geocode({ 'location': latlng, language: lang });
