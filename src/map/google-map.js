@@ -63,7 +63,7 @@ export class GoogleMap {
   async renderMap(locations, showUserLocation) {
     const lang = pluginContext.getLanguage();
     const url = `http://mt0.google.com/vt/lyrs=m@160000000&hl=${lang}&gl=${lang}&src=app&y={y}&x={x}&z={z}&s=Ga`;
-    if (!document.getElementById('map-container')) return;
+    if (!document.getElementsByClassName('map-container')) return;
     window.L = L;
     const { position, zoom } = await getInitialMapCenter(locations, this.geocoder);
     if (!this.map) {
@@ -285,7 +285,8 @@ export class GoogleMap {
 
     const tooltipLabelContent = generateLabelContent(location);
     let myIcon;
-    if (mapMode === MAP_MODE.DEFAULT) {
+    console.log(MAP_MODE.DEFAULT);
+    if (mapMode === MAP_MODE.DEFAULT || mapMode === 'Default map') {
       if (color) {
         const colorIndex = COLORS.findIndex((item) => color === item.COLOR);
         if (colorIndex > -1) {
@@ -335,6 +336,9 @@ export class GoogleMap {
         marker.on('click', () => {
           eventBus.dispatch(EVENT_BUS_TYPE.SHOW_LOCATION_DETAILS, marker.getLatLng());
         });
+        this.map.addEventListener('click', () => {
+          eventBus.dispatch(EVENT_BUS_TYPE.CLOSE_LOCATION_DETAILS);
+        });
       }
 
       this.markers.push(marker);
@@ -343,10 +347,10 @@ export class GoogleMap {
   };
 
   addPanByHandler = () => {
-    const up = document.getElementById('up-arrow');
-    const down = document.getElementById('down-arrow');
-    const left = document.getElementById('left-arrow');
-    const right = document.getElementById('right-arrow');
+    const up = document.getElementsByClassName('up-hover')[0];
+    const down = document.getElementsByClassName('down-hover')[0];
+    const left = document.getElementsByClassName('left-hover')[0];
+    const right = document.getElementsByClassName('right-hover')[0];
     up.onclick = () => {this.map.panBy([0, -100]);};
     down.onclick = () => this.map.panBy([0, 100]);
     left.onclick = () => this.map.panBy([-100, 0]);

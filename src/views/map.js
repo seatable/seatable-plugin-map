@@ -476,10 +476,14 @@ class App extends React.Component {
           {mapKey && (
             <div className="App dtable-map-plugin">
               <div className='control-panel'>
-                <div id='up-arrow'></div>
-                <div id='down-arrow'></div>
-                <div id='left-arrow'></div>
-                <div id='right-arrow'></div>
+                <div class='up-hover sector'></div>
+                <div class='down-hover sector'></div>
+                <div class='left-hover sector'></div>
+                <div class='right-hover sector'></div>
+                <div id='up-arrow' className='arrow'></div>
+                <div id='down-arrow' className='arrow'></div>
+                <div id='left-arrow' className='arrow' ></div>
+                <div id='right-arrow' className='arrow'></div>
               </div>
               <div id="map-container" className="map-container"></div>
             </div>

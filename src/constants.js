@@ -50,7 +50,7 @@ export const SHOWN_COLUMN_TYPES = [
 ];
 
 export const SETTING_TITLE = {
-  SHOW_USER_LOCATION: intl.get('Show_user_position'),
+  SHOW_USER_LOCATION: intl.get('Show_user_location'),
   MAP_MODE: intl.get('Map_type'),
   TABLE: intl.get('Table'),
   VIEW: intl.get('View'),

@@ -18,7 +18,6 @@ import { IMAGE_PATH,
   KEY_SELECTED_VIEW_IDS,
   EVENT_BUS_TYPE
 } from '../constants';
-import { toaster } from 'dtable-ui-component';
 import '../locale';
 import MobileLocationDetailList from '../components/mobile/mobile-location-detail-list';
 import logo from '../image/map.png';
