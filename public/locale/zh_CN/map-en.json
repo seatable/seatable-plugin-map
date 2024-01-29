@@ -25,6 +25,6 @@
   "Submit": "提交",
   "Default_View": "默认视图",
   "Row_color": "行颜色",
-  "Show_user_location":"显示用户当前位置",
-  "Hover_display_field":"鼠标悬浮时展示字段"
+  "Show_user_location": "展示用户当前位置",
+  "Hover_display_field": "鼠标悬浮时展示字段"
 }

@@ -24,5 +24,7 @@
   "Name_is_required": "O nome é obrigatório",
   "Submit": "EnvI",
   "Default_View": "Modo de Exibição Padrão",
-  "Row_color": "Cor da linha"
+  "Row_color": "Cor da linha",
+  "Show_user_location": "Show user's Location",
+  "Hover_display_field": "Hover display field"
 }

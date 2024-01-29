@@ -24,5 +24,7 @@
   "Name_is_required": "Имя обязательно",
   "Submit": "Сохранить",
   "Default_View": "Вид по умолчанию",
-  "Row_color": "Цвет строки"
+  "Row_color": "Цвет строки",
+  "Show_user_location": "Show user's Location",
+  "Hover_display_field": "Hover display field"
 }

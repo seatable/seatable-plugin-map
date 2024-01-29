@@ -2,7 +2,6 @@ const en = {
   "Map_plugin": "Map plugin",
   "Map_type": "Map type",
   "Default_map": "Default map",
-  "Default_view": "Default View",
   "Image_map": "Image map",
   "The_map_plugin_is_not_properly_configured_contact_the_administrator": "The map plugin is not properly configured. Contact the administrator.",
   "Table": "Table",
@@ -26,16 +25,8 @@ const en = {
   "Submit": "Submit",
   "Default_View": "Default View",
   "Row_color": "Row color",
-  "Show_user_location": "Show user's Current Location",
-  "Hover_display_field": "Hover Display Field",
-  'Field': 'Field',
-  "Display_all": 'Display All',
-  "Hide_all": 'Hide All',
-  "Records": "Records",
-  "Back":"Back",
-  "Total_records":"{num} in total",
-  "Not_support_geo":'Current browser does not support geolocation.',
-  'others': 'others'
+  "Show_user_location": "Show user's Location",
+  "Hover_display_field": "Hover display field"
 };
 
 export default en;

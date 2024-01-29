@@ -24,5 +24,7 @@
   "Name_is_required": "Nombre necesario",
   "Submit": "Enviar",
   "Default_View": "Vista por defecto",
-  "Row_color": "Color de fila"
+  "Row_color": "Color de fila",
+  "Show_user_location": "Show user's Location",
+  "Hover_display_field": "Hover display field"
 }
