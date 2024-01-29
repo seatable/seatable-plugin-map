@@ -34,7 +34,8 @@ const zh_CN = {
   "Records": "记录",
   "Back":"返回",
   'Total_records':'共有{num}条',
-  "Not_support_geo": "当前浏览器不支持定位"
+  "Not_support_geo": "当前浏览器不支持定位",
+  'others': '其他'
 };
 
 export default zh_CN;

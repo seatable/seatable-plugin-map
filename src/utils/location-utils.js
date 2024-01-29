@@ -282,9 +282,9 @@ export const getDetailLocation = (locationItem) => {
 
   // location is an object
   const { province, city, district, detail } = location || {};
-  const newProvince = (province && province !== '其他') ? province : '';
-  const newCity = (city && city !== '其他') ? city : '';
-  const newDistrict = (district && district !== '其他') ? district : '';
+  const newProvince = (province && province !== intl.get('others')) ? province : '';
+  const newCity = (city && city !== intl.get('others')) ? city : '';
+  const newDistrict = (district && district !== intl.get('others')) ? district : '';
   const newDetail = detail ? detail : '';
 
   return `${newProvince}${newCity}${newDistrict}${newDetail}`;
@@ -298,7 +298,7 @@ export const getSimpleLocation = (locationItem) => {
   }
 
   const { district, detail } = location || {};
-  const newDistrict = (district && district !== '其他') ? district : '';
+  const newDistrict = (district && district !== intl.get('others')) ? district : '';
   const newDetail = detail ? detail : '';
 
   return `${newDistrict}${newDetail}`;
@@ -320,7 +320,7 @@ export const getCityLocation = (locationItem) => {
   if (locationItem.type === 'province') {
     newCity = PROVINCIAL_CAPITAL[province] || '';
   } else {
-    newCity = (city && city !== '其他') ? city : '';
+    newCity = (city && city !== intl.get('others')) ? city : '';
   }
   return newCity;
 };

@@ -34,7 +34,8 @@ const en = {
   "Records": "Records",
   "Back":"Back",
   "Total_records":"{num} in total",
-  "Not_support_geo":'Current browser does not support geolocation.'
+  "Not_support_geo":'Current browser does not support geolocation.',
+  'others': 'others'
 };
 
 export default en;

@@ -34,7 +34,8 @@ const de = {
   "Records": "Datensätze",
   "Back": "Zurück",
   "Total_records":"{num} insgesamt",
-  "Not_support_geo":'Der Browser unterstützt keine Geolokalisierung.'
+  "Not_support_geo":'Der Browser unterstützt keine Geolokalisierung.',
+  'others': 'Andere'
 };
 
 export default de;

@@ -34,7 +34,8 @@ const fr = {
   "Records": "Enregistrements",
   "Back": "Retour",
   "Total_records": "Total de {num} enregistrements",
-  "Not_support_geo":'Le navigateur ne prend pas en charge la géolocalisation.'
+  "Not_support_geo":'Le navigateur ne prend pas en charge la géolocalisation.',
+  'others': 'autres'
 };
 
 export default fr;
