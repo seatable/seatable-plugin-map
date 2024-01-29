@@ -16,6 +16,7 @@ import intl from 'react-intl-universal';
 import { eventBus } from '../utils/event-bus';
 import pluginContext from '../plugin-context';
 import { getTableColumnByName } from 'dtable-utils';
+import { createLeafletLocationControl } from './locate-control';
 import './user-avatar.css';
 
 L.Icon.Default.imagePath = IMAGE_PATH;
@@ -79,6 +80,17 @@ export class GoogleMap {
         maxZoom: 18,
         minZoom: 2
       }).addTo(this.map);
+
+      const handleLocate = (error, location) => {
+        if (error) {
+          this.errorHandler(error.message);
+          return;
+        }
+        this.map.flyTo(location, 7, { animiate: true, duration: 1 });
+      };
+      const GeolocationControl = createLeafletLocationControl(handleLocate);
+      const controller = new GeolocationControl();
+      controller.setPosition('bottomright').addTo(this.map);
     }
 
     if (showUserLocation) {
@@ -285,7 +297,6 @@ export class GoogleMap {
 
     const tooltipLabelContent = generateLabelContent(location);
     let myIcon;
-    console.log(MAP_MODE.DEFAULT);
     if (mapMode === MAP_MODE.DEFAULT || mapMode === 'Default map') {
       if (color) {
         const colorIndex = COLORS.findIndex((item) => color === item.COLOR);
