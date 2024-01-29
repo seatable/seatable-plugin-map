@@ -1,8 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import DTable from 'dtable-sdk';
-import './setting';
 import './locale';
+import './setting';
 import App from './app';
 
 import './index.css';
@@ -20,6 +20,7 @@ class TaskList {
     };
     await dtableSDK.init(window.dtablePluginConfig);
     await dtableSDK.syncWithServer();
+    await dtableSDK.dtableWebAPI.login();
 
     window.app.collaborators = dtableSDK.dtableStore.collaborators;
     window.app.collaboratorsCache = {};

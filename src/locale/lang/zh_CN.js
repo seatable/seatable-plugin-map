@@ -2,6 +2,7 @@ const zh_CN = {
   "Map_plugin": "地图插件",
   "Map_type": "图表类型",
   "Default_map": "普通地图",
+  "Default_view": "默认视图",
   "Image_map": "图片地图",
   "The_map_plugin_is_not_properly_configured_contact_the_administrator": "地图插件配置不正确。请与管理员联系。",
   "Table": "表格",
@@ -24,7 +25,17 @@ const zh_CN = {
   "Name_is_required": "名称必须存在",
   "Submit": "提交",
   "Default_View": "默认视图",
-  "Row_color": "行颜色"
+  "Row_color": "行颜色",
+  "Show_user_location":"展示用户当前位置",
+  "Hover_display_field":"鼠标悬浮时展示字段",
+  'Field':'字段',
+  "Display_all":'展示全部',
+  "Hide_all":'隐藏全部',
+  "Records": "记录",
+  "Back":"返回",
+  'Total_records':'共有{num}条',
+  "Not_support_geo": "当前浏览器不支持定位",
+  'others': '其他'
 };
 
 export default zh_CN;

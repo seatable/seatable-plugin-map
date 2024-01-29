@@ -2,6 +2,7 @@ const de = {
   "Map_plugin": "Map",
   "Map_type": "Map type",
   "Default_map": "Default map",
+  "Default_view": "Default View",
   "Image_map": "Image map",
   "The_map_plugin_is_not_properly_configured_contact_the_administrator": "The map plugin is not properly configured. Contact the administrator.",
   "Table": "Tabelle",
@@ -24,7 +25,17 @@ const de = {
   "Name_is_required": "Der Name ist erforderlich.",
   "Submit": "Absenden",
   "Default_View": "Standardansicht",
-  "Row_color": "Zeilenfarbe"
+  "Row_color": "Zeilenfarbe",
+  "Show_user_location":"Zeige die Position des Benutzers",
+  "Hover_display_field":"Hover-Anzeigefeld",
+  'Field':'Feld',
+  "Display_all":'Alle anzeigen',
+  "Hide_all":'Alle ausblenden',
+  "Records": "Datensätze",
+  "Back": "Zurück",
+  "Total_records":"{num} insgesamt",
+  "Not_support_geo":'Der Browser unterstützt keine Geolokalisierung.',
+  'others': 'Andere'
 };
 
 export default de;

@@ -3,8 +3,9 @@
   "version": "0.0.38",
   "private": true,
   "dependencies": {
+    "@googlemaps/js-api-loader": "^1.16.2",
     "dtable-ui-component": "4.3.3",
-    "dtable-utils": "4.3.5",
+    "dtable-utils": "4.3.9",
     "html2canvas": "^1.4.1",
     "leaflet": "^1.6.0",
     "leaflet.markercluster": "^1.5.3",

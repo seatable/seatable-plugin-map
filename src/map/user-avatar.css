@@ -1,0 +1,14 @@
+.plugin-map-en-avatar-marker {
+    background-image: url(../image/map-icon/marker.png);
+    width: 25px;
+    height: 41px;
+    position: absolute;
+    background-size: cover;
+    padding: 2.5px 0px 0px 2.5px;
+}
+
+.plugin-map-en-avatar {
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+}

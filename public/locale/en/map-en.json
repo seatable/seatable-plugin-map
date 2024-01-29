@@ -24,5 +24,7 @@
   "Name_is_required": "Name is required",
   "Submit": "Submit",
   "Default_View": "Default View",
-  "Row_color": "Row color"
+  "Row_color": "Row color",
+  "Show_user_location":"Show user's Location",
+  "Hover_display_field":"Hover Display Field"
 }

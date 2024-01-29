@@ -2,6 +2,7 @@ const fr = {
   "Map_plugin": "Carte",
   "Map_type": "Map type",
   "Default_map": "Default map",
+  "Default_view": "Default View",
   "Image_map": "Image map",
   "The_map_plugin_is_not_properly_configured_contact_the_administrator": "The map plugin is not properly configured. Contact the administrator.",
   "Table": "Tableau",
@@ -24,7 +25,17 @@ const fr = {
   "Name_is_required": "Le nom est nécessaire.",
   "Submit": "Soumettre",
   "Default_View": "Vue standard",
-  "Row_color": "Couleur de la ligne"
+  "Row_color": "Couleur de la ligne",
+  "Show_user_location": "Afficher l'emplacement de l'utilisateur",
+  "Hover_display_field": "Champ d'affichage au survol",
+  'Field': 'Champ',
+  "Display_all": 'Afficher tout',
+  "Hide_all": 'Masquer tout',
+  "Records": "Enregistrements",
+  "Back": "Retour",
+  "Total_records": "Total de {num} enregistrements",
+  "Not_support_geo":'Le navigateur ne prend pas en charge la géolocalisation.',
+  'others': 'autres'
 };
 
 export default fr;
