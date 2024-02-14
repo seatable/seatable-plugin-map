@@ -147,7 +147,7 @@ class App extends React.Component {
 
   async renderMap() {
     let lang = pluginContext.getLanguage();
-    let url = `http://mt0.google.com/vt/lyrs=m@160000000&hl=${lang}&gl=${lang}&src=app&y={y}&x={x}&z={z}&s=Ga`;
+    let url = `https://mt0.google.com/vt/lyrs=m@160000000&hl=${lang}&gl=${lang}&src=app&y={y}&x={x}&z={z}&s=Ga`;
     if (!document.getElementById('map-container')) return;
     window.L = L;
     const { position, zoom } = await getInitialMapCenter(this.state.locations, this.geocoder);
