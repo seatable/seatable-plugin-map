@@ -63,7 +63,7 @@ export class GoogleMap {
 
   async renderMap(locations, showUserLocation) {
     const lang = pluginContext.getLanguage();
-    const url = `http://mt0.google.com/vt/lyrs=m@160000000&hl=${lang}&gl=${lang}&src=app&y={y}&x={x}&z={z}&s=Ga`;
+    const url = `https://mt0.google.com/vt/lyrs=m@160000000&hl=${lang}&gl=${lang}&src=app&y={y}&x={x}&z={z}&s=Ga`;
     if (!document.getElementsByClassName('map-container')) return;
     window.L = L;
     const { position, zoom } = await getInitialMapCenter(locations, this.geocoder);
