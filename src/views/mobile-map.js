@@ -396,7 +396,7 @@ class App extends React.Component {
   };
 
   onAddView = (name) => {
-    const view = this.getInitSettingItem(name);
+    const view = pluginContext.getInitSettingItem(name);
     const { settings } = this.state;
     settings.push(view);
     const selectedViewIdx = settings.length - 1;

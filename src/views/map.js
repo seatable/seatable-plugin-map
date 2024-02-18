@@ -318,7 +318,7 @@ class App extends React.Component {
     const settingItem = settings[index];
     const configSettings = pluginContext.initSelectedSettings(settingItem);
     setSelectedViewIds(KEY_SELECTED_VIEW_IDS, index);
-    const locations = getLocations(window.dtableSDK, configSettings);
+    const locations = this.getLocations(configSettings);
     this.setState({
       configSettings,
       selectedViewIdx: index,
