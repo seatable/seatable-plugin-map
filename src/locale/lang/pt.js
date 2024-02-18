@@ -1,0 +1,32 @@
+const pt = {
+  "Map_plugin": "Plugin de mapa",
+  "Map_type": "Map type",
+  "Default_map": "Default map",
+  "Image_map": "Image map",
+  "The_map_plugin_is_not_properly_configured_contact_the_administrator": "The map plugin is not properly configured. Contact the administrator.",
+  "Table": "Tabela",
+  "View": "Vista",
+  "Address_field": "Campo de endereço",
+  "Settings": "Configurações",
+  "Your_Google_Maps_key_has_exceeded_quota": "Sua chave do Google Maps excedeu a cota.",
+  "address_was_not_found": "{address} was not found.",
+  "Not_used": "Não utilizado",
+  "Marker_colored_by": "Marker colored by",
+  "Cancel": "Cancelar",
+  "Save": "Salvar",
+  "Please_select": "Please select",
+  "Display_field": "Display field",
+  "Image_field": "Image field",
+  "New_view": "Nova vista",
+  "Rename_view": "Renomear modo de exibição",
+  "Delete_view": "Excluir modo de exibição",
+  "Name": "Nome",
+  "Name_is_required": "O nome é obrigatório",
+  "Submit": "EnvI",
+  "Default_View": "Modo de Exibição Padrão",
+  "Row_color": "Cor da linha",
+  "Show_user_location": "Show user's Location",
+  "Hover_display_field": "Hover display field"
+};
+
+export default pt;

@@ -25,8 +25,8 @@ const de = {
   "Submit": "Absenden",
   "Default_View": "Standardansicht",
   "Row_color": "Zeilenfarbe",
-  "Show_user_location": "Show user's Location",
-  "Hover_display_field": "Hover display field"
+  "Show_user_location": "Ort des Benutzers anzeigen",
+  "Hover_display_field": "Anzeigefeld beim Drüberfahren"
 };
 
 export default de;

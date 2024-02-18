@@ -25,8 +25,8 @@ const fr = {
   "Submit": "Soumettre",
   "Default_View": "Vue standard",
   "Row_color": "Couleur de la ligne",
-  "Show_user_location": "Show user's Location",
-  "Hover_display_field": "Hover display field"
+  "Show_user_location": "Afficher l'emplacement de l'utilisateur",
+  "Hover_display_field": "Champ d'affichage en survol"
 };
 
 export default fr;
