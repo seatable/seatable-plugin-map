@@ -385,7 +385,7 @@ class App extends React.Component {
   onSelectView = (index) => {
     const { settings } = this.state;
     const settingItem = settings[index];
-    const configSettings = this.initSelectedSettings(settingItem);
+    const configSettings = pluginContext.initSelectedSettings(settingItem);
     setSelectedViewIds(KEY_SELECTED_VIEW_IDS, index);
     const locations = this.getLocations(configSettings);
     this.setState({
