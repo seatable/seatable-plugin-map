@@ -25,6 +25,9 @@ const ru = {
   "Submit": "Сохранить",
   "Default_View": "Вид по умолчанию",
   "Row_color": "Цвет строки",
+  "Display_all": "Display all",
+  "Hide_all": "Hide all",
+  "Field": "Field",
   "Show_user_location": "Show user's Location",
   "Hover_display_field": "Hover display field"
 };

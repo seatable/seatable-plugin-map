@@ -25,6 +25,9 @@
   "Submit": "Submit",
   "Default_View": "Default View",
   "Row_color": "Row color",
+  "Display_all": "Display all",
+  "Hide_all": "Hide all",
+  "Field": "Field",
   "Show_user_location": "Show user's Location",
   "Hover_display_field": "Hover display field"
 }
