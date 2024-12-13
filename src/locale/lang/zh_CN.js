@@ -25,6 +25,9 @@ const zh_CN = {
   "Submit": "提交",
   "Default_View": "默认视图",
   "Row_color": "行颜色",
+  "Display_all": "展示所有",
+  "Hide_all": "隐藏所有",
+  "Field": "字段",
   "Show_user_location": "展示用户当前位置",
   "Hover_display_field": "鼠标悬浮时展示字段"
 };

@@ -25,6 +25,9 @@
   "Submit": "Absenden",
   "Default_View": "Standardansicht",
   "Row_color": "Zeilenfarbe",
+  "Display_all": "Display all",
+  "Hide_all": "Hide all",
+  "Field": "Field",
   "Show_user_location": "Ort des Benutzers anzeigen",
   "Hover_display_field": "Anzeigefeld beim Drüberfahren"
 }
