@@ -10,7 +10,6 @@ const pt = {
   "Settings": "Configurações",
   "Your_Google_Maps_key_has_exceeded_quota": "Sua chave do Google Maps excedeu a cota.",
   "address_was_not_found": "{address} was not found.",
-  "Not_used": "Não utilizado",
   "Marker_colored_by": "Marker colored by",
   "Cancel": "Cancelar",
   "Save": "Salvar",

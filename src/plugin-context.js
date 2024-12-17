@@ -263,16 +263,16 @@ class PluginContext {
         const viewName = getConfigItemByType(configSettings, 'view').active;
         let currentTable = getTableByName(tables, tableName);
         let currentView = getViewByName(currentTable.views, viewName);
-        let columnSetting = this.getMarkColumnSetting(currentTable, currentView, option.name);
+        let columnSetting = this.getMarkColumnSetting(currentTable, currentView, option?.name);
         replaceSettingItemByType(configSettings, 'mark_dependence', columnSetting);
         return configSettings;
       }
-      case CONFIG_TYPE.DIECT_SHOWN_COLUMN: {
+      case CONFIG_TYPE.DIRECT_SHOWN_COLUMN: {
         const tableName = getConfigItemByType(configSettings, 'table').active;
         const viewName = getConfigItemByType(configSettings, 'view').active;
         let currentTable = getTableByName(tables, tableName);
         let currentView = getViewByName(currentTable.views, viewName);
-        let column = getTableColumnByName(currentTable, option.name);
+        let column = getTableColumnByName(currentTable, option?.name);
         let directShownColumnSetting = this.getDirectShownColumnSetting(currentTable, currentView, column);
         replaceSettingItemByType(configSettings, 'direct_shown_column', directShownColumnSetting);
         return configSettings;
@@ -282,7 +282,7 @@ class PluginContext {
         const viewName = getConfigItemByType(configSettings, 'view').active;
         let currentTable = getTableByName(tables, tableName);
         let currentView = getViewByName(currentTable.views, viewName);
-        let column = getTableColumnByName(currentTable, option.name);
+        let column = getTableColumnByName(currentTable, option?.name);
         let imageColumnSetting = this.getImageColumnsSetting(currentTable, currentView, column);
         replaceSettingItemByType(configSettings, CONFIG_TYPE.IMAGE_COLUMN, imageColumnSetting);
         return configSettings;
@@ -430,7 +430,6 @@ class PluginContext {
     return settings;
   };
 
-
   getMarkColumnSetting = (currentTable, currentView, dependence = null) => {
     let columns = getViewShownColumns(currentView, currentTable.columns);
     // need options: checkout map column
@@ -443,11 +442,11 @@ class PluginContext {
     });
 
     let active = '';
-    columnSettings.unshift({ id: 'not_used', name: intl.get('Not_used') }, { id: 'rows_color', name: intl.get('Row_color') });
+    columnSettings.unshift({ id: 'rows_color', name: intl.get('Row_color') });
     if (dependence === 'rows_color') {
       active = intl.get('Row_color');
     } else {
-      active = dependence ? dependence : columnSettings[0].name;
+      active = dependence ? dependence : '';
     }
     return {
       type: 'mark_dependence',
@@ -465,12 +464,11 @@ class PluginContext {
     let columnSettings = columns.map(column => {
       return { id: column.key, name: column.name };
     });
-    columnSettings.unshift({ id: 'not_used', name: intl.get('Not_used') });
     // need options: checkout map column
-    let active = activeColumn ? activeColumn.name : columnSettings[0].name;
+    let active = activeColumn ? activeColumn.name : '';
     return {
       type: 'direct_shown_column',
-      name: SETTING_TITLE.DIECT_SHOWN_COLUMN,
+      name: SETTING_TITLE.DIRECT_SHOWN_COLUMN,
       settings: columnSettings,
       active,
     };
@@ -485,8 +483,7 @@ class PluginContext {
       return { id: column.key, name: column.name };
     });
 
-    columnSettings.unshift({ id: 'not_used', name: intl.get('Not_used') });
-    let active = activeColumn ? activeColumn.name : columnSettings[0].name;
+    let active = activeColumn ? activeColumn.name : '';
     return {
       type: 'image_column',
       name: SETTING_TITLE.IMAGE_COLUMN,

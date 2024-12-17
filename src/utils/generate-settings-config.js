@@ -21,28 +21,23 @@ const SETTING_MIRROR = {
 export const generateSettingsByConfig = (configSettings, currentSettingItem) => {
   const settings = {};
   configSettings.forEach((config) => {
-    if (config.type === 'hover_display_columns') {
-      settings[SETTING_MIRROR[config.type]] = config.settings;
-    } else if (config.type === 'bubble_size') {
-      settings[SETTING_MIRROR[config.type]] = config.value;
-    } else if (config.type === 'mark_dependence') {
+    const { type } = config;
+    if (type === 'hover_display_columns') {
+      settings[SETTING_MIRROR[type]] = config.settings;
+    } else if (type === 'bubble_size') {
+      settings[SETTING_MIRROR[type]] = config.value;
+    } else if (type === 'mark_dependence') {
       let value = config.active;
-      if (config.active === intl.get('Not_used')) {
-        value = null;
-      } else if (config.active === intl.get('Row_color')) {
+      if (config.active === intl.get('Row_color')) {
         value = 'rows_color';
       }
-      settings[SETTING_MIRROR[config.type]] = value;
-    } else if (config.type === 'image_column') {
-      settings[SETTING_MIRROR[config.type]] = config.active;
-    } else if (config.type === 'show_user_location') {
+      settings[SETTING_MIRROR[type]] = value;
+    } else if (type === 'image_column') {
+      settings[SETTING_MIRROR[type]] = config.active;
+    } else if (type === 'show_user_location') {
       return;
-    }  else {
-      let value = config.active;
-      if (value === intl.get('Not_used')){
-        value = null;
-      }
-      settings[SETTING_MIRROR[config.type]] = value;
+    } else {
+      settings[SETTING_MIRROR[type]] = config.active;
     }
   });
   settings.id = currentSettingItem.id;
