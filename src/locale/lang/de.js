@@ -10,7 +10,6 @@ const de = {
   "Settings": "Einstellungen",
   "Your_Google_Maps_key_has_exceeded_quota": "Ihr Google Maps Schlüssel hat seine Quota ausgeschöpft.",
   "address_was_not_found": "{address} wurde nicht gefunden.",
-  "Not_used": "Nicht verwendet",
   "Marker_colored_by": "Farbe des Pins",
   "Cancel": "Abbrechen",
   "Save": "Speichern",

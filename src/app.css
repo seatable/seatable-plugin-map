@@ -217,10 +217,6 @@
   line-height: 14px;
 }
 
-.plugin-map-dialog-en .null-option-name {
-  color: rgba(0, 0, 0, .25) !important;
-}
-
 .plugin-map-dialog-en .address-type-container {
   display: flex;
   height: 36px;

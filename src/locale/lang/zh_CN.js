@@ -10,7 +10,6 @@ const zh_CN = {
   "Settings": "设置",
   "Your_Google_Maps_key_has_exceeded_quota": "您的谷歌地图密钥已超出配额。",
   "address_was_not_found": "{address}没有被找到。",
-  "Not_used": "不使用",
   "Marker_colored_by": "标签颜色来自",
   "Cancel": "取消",
   "Save": "保存",

@@ -20,7 +20,7 @@ export const CONFIG_TYPE = {
   VIEW: 'view',
   COLUMN: 'column',
   MARK_DEPENDENCE: 'mark_dependence',
-  DIECT_SHOWN_COLUMN: 'direct_shown_column',
+  DIRECT_SHOWN_COLUMN: 'direct_shown_column',
   IMAGE_COLUMN: 'image_column'
 };
 
@@ -37,7 +37,6 @@ export const MAP_MODE = {
   IMAGE: intl.get('Image_map')
 };
 
-export const EMPTY_MARK_DEPENDENCE = intl.get('Not_used');
 export const GEOLOCATION_COLUMN_NAME = intl.get('Please_select');
 export const SHOWN_COLUMN_TYPES = [
   CellType.NUMBER,
@@ -56,7 +55,7 @@ export const SETTING_TITLE = {
   VIEW: intl.get('View'),
   GEO_COLUMN: intl.get('Address_field'),
   COLOR_COLUMN: intl.get('Marker_colored_by'),
-  DIECT_SHOWN_COLUMN: intl.get('Display_field'),
+  DIRECT_SHOWN_COLUMN: intl.get('Display_field'),
   HOVER_DISPLAY_COLUMNS: intl.get('Hover_display_field'),
   IMAGE_COLUMN: intl.get('Image_field')
 };
