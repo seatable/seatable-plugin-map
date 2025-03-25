@@ -123,11 +123,11 @@
   border-bottom: 1px solid #e4e4e4;
 }
 
-.plugin-map-dialog-en .btn-close {
+.plugin-map-dialog-en .dtable-icon-x {
   font-weight: 700;
 }
 
-.plugin-map-dialog-en .dtable-plugin-location-settings-header .btn-close:hover {
+.plugin-map-dialog-en .dtable-plugin-location-settings-header .dtable-icon-x:hover {
   opacity: .8;
 }
 

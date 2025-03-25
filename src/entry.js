@@ -1,12 +1,13 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import './locale';
 import App from './app';
 
 class TaskList {
 
   static execute() {
-    ReactDOM.render(<App showDialog />, document.querySelector('#plugin-wrapper'));
+    const root = createRoot(document.getElementById('#plugin-wrapper'));
+    root.render(<App showDialog />);
   }
 
 }
