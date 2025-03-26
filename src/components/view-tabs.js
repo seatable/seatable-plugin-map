@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import ModalPortal from './dialog/modal-portal';
+import { ModalPortal } from 'dtable-ui-component';
 import NewViewDialog from './dialog/new-view-dialog';
 import RenameViewDialog from './dialog/rename-view-dialog';
 import DropdownMenu from './dropdownmenu';

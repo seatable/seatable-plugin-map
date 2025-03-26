@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import '../css/dropdown-menu.css';
 
 const propTypes = {
   dropdownMenuPosition: PropTypes.object,
@@ -18,7 +17,7 @@ class DropdownMenu extends React.Component {
       ...dropdownMenuPosition,
     };
     return (
-      <div className="map-cn-dropdown-menu dropdown-menu large show" style={dropdownMenuStyle}>
+      <div className="dtable-dropdown-menu dropdown-menu large show" style={dropdownMenuStyle}>
         {options || <div className="no-options">{'No_options'}</div>}
       </div>
     );

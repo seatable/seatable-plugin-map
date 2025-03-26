@@ -1,8 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Modal, ModalBody, ModalFooter, Form, FormGroup, Label, Input, Alert, Button } from 'reactstrap';
+import { Modal, ModalBody, ModalHeader, ModalFooter, Form, FormGroup, Label, Input, Alert, Button } from 'reactstrap';
 import intl from 'react-intl-universal';
-import { DTableModalHeader } from 'dtable-ui-component';
 
 const propTypes = {
   onNewViewConfirm: PropTypes.func,
@@ -45,7 +44,7 @@ class NewViewDialog extends React.Component {
   render() {
     return (
       <Modal isOpen={true} toggle={this.toggle} autoFocus={false}>
-        <DTableModalHeader toggle={this.toggle}>{intl.get('New_view')}</DTableModalHeader>
+        <ModalHeader toggle={this.toggle}>{intl.get('New_view')}</ModalHeader>
         <ModalBody>
           <Form>
             <FormGroup>
