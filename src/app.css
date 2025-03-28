@@ -111,6 +111,10 @@
   flex-direction: column;
 }
 
+.plugin-map-dialog-en .dtable-plugin-location-settings .form-label {
+  font-weight: unset;
+}
+
 .plugin-map-dialog-en .dtable-plugin-location-settings-header {
   padding: 0 20px;
 }
