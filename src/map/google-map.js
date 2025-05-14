@@ -1,6 +1,8 @@
 import { Loader } from '@googlemaps/js-api-loader';
 import L from 'leaflet';
-import { renderMarkByPosition, formatGeolocationValue, getInitialMapCenter, generateLabelContent } from '../utils/location-utils';
+import {
+  renderMarkByPosition, formatGeolocationValue, getInitialMapCenter, generateLabelContent, checkIsOverFreeCodingLocations, getRequiredCodingLocations, checkIsOverMaxCodingLocations,
+} from '../utils/location-utils';
 import 'leaflet.markercluster/dist/leaflet.markercluster-src';
 import {
   IMAGE_PATH,
@@ -11,12 +13,14 @@ import {
 } from '../constants';
 import getConfigItemByType from '../utils/get-config-item-by-type';
 import COLORS from '../marker-color';
-import * as image  from '../image/index';
+import * as image from '../image/index';
 import intl from 'react-intl-universal';
 import { eventBus } from '../utils/event-bus';
 import pluginContext from '../plugin-context';
 import { getTableColumnByName } from 'dtable-utils';
 import { createLeafletLocationControl } from './locate-control';
+import { toaster } from 'dtable-ui-component';
+
 import './user-avatar.css';
 
 L.Icon.Default.imagePath = IMAGE_PATH;
@@ -39,6 +43,7 @@ export class GoogleMap {
     this.geocodingLocations = [];
     this.sameLocationList = {};
     this.userInfo = null;
+    this.cachedAddressGeocodingMap = {}; // { [address]: { lat, lng } }
   }
 
   loadMap = async () => {
@@ -51,7 +56,7 @@ export class GoogleMap {
       });
       await loader.load();
       this.geocoder = new window.google.maps.Geocoder();
-    } catch (err){
+    } catch (err) {
       console.log(err);
       let errMessage;
       if (typeof err !== 'string') {
@@ -110,6 +115,17 @@ export class GoogleMap {
       clearTimeout(this.timer);
       this.timer = null;
     }
+
+    const requiredCodingLocations = getRequiredCodingLocations(locations);
+    if (checkIsOverFreeCodingLocations(requiredCodingLocations)) {
+      toaster.danger(intl.get('Exceeded_the_free_locations_limit'));
+      return;
+    }
+    if (checkIsOverMaxCodingLocations(requiredCodingLocations)) {
+      toaster.danger(intl.get('Exceeded_the_max_locations_limit'));
+      return;
+    }
+
     this.geocodingLocations = [];
     const locationItem = locations[0] || {};
     const addressType = locationItem.type;
@@ -144,7 +160,7 @@ export class GoogleMap {
           return L.divIcon({
             html: `
             <div class="map-plugin-custom-image-container">
-              ${markerUrl ? imageElement : '<div class="map-plugin-empty-custom-image-wrapper"></div>' }
+              ${markerUrl ? imageElement : '<div class="map-plugin-empty-custom-image-wrapper"></div>'}
               <span class="map-plugin-custom-image-number">${imgCount}</span>
               <i class='plugin-map-image-label-arrow dtable-font dtable-icon-drop-down'></i>
             </div>
@@ -163,15 +179,15 @@ export class GoogleMap {
     locations.forEach((item) => {
       const row = pluginContext.getRow(currentTable, item.rowId);
       const imageColumn = getTableColumnByName(currentTable, item.imageColumnName);
-      const imageUrlList = imageColumn?.key ? row[imageColumn.key] : [];
+      const imageUrlList = (imageColumn?.key && row[imageColumn.key]) || [];
       item.imgUrl = imageUrlList;
       const { location } = item;
       const { lat, lng } = location;
       if (lng && lat) {
         const imageElement = `<img src=${imageUrlList[0]} width="72" height="72" />`;
-        const htmlString =  `
+        const htmlString = `
           <div class="map-plugin-custom-image-container">
-            ${imageUrlList.length > 0 ? `<span class="map-plugin-custom-image-number">${imageUrlList.length}</span> ${imageElement}` : '<div class="map-plugin-empty-custom-image-wrapper"></div>' }
+            ${imageUrlList.length > 0 ? `<span class="map-plugin-custom-image-number">${imageUrlList.length}</span> ${imageElement}` : '<div class="map-plugin-empty-custom-image-wrapper"></div>'}
             <i class='plugin-map-image-label-arrow dtable-font dtable-icon-drop-down'></i>
           </div>
         `;
@@ -186,6 +202,15 @@ export class GoogleMap {
     });
     this.clusterMarkers.addLayers(list);
     this.map.addLayer(this.clusterMarkers);
+  };
+
+  geocodingCallback = ({ lat, lng, mapMode, currentLocation, locations, index, address, configSettings }) => {
+    if (mapMode === MAP_MODE.IMAGE) {
+      this.geocodingLocations.push({ ...currentLocation, location: { lat, lng } });
+    } else {
+      this.addMarker(currentLocation, lat, lng, address, configSettings);
+    }
+    this.geocoding(locations, 1, ++index, configSettings);
   };
 
   geocoding = (locations, resolutionTimes, index, configSettings) => {
@@ -205,24 +230,36 @@ export class GoogleMap {
       this.geocoding(locations, 1, ++index, configSettings);
       return;
     }
+
     const activeColumn = configSettings[3].active;
     const mapMode = configSettings[0].active;
+
+    // try to geocoding via cache
+    if (this.cachedAddressGeocodingMap[address]) {
+      const { lat, lng } = this.cachedAddressGeocodingMap[address];
+      this.geocodingCallback({
+        lat, lng, mapMode, locations, index, address, configSettings,
+        currentLocation: locationItem,
+      });
+      return;
+    }
+
+    // try to geocoding via google map
     this.geocoder.geocode({ 'address': address }, (points, status) => {
       if (locationItem.columnName !== activeColumn) return;
       switch (status) {
         case window.google.maps.GeocoderStatus.OK: {
-          let lat = points[0].geometry.location.lat();
-          let lng = points[0].geometry.location.lng();
-          if (mapMode === MAP_MODE.IMAGE) {
-            this.geocodingLocations.push({ imgUrl: locationItem.imgUrl, location: { lat, lng } });
-          } else {
-            this.addMarker(locationItem, lat, lng, address, configSettings);
-          }
-          this.geocoding(locations, 1, ++index, configSettings);
+          const lat = points[0].geometry.location.lat();
+          const lng = points[0].geometry.location.lng();
+          this.cachedAddressGeocodingMap[address] = { lat, lng };
+          this.geocodingCallback({
+            lat, lng, mapMode, locations, index, address, configSettings,
+            currentLocation: locationItem,
+          });
           break;
         }
         case window.google.maps.GeocoderStatus.OVER_QUERY_LIMIT: {
-          this.timer =  setTimeout(() => {
+          this.timer = setTimeout(() => {
             clearTimeout(this.timer);
             this.timer = null;
             if (resolutionTimes < 3) {
@@ -293,7 +330,7 @@ export class GoogleMap {
     }
 
     // create only one marker for same location
-    if (existsPoint.length > 1)  return;
+    if (existsPoint.length > 1) return;
 
     const tooltipLabelContent = generateLabelContent(location);
     let myIcon;
@@ -318,6 +355,7 @@ export class GoogleMap {
         });
       }
       let marker = new L.Marker([lat, lng], { icon: myIcon, riseOnHover: true });
+      if (!marker || !this.map) return;
 
       if (directShownLabel) {
         marker.bindTooltip(directShownLabel, {
@@ -362,7 +400,7 @@ export class GoogleMap {
     const down = document.getElementsByClassName('down-hover')[0];
     const left = document.getElementsByClassName('left-hover')[0];
     const right = document.getElementsByClassName('right-hover')[0];
-    up.onclick = () => {this.map.panBy([0, -100]);};
+    up.onclick = () => { this.map.panBy([0, -100]); };
     down.onclick = () => this.map.panBy([0, 100]);
     left.onclick = () => this.map.panBy([-100, 0]);
     right.onclick = () => this.map.panBy([100, 0]);

@@ -1,9 +1,10 @@
 import intl from 'react-intl-universal';
 import { getTableByName, getViewByName, getTableColumnByName, CellType, FORMULA_COLUMN_TYPES_MAP, isDefaultView, } from 'dtable-utils';
 import getConfigItemByType from './get-config-item-by-type';
-import { MAP_MODE, DEFAULT_MARK_COLOR, ADDRESS_REG, PROVINCIAL_CAPITAL } from '../constants';
+import { MAP_MODE, DEFAULT_MARK_COLOR, ADDRESS_REG, PROVINCIAL_CAPITAL, GEOCODING_FORMAT } from '../constants';
 import { FormulaFormatter } from 'dtable-ui-component';
 import ReactDOMServer from 'react-dom/server';
+import { getCanUseAdvancedPerms } from './common-utils';
 
 export const getLocations = (tables, configSettings, { collaborators }) => {
   let locations = [];
@@ -102,6 +103,23 @@ export const getLocations = (tables, configSettings, { collaborators }) => {
     }
   });
   return locations;
+};
+
+export const getRequiredCodingLocations = (locations) => {
+  if (!Array.isArray(locations)) return [];
+  return locations.filter((location) => {
+    const addressType = location && location.type;
+    return addressType && GEOCODING_FORMAT.includes(addressType);
+  });
+};
+
+export const checkIsOverFreeCodingLocations = (locations) => {
+  if (getCanUseAdvancedPerms()) return false;
+  return locations.length > 100;
+};
+
+export const checkIsOverMaxCodingLocations = (locations) => {
+  return locations.length > 5000;
 };
 
 const getMarkColorByColumn = (markColumn, row) => {
@@ -351,4 +369,3 @@ export const generateLabelContent = (location) => {
     `);
   }
 };
-
