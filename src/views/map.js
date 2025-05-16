@@ -9,7 +9,7 @@ import Loading from '../components/loading';
 import ViewTabs from '../components/view-tabs';
 import { getLocations } from '../utils/location-utils';
 import { generateSettingsByConfig } from '../utils/generate-settings-config';
-import {  replaceSettingItem, setSelectedViewIds } from '../utils/common-utils';
+import { replaceSettingItem, setSelectedViewIds } from '../utils/common-utils';
 import getConfigItemByType from '../utils/get-config-item-by-type';
 import onCapture from '../utils/capture';
 import {
@@ -68,13 +68,16 @@ class App extends React.Component {
     });
   }
 
-  componentDidUpdate(preProps, preState) {
+  async componentDidUpdate(preProps, preState) {
     const { showLocationDetail, clickPoint, locations, configSettings } = this.state;
     const { showLocationDetail: preShowLocationDetail, clickPoint: prevClickPoint } = preState;
     if (this.state.showSettingDialog !== preState.showSettingDialog) return;
 
     if ((window.google && this.state.showDialog) && (showLocationDetail === preShowLocationDetail) && (clickPoint === prevClickPoint)) {
       // render locations after the container rendered in the dom tree
+      if (!this.mapInstance.map) {
+        await this.mapInstance.loadMap();
+      }
       this.resetLocationDetails();
       this.mapInstance.renderLocations(locations, configSettings);
     }
@@ -501,14 +504,14 @@ class App extends React.Component {
             />
           )}
           {showLocationDetail &&
-          <LocationDetailList
-            toggle={this.showLocationDetailsToggle}
-            sameLocationList={sameLocationList}
-            clickPoint={this.state.clickPoint}
-            configSettings={configSettings}
-            cellValueUtils={this.cellValueUtils}
-            getLocation={useGeocoder}
-          />
+            <LocationDetailList
+              toggle={this.showLocationDetailsToggle}
+              sameLocationList={sameLocationList}
+              clickPoint={this.state.clickPoint}
+              configSettings={configSettings}
+              cellValueUtils={this.cellValueUtils}
+              getLocation={useGeocoder}
+            />
           }
         </div>
       </div>

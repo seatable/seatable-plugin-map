@@ -28,5 +28,7 @@
   "Hide_all": "隐藏所有",
   "Field": "字段",
   "Show_user_location": "展示用户当前位置",
-  "Hover_display_field": "鼠标悬浮时展示字段"
+  "Hover_display_field": "鼠标悬浮时展示字段",
+  "Exceeded_the_free_locations_limit": "地理位置超过 100 个限制，请升级到团队付费版本。",
+  "Exceeded_the_max_locations_limit": "地理位置超过 5000 个限制"
 }
