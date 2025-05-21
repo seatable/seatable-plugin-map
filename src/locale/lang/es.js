@@ -28,7 +28,12 @@ const es = {
   "Hide_all": "Hide all",
   "Field": "Field",
   "Show_user_location": "Show user's Location",
-  "Hover_display_field": "Hover display field"
-};
+  "Hover_display_field": "Hover display field",
+  "Back": "Back",
+  "Total_records": "Total records",
+  "Exceeded_the_free_locations_limit": "You've exceeded the limit of 100 locations. Please upgrade to a paid plan.",
+  "Exceeded_the_max_locations_limit": "You've exceeded the limit of 5000 locations"
+}
+;
 
 export default es;

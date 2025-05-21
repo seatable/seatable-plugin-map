@@ -24,9 +24,13 @@
   "Submit": "Soumettre",
   "Default_View": "Vue standard",
   "Row_color": "Couleur de la ligne",
-  "Display_all": "Display all",
-  "Hide_all": "Hide all",
-  "Field": "Field",
+  "Display_all": "Afficher tout",
+  "Hide_all": "Masquer tout",
+  "Field": "Champ",
   "Show_user_location": "Afficher l'emplacement de l'utilisateur",
-  "Hover_display_field": "Champ d'affichage en survol"
+  "Hover_display_field": "Champ d'affichage en survol",
+  "Back": "Back",
+  "Total_records": "Total records",
+  "Exceeded_the_free_locations_limit": "You've exceeded the limit of 100 locations. Please upgrade to a paid plan.",
+  "Exceeded_the_max_locations_limit": "You've exceeded the limit of 5000 locations"
 }

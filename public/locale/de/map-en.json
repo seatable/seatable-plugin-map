@@ -24,9 +24,13 @@
   "Submit": "Absenden",
   "Default_View": "Standardansicht",
   "Row_color": "Zeilenfarbe",
-  "Display_all": "Display all",
-  "Hide_all": "Hide all",
-  "Field": "Field",
+  "Display_all": "Alle anzeigen",
+  "Hide_all": "Alle ausblenden",
+  "Field": "Feld",
   "Show_user_location": "Ort des Benutzers anzeigen",
-  "Hover_display_field": "Anzeigefeld beim Drüberfahren"
+  "Hover_display_field": "Anzeigefeld beim Drüberfahren",
+  "Back": "Back",
+  "Total_records": "Total records",
+  "Exceeded_the_free_locations_limit": "You've exceeded the limit of 100 locations. Please upgrade to a paid plan.",
+  "Exceeded_the_max_locations_limit": "You've exceeded the limit of 5000 locations"
 }

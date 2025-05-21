@@ -33,6 +33,7 @@ const en = {
   "Total_records": "Total records",
   "Exceeded_the_free_locations_limit": "You've exceeded the limit of 100 locations. Please upgrade to a paid plan.",
   "Exceeded_the_max_locations_limit": "You've exceeded the limit of 5000 locations"
-};
+}
+;
 
 export default en;
