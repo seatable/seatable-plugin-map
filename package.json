@@ -1,6 +1,6 @@
 {
   "name": "seatable-plugin-map",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "dependencies": {
     "@googlemaps/js-api-loader": "^1.16.2",
