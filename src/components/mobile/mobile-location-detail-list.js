@@ -34,17 +34,7 @@ class MobileLocationDetailList extends React.Component {
 
   getAddressFromPoint = async () => {
     const { clickPoint, getLocation } = this.props;
-    const res = await getLocation(clickPoint);
-    // use the longest address as the location cause it is more accurate
-    let maxLengthRes;
-    res.results.forEach((item) => {
-      if (!maxLengthRes) maxLengthRes = item.formatted_address;
-      if (item.formatted_address.length > maxLengthRes.length) {
-        maxLengthRes = item.formatted_address;
-      }
-    });
-
-    return maxLengthRes;
+    return await getLocation(clickPoint);
   };
 
   setLocation = (location) => {
@@ -91,7 +81,7 @@ class MobileLocationDetailList extends React.Component {
 
   getSameLocationRows = () => {
     const { clickPoint, sameLocationList } = this.props;
-    const sameLocationItem = sameLocationList['' +  clickPoint.lat +  clickPoint.lng];
+    const sameLocationItem = sameLocationList['' + clickPoint.lat + clickPoint.lng];
     return sameLocationItem || [];
   };
 
@@ -119,7 +109,7 @@ class MobileLocationDetailList extends React.Component {
           <h4 className={styles['location-detail-title']}>{address}</h4>
         </div>
         <div className={styles['location-detail-list']}>
-          <div className={`${styles['location-detail-records-length']} mb-2`}>{ intl.get('Total_records', { num: rows.length }) }</div>
+          <div className={`${styles['location-detail-records-length']} mb-2`}>{intl.get('Total_records', { num: rows.length })}</div>
           {rows.map((row, rowIdx) => {
             return (
               <RowCard

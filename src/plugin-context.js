@@ -26,8 +26,8 @@ class PluginContext {
     return this.settings['lang'] || 'en';
   };
 
-  getUserCommonInfo = async (email, avatar_size = '30') => {
-    return  window.dtableWebAPI.getUserCommonInfo(email || this.getSetting('username'), avatar_size);
+  getUserCommonInfo = async (email, avatar_size = '256') => {
+    return window.dtableWebAPI.getUserCommonInfo(email || this.getSetting('username'), avatar_size);
   };
 
   getMapConfig = () => {
@@ -203,7 +203,7 @@ class PluginContext {
         const mapSettings = this.getMapSetting(mapMode);
         configSettings[0] = mapSettings;
         if (mapMode === MAP_MODE.IMAGE) {
-          const imageColumnSetting = this.getImageColumnsSetting(currentTable, currentView, );
+          const imageColumnSetting = this.getImageColumnsSetting(currentTable, currentView,);
           configSettings.forEach((setting) => {
             const type = setting.type;
             if (type === 'column') {
@@ -306,18 +306,18 @@ class PluginContext {
     let activeView = window.dtableSDK.getActiveView();
     const shownColumns = this.getViewShowColumns(activeTable, activeView);
     let pluginSettingItem =
-        {
-          id: generatorViewId(),
-          name,
-          mapMode: MAP_MODE.DEFAULT,
-          tableName: activeTable.name,
-          viewName: activeView.name,
-          columnName: null,
-          markDependence: null,
-          directShownColumn: null,
-          shownColumns,
-          showUserLocation: true,
-        };
+    {
+      id: generatorViewId(),
+      name,
+      mapMode: MAP_MODE.DEFAULT,
+      tableName: activeTable.name,
+      viewName: activeView.name,
+      columnName: null,
+      markDependence: null,
+      directShownColumn: null,
+      shownColumns,
+      showUserLocation: true,
+    };
     return pluginSettingItem;
   };
 
@@ -335,7 +335,7 @@ class PluginContext {
     return setting;
   };
 
-  getMarkerHoverSettings = ( currentTable, currentView, locationColumn, hoverDisplayColumns) => {
+  getMarkerHoverSettings = (currentTable, currentView, locationColumn, hoverDisplayColumns) => {
     if (hoverDisplayColumns) {
       return { type: 'hover_display_columns', name: SETTING_TITLE.HOVER_DISPLAY_COLUMNS, settings: hoverDisplayColumns };
     }
@@ -405,7 +405,7 @@ class PluginContext {
 
   mergeOldMarkerHoverSettings = (configSettings, currentTable, currentView, locationColumn, oldSettings = []) => {
     if (!oldSettings.length) {
-      const hoverDisplaySettings =  getConfigItemByType(configSettings, 'hover_display_columns');
+      const hoverDisplaySettings = getConfigItemByType(configSettings, 'hover_display_columns');
       if (hoverDisplaySettings) oldSettings = hoverDisplaySettings.settings;
     }
 
@@ -514,7 +514,6 @@ class PluginContext {
 
 }
 
-const pluginContext =  new PluginContext();
+const pluginContext = new PluginContext();
 
 export default pluginContext;
-

@@ -6,9 +6,7 @@ import 'leaflet.markercluster/dist/leaflet.markercluster-src';
 import pluginContext from '../plugin-context';
 import Settings from '../components/mobile/settings';
 import Loading from '../components/loading';
-import {
-  getLocations, getInitialMapCenter, getRequiredCodingLocations, checkIsOverFreeCodingLocations, checkIsOverMaxCodingLocations,
-} from '../utils/location-utils';
+import { getLocations, getInitialMapCenter } from '../utils/location-utils';
 import ViewTabs from '../components/view-tabs';
 import { generateSettingsByConfig } from '../utils/generate-settings-config';
 import { replaceSettingItem, setSelectedViewIds } from '../utils/common-utils';
@@ -51,7 +49,6 @@ class App extends React.Component {
       showUserLocationChecked: true,
     };
     this.map = null;
-    this.geocoder = null;
     this.markers = [];
     this.timer = null;
     this.clusterMarkers = null;
@@ -153,21 +150,11 @@ class App extends React.Component {
 
   async renderMap() {
     const { locations } = this.state;
-    const requiredCodingLocations = getRequiredCodingLocations(locations);
-    if (checkIsOverFreeCodingLocations(requiredCodingLocations)) {
-      toaster.danger(intl.get('Exceeded_the_free_locations_limit'));
-      return;
-    }
-    if (checkIsOverMaxCodingLocations(requiredCodingLocations)) {
-      toaster.danger(intl.get('Exceeded_the_max_locations_limit'));
-      return;
-    }
-
     let lang = pluginContext.getLanguage();
     let url = `https://mt0.google.com/vt/lyrs=m@160000000&hl=${lang}&gl=${lang}&src=app&y={y}&x={x}&z={z}&s=Ga`;
     if (!document.getElementById('map-container')) return;
     window.L = L;
-    const { position, zoom } = await getInitialMapCenter(locations, this.geocoder);
+    const { position, zoom } = await getInitialMapCenter(locations);
     if (!this.map) {
       this.map = L.map('map-container', {
         center: position,

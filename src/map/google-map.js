@@ -4,6 +4,8 @@ import {
   renderMarkByPosition, formatGeolocationValue, getInitialMapCenter, generateLabelContent, checkIsOverFreeCodingLocations, getRequiredCodingLocations, checkIsOverMaxCodingLocations,
 } from '../utils/location-utils';
 import 'leaflet.markercluster/dist/leaflet.markercluster-src';
+import { toaster } from 'dtable-ui-component';
+import { getTableColumnByName, isNumber } from 'dtable-utils';
 import {
   IMAGE_PATH,
   GEOCODING_FORMAT,
@@ -17,9 +19,8 @@ import * as image from '../image/index';
 import intl from 'react-intl-universal';
 import { eventBus } from '../utils/event-bus';
 import pluginContext from '../plugin-context';
-import { getTableColumnByName } from 'dtable-utils';
 import { createLeafletLocationControl } from './locate-control';
-import { toaster } from 'dtable-ui-component';
+import dtableWebProxyAPI from '../api/dtable-web-proxy-api';
 
 import './user-avatar.css';
 
@@ -30,7 +31,6 @@ export class GoogleMap {
   constructor(props) {
     this.mapKey = props.mapKey;
     this.map = null;
-    this.geocoder = null;
     this.markerClusterer = null;
     this.errorHandler = props.errorHandler;
 
@@ -44,18 +44,17 @@ export class GoogleMap {
     this.sameLocationList = {};
     this.userInfo = null;
     this.cachedAddressGeocodingMap = {}; // { [address]: { lat, lng } }
+    this.cachedLatLngGeocodingMap = {}; // { lat_lng: address }
   }
 
   loadMap = async () => {
     if (!this.mapKey) return;
     try {
-      // only use geocoder of google map
       const loader = new Loader({
         apiKey: this.mapKey,
         version: 'weekly',
       });
       await loader.load();
-      this.geocoder = new window.google.maps.Geocoder();
     } catch (err) {
       console.log(err);
       let errMessage;
@@ -71,7 +70,7 @@ export class GoogleMap {
     const url = `https://mt0.google.com/vt/lyrs=m@160000000&hl=${lang}&gl=${lang}&src=app&y={y}&x={x}&z={z}&s=Ga`;
     if (!document.getElementsByClassName('map-container')) return;
     window.L = L;
-    const { position, zoom } = await getInitialMapCenter(locations, this.geocoder);
+    const { position, zoom } = await getInitialMapCenter(locations);
     if (!this.map) {
       this.map = L
         .map('map-container', {
@@ -132,7 +131,7 @@ export class GoogleMap {
     if (!addressType) return;
 
     if (GEOCODING_FORMAT.includes(addressType)) {
-      this.geocoding(locations, 1, 0, configSettings);
+      this.geocoding(locations, configSettings);
     } else {
       if (configSettings[0].active === MAP_MODE.IMAGE) {
         this.createMarkerCluster(locations, configSettings);
@@ -204,94 +203,62 @@ export class GoogleMap {
     this.map.addLayer(this.clusterMarkers);
   };
 
-  geocodingCallback = ({ lat, lng, mapMode, currentLocation, locations, index, address, configSettings }) => {
-    if (mapMode === MAP_MODE.IMAGE) {
-      this.geocodingLocations.push({ ...currentLocation, location: { lat, lng } });
-    } else {
-      this.addMarker(currentLocation, lat, lng, address, configSettings);
-    }
-    this.geocoding(locations, 1, ++index, configSettings);
-  };
-
-  geocoding = (locations, resolutionTimes, index, configSettings) => {
-    const locationItem = locations[index];
-    if (!locationItem) {
-      this.createMarkerCluster(this.geocodingLocations, configSettings);
-      return;
-    }
-    let address;
-    const value = locationItem.location;
-    if (GEOCODING_FORMAT.includes(locationItem.type) && typeof value === 'object') {
-      address = formatGeolocationValue(value, locationItem.type);
-    } else {
-      address = locationItem.location;
-    }
-    if (!address) {
-      this.geocoding(locations, 1, ++index, configSettings);
-      return;
-    }
-
-    const activeColumn = configSettings[3].active;
-    const mapMode = configSettings[0].active;
-
-    // try to geocoding via cache
-    if (this.cachedAddressGeocodingMap[address]) {
-      const { lat, lng } = this.cachedAddressGeocodingMap[address];
-      this.geocodingCallback({
-        lat, lng, mapMode, locations, index, address, configSettings,
-        currentLocation: locationItem,
-      });
-      return;
-    }
-
-    // try to geocoding via google map
-    this.geocoder.geocode({ 'address': address }, (points, status) => {
-      if (locationItem.columnName !== activeColumn) return;
-      switch (status) {
-        case window.google.maps.GeocoderStatus.OK: {
-          const lat = points[0].geometry.location.lat();
-          const lng = points[0].geometry.location.lng();
-          this.cachedAddressGeocodingMap[address] = { lat, lng };
-          this.geocodingCallback({
-            lat, lng, mapMode, locations, index, address, configSettings,
-            currentLocation: locationItem,
-          });
-          break;
-        }
-        case window.google.maps.GeocoderStatus.OVER_QUERY_LIMIT: {
-          this.timer = setTimeout(() => {
-            clearTimeout(this.timer);
-            this.timer = null;
-            if (resolutionTimes < 3) {
-              this.geocoding(locations, ++resolutionTimes, index, configSettings);
-            } else {
-              // eslint-disable-next-line no-console
-              console.log(intl.get('Your_Google_Maps_key_has_exceeded_quota'));
-              this.geocoding(locations, 1, ++index, configSettings);
-            }
-          }, resolutionTimes * 1000);
-          break;
-        }
-        case window.google.maps.GeocoderStatus.UNKNOWN_ERROR:
-        case window.google.maps.GeocoderStatus.ERROR: {
-          this.timer = setTimeout(() => {
-            clearTimeout(this.timer);
-            this.timer = null;
-            this.geocoding(locations, 0, index, configSettings);
-          }, 1000);
-          break;
-        }
-        case window.google.maps.GeocoderStatus.INVALID_REQUEST:
-        case window.google.maps.GeocoderStatus.REQUEST_DENIED: {
-          break;
-        }
-        default: {
-          // eslint-disable-next-line no-console
-          console.log(intl.get('address_was_not_found', { address: address }));
-          break;
+  geocodingAddresses(locations, mapMode, configSettings) {
+    let convertedLocations = [];
+    let waitingGeocodingLocations = [];
+    locations.forEach((location) => {
+      let address;
+      if (GEOCODING_FORMAT.includes(location.type) && typeof location.location === 'object') {
+        address = formatGeolocationValue(location.location, location.type);
+      } else {
+        address = location.location;
+      }
+      if (address) {
+        if (this.cachedAddressGeocodingMap[address]) {
+          // try to geocoding via cache
+          const { lat, lng } = this.cachedAddressGeocodingMap[address];
+          convertedLocations.push({ ...location, address, location: { lat, lng } });
+          return;
+        } else {
+          // try to geocoding
+          waitingGeocodingLocations.push({ ...location, address });
         }
       }
     });
+    const asyncConvert = async () => {
+      if (waitingGeocodingLocations.length > 0) {
+        const currentGeocodingLocations = waitingGeocodingLocations.splice(0, 5);
+        const currentGeocodingAddresses = currentGeocodingLocations.map((location) => location.address);
+        const res = await dtableWebProxyAPI.addressConvert(currentGeocodingAddresses);
+        const { result } = (res && res.data) || {};
+        if (Array.isArray(result) && result.length > 0) {
+          currentGeocodingLocations.forEach((location, index) => {
+            const { lat, lng } = result[index] || {};
+            if (isNumber(lat) && isNumber(lng)) {
+              this.cachedAddressGeocodingMap[location.address] = { lat, lng };
+              convertedLocations.push({ ...location, location: { lat, lng } });
+            }
+          });
+        }
+        asyncConvert();
+      } else {
+        convertedLocations.forEach((convertedLocation) => {
+          if (mapMode === MAP_MODE.IMAGE) {
+            this.geocodingLocations.push(convertedLocation);
+          } else {
+            const { lat, lng } = convertedLocation.location;
+            this.addMarker(convertedLocation, lat, lng, convertedLocation.address, configSettings);
+          }
+        });
+        this.createMarkerCluster(this.geocodingLocations, configSettings);
+      }
+    };
+    asyncConvert();
+  }
+
+  geocoding = (locations, configSettings) => {
+    const mapMode = configSettings[0].active;
+    this.geocodingAddresses(locations, mapMode, configSettings);
   };
 
   removeLayers = () => {
@@ -408,21 +375,30 @@ export class GoogleMap {
   };
 
   useGeocoder = async (latlng, cb) => {
-    if (!this.geocoder) {
-      this.geocoder = new window.google.maps.Geocoder();
+    const { lat, lng } = latlng;
+    const strLatLng = `${lat}, ${lng}`;
+    if (this.cachedLatLngGeocodingMap[strLatLng]) {
+      return this.cachedLatLngGeocodingMap[strLatLng];
     }
     const lang = pluginContext.getLanguage();
-    let res = { results: [] };
+    let address = '';
     try {
-      res = await this.geocoder.geocode({ 'location': latlng, language: lang });
+      const res = await dtableWebProxyAPI.locationConvert([strLatLng], lang);
+      const { result } = (res && res.data) || {};
+      if (Array.isArray(result)) {
+        address = result[0] || '';
+        if (address) {
+          this.cachedLatLngGeocodingMap[strLatLng] = address;
+        }
+      }
     } catch (err) {
       console.log('geocodeError: ', err);
     }
     // call the cbs
     if (cb) {
-      cb(res);
+      cb(address);
     }
-    return res;
+    return address;
   };
 
   addUserAvatarMarker = () => {

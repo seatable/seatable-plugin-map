@@ -26,8 +26,9 @@ class TaskList {
     window.app.collaboratorsCache = {};
     window.app.state.collaborators = dtableSDK.dtableStore.collaborators;
     window.dtableWebAPI = dtableSDK.dtableWebAPI;
-    window.app.onClosePlugin = () => {};
+    window.app.onClosePlugin = () => { };
     window.dtableSDK = dtableSDK;
+    window.dtable = Object.assign(window.dtable, dtableSDK.config);
   }
 
   static async execute() {

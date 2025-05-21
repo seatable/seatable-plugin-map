@@ -1,10 +1,11 @@
 import intl from 'react-intl-universal';
-import { getTableByName, getViewByName, getTableColumnByName, CellType, FORMULA_COLUMN_TYPES_MAP, isDefaultView, } from 'dtable-utils';
+import { getTableByName, getViewByName, getTableColumnByName, CellType, FORMULA_COLUMN_TYPES_MAP, isDefaultView, isNumber, } from 'dtable-utils';
+import { FormulaFormatter } from 'dtable-ui-component';
 import getConfigItemByType from './get-config-item-by-type';
 import { MAP_MODE, DEFAULT_MARK_COLOR, ADDRESS_REG, PROVINCIAL_CAPITAL, GEOCODING_FORMAT } from '../constants';
-import { FormulaFormatter } from 'dtable-ui-component';
 import ReactDOMServer from 'react-dom/server';
 import { getCanUseAdvancedPerms } from './common-utils';
+import dtableWebProxyAPI from '../api/dtable-web-proxy-api';
 
 export const getLocations = (tables, configSettings, { collaborators }) => {
   let locations = [];
@@ -249,24 +250,25 @@ const getRowColor = (rowsColors, row) => {
   return rowsColors[row._id] || '';
 };
 
-export const getInitialMapCenter = async (locations, geocoder) => {
-  let position = [32, 166], zoom = 2;
+export const getInitialMapCenter = async (locations) => {
+  let position = [32, 166];
+  let zoom = 2;
   let center = localStorage.getItem('dtable-map-plugin-center');
   if (!center) {
-    let location = locations[0] || {};
-    if (location.type === 'text') {
+    const location = locations[0] || {};
+    const address = location.location;
+    if (location.type === 'text' && typeof address === 'string' && address) {
       return await new Promise(resolve => {
-        geocoder.geocode(
-          { address: location.location },
-          (points, status) => {
-            if (status === window.google.maps.GeocoderStatus.OK) {
-              let lat = points[0].geometry.location.lat();
-              let lng = points[0].geometry.location.lng();
+        dtableWebProxyAPI.addressConvert([address]).then((res) => {
+          const { result } = (res && res.data) || {};
+          if (Array.isArray(result) && result.length > 0) {
+            const { lat, lng } = result[0] || {};
+            if (isNumber(lat) && isNumber(lng)) {
               position = [lat, lng];
             }
             resolve({ position, zoom });
           }
-        );
+        });
       });
     } else {
       position = location.position || position;

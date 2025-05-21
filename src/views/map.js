@@ -43,7 +43,6 @@ class App extends React.Component {
       showUserLocationChecked: true,
     };
     this.map = null;
-    this.geocoder = null;
     this.markers = [];
     this.timer = null;
     this.clusterMarkers = null;

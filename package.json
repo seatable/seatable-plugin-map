@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@googlemaps/js-api-loader": "^1.16.2",
+    "axios": "~1.8.*",
     "dtable-ui-component": "6.0.13",
     "dtable-utils": "5.0.10",
     "html2canvas": "^1.4.1",
