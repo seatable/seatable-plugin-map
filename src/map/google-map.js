@@ -203,8 +203,16 @@ export class GoogleMap {
     this.map.addLayer(this.clusterMarkers);
   };
 
+  geocodingCallback = ({ convertedLocation, mapMode, configSettings }) => {
+    if (mapMode === MAP_MODE.IMAGE) {
+      this.geocodingLocations.push(convertedLocation);
+    } else {
+      const { lat, lng } = convertedLocation.location;
+      this.addMarker(convertedLocation, lat, lng, convertedLocation.address, configSettings);
+    }
+  };
+
   geocodingAddresses(locations, mapMode, configSettings) {
-    let convertedLocations = [];
     let waitingGeocodingLocations = [];
     locations.forEach((location) => {
       let address;
@@ -217,14 +225,19 @@ export class GoogleMap {
         if (this.cachedAddressGeocodingMap[address]) {
           // try to geocoding via cache
           const { lat, lng } = this.cachedAddressGeocodingMap[address];
-          convertedLocations.push({ ...location, address, location: { lat, lng } });
-          return;
+          this.geocodingCallback({
+            convertedLocation: { ...location, address, location: { lat, lng } },
+            mapMode,
+            configSettings,
+          });
         } else {
-          // try to geocoding
+          // waiting to geocoding
           waitingGeocodingLocations.push({ ...location, address });
         }
       }
     });
+
+    // try to geocoding
     const asyncConvert = async () => {
       if (waitingGeocodingLocations.length > 0) {
         const currentGeocodingLocations = waitingGeocodingLocations.splice(0, 5);
@@ -236,20 +249,16 @@ export class GoogleMap {
             const { lat, lng } = result[index] || {};
             if (isNumber(lat) && isNumber(lng)) {
               this.cachedAddressGeocodingMap[location.address] = { lat, lng };
-              convertedLocations.push({ ...location, location: { lat, lng } });
+              this.geocodingCallback({
+                convertedLocation: { ...location, address: location.address, location: { lat, lng } },
+                mapMode,
+                configSettings,
+              });
             }
           });
         }
         asyncConvert();
       } else {
-        convertedLocations.forEach((convertedLocation) => {
-          if (mapMode === MAP_MODE.IMAGE) {
-            this.geocodingLocations.push(convertedLocation);
-          } else {
-            const { lat, lng } = convertedLocation.location;
-            this.addMarker(convertedLocation, lat, lng, convertedLocation.address, configSettings);
-          }
-        });
         this.createMarkerCluster(this.geocodingLocations, configSettings);
       }
     };
