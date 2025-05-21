@@ -40,17 +40,7 @@ class LocationDetailList extends React.Component {
 
   getAddressFromPoint = async () => {
     const { clickPoint, getLocation } = this.props;
-    const res = await getLocation(clickPoint);
-    // use the longest address as the location cause it is more accurate
-    let maxLengthRes;
-    res.results.forEach((item) => {
-      if (!maxLengthRes) maxLengthRes = item.formatted_address;
-      if (item.formatted_address.length > maxLengthRes.length) {
-        maxLengthRes = item.formatted_address;
-      }
-    });
-
-    return maxLengthRes;
+    return await getLocation(clickPoint);
   };
 
   setLocation = (location) => {
@@ -85,7 +75,7 @@ class LocationDetailList extends React.Component {
 
   getSameLocationRows = () => {
     const { clickPoint, sameLocationList } = this.props;
-    const sameLocationItem = sameLocationList['' +  clickPoint.lat +  clickPoint.lng];
+    const sameLocationItem = sameLocationList['' + clickPoint.lat + clickPoint.lng];
     return sameLocationItem || [];
   };
 
