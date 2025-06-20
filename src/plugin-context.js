@@ -7,6 +7,8 @@ import removeSettingByType from './utils/remove-setting-by-type';
 import { replaceSettingItemByType } from './utils/repalce-setting-item-by-type';
 import { generatorViewId, getSelectedViewIds } from './utils/common-utils';
 
+const DEFAULT_VIEW_NAME = intl.get('Default_View');
+
 class PluginContext {
 
   constructor() {
@@ -301,14 +303,14 @@ class PluginContext {
     return { name: intl.get('Bubble_size'), value: size, type: 'bubble_size' };
   };
 
-  getInitSettingItem = (name = intl.get('Default_view')) => {
+  getInitSettingItem = (name) => {
     let activeTable = window.dtableSDK.getActiveTable();
     let activeView = window.dtableSDK.getActiveView();
     const shownColumns = this.getViewShowColumns(activeTable, activeView);
     let pluginSettingItem =
     {
       id: generatorViewId(),
-      name,
+      name: name || DEFAULT_VIEW_NAME,
       mapMode: MAP_MODE.DEFAULT,
       tableName: activeTable.name,
       viewName: activeView.name,

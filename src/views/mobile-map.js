@@ -88,6 +88,9 @@ class App extends React.Component {
     }
   }
 
+  componentWillUnmount() {
+    this.onExit();
+  }
 
   onExit = () => {
     if (this.timer) {
@@ -117,35 +120,21 @@ class App extends React.Component {
   };
 
   async initPluginDTableData() {
-    if (this.props.isDevelopment) {
-      this.unsubscribeLocalDtableChanged = window.dtableSDK.subscribe('local-dtable-changed', () => { this.onDTableChanged(); });
-      this.unsubscribeRemoteDtableChanged = window.dtableSDK.subscribe('remote-dtable-changed', () => { this.onDTableChanged(); });
-      const { settings, configSettings, locations, selectedViewIdx, shouldFetchUserInfo } = this.getInitPluginSettings();
-      this.setState({
-        configSettings,
-        isDataLoaded: true,
-        locations,
-        settings,
-        selectedViewIdx,
-        showUserLocationChecked: shouldFetchUserInfo
-      }, async () => {
-        await this.mapInstance.renderMap(locations, shouldFetchUserInfo);
-      });
-    } else {
-      this.unsubscribeLocalDtableChanged = window.dtableSDK.subscribe('local-dtable-changed', () => { this.onDTableChanged(); });
-      this.unsubscribeRemoteDtableChanged = window.dtableSDK.subscribe('remote-dtable-changed', () => { this.onDTableChanged(); });
-      const { settings, configSettings, locations, selectedViewIdx, shouldFetchUserInfo } = this.getInitPluginSettings();
-      this.setState({
-        configSettings,
-        isDataLoaded: true,
-        locations,
-        settings,
-        selectedViewIdx,
-        showUserLocationChecked: shouldFetchUserInfo
-      }, async () => {
-        await this.mapInstance.renderMap(locations, shouldFetchUserInfo);
-      });
-    }
+    this.unsubscribeLocalDtableChanged = window.dtableSDK.subscribe('local-dtable-changed', () => { this.onDTableChanged(); });
+    this.unsubscribeRemoteDtableChanged = window.dtableSDK.subscribe('remote-dtable-changed', () => { this.onDTableChanged(); });
+    const { settings, configSettings, locations, selectedViewIdx, shouldFetchUserInfo } = this.getInitPluginSettings();
+
+    // has no height animation
+    this.setState({
+      configSettings,
+      isDataLoaded: true,
+      locations,
+      settings,
+      selectedViewIdx,
+      showUserLocationChecked: shouldFetchUserInfo
+    }, async () => {
+      await this.mapInstance.renderMap(locations, shouldFetchUserInfo);
+    });
   }
 
   async renderMap() {
@@ -153,7 +142,6 @@ class App extends React.Component {
     let lang = pluginContext.getLanguage();
     let url = `https://mt0.google.com/vt/lyrs=m@160000000&hl=${lang}&gl=${lang}&src=app&y={y}&x={x}&z={z}&s=Ga`;
     if (!document.getElementById('map-container')) return;
-    window.L = L;
     const { position, zoom } = await getInitialMapCenter(locations);
     if (!this.map) {
       this.map = L.map('map-container', {
