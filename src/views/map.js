@@ -57,6 +57,10 @@ class App extends React.Component {
     this.initPluginDTableData();
   }
 
+  componentWillUnmount() {
+    this.onExit();
+  }
+
   UNSAFE_componentWillReceiveProps(nextProps) {
     this.setState({
       showDialog: nextProps.showDialog
@@ -110,10 +114,11 @@ class App extends React.Component {
   };
 
   async initPluginDTableData() {
-    if (this.props.isDevelopment) {
-      this.unsubscribeLocalDtableChanged = window.dtableSDK.subscribe('local-dtable-changed', () => { this.onDTableChanged(); });
-      this.unsubscribeRemoteDtableChanged = window.dtableSDK.subscribe('remote-dtable-changed', () => { this.onDTableChanged(); });
-      const { settings, configSettings, locations, selectedViewIdx, shouldFetchUserInfo } = this.getInitPluginSettings();
+    this.unsubscribeLocalDtableChanged = window.dtableSDK.subscribe('local-dtable-changed', () => { this.onDTableChanged(); });
+    this.unsubscribeRemoteDtableChanged = window.dtableSDK.subscribe('remote-dtable-changed', () => { this.onDTableChanged(); });
+    const { settings, configSettings, locations, selectedViewIdx, shouldFetchUserInfo } = this.getInitPluginSettings();
+    this.timer = setTimeout(() => {
+      // render the map after the plugin's height animation has completed
       this.setState({
         configSettings,
         isDataLoaded: true,
@@ -124,21 +129,7 @@ class App extends React.Component {
       }, async () => {
         await this.mapInstance.renderMap(locations, shouldFetchUserInfo);
       });
-    } else {
-      this.unsubscribeLocalDtableChanged = window.dtableSDK.subscribe('local-dtable-changed', () => { this.onDTableChanged(); });
-      this.unsubscribeRemoteDtableChanged = window.dtableSDK.subscribe('remote-dtable-changed', () => { this.onDTableChanged(); });
-      const { settings, configSettings, locations, selectedViewIdx, shouldFetchUserInfo } = this.getInitPluginSettings();
-      this.setState({
-        configSettings,
-        isDataLoaded: true,
-        locations,
-        settings,
-        selectedViewIdx,
-        showUserLocationChecked: shouldFetchUserInfo
-      }, async () => {
-        await this.mapInstance.renderMap(locations, shouldFetchUserInfo);
-      });
-    }
+    }, 300);
   }
 
 
@@ -232,8 +223,6 @@ class App extends React.Component {
     }, 500);
     window.app.onClosePlugin && window.app.onClosePlugin();
   };
-
-
 
   getRowByConfigSettings = (cfgSettings, rowId) => {
     const tableName = getConfigItemByType(cfgSettings, 'table').active;
