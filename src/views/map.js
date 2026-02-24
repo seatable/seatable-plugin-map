@@ -453,7 +453,7 @@ class App extends React.Component {
           <div className="map-operators">
             <span className="map-operator dtable-font dtable-icon-download btn-margin-right" onClick={onCapture}></span>
             <span className={`map-operator dtable-font dtable-icon-full-screen btn-margin-right ${isFullScreen ? 'full-screen-active' : ''}`} onClick={this.toggleFullScreen}></span>
-            <span className="map-operator dtable-font dtable-icon-settings btn-margin-right" onClick={this.toggleSettingDialog}></span>
+            <span className="map-operator dtable-font dtable-icon-set-up btn-margin-right" onClick={this.toggleSettingDialog}></span>
             <span className="map-operator dtable-font dtable-icon-x btn-margin-right" onClick={this.toggle}></span>
           </div>
         </div>
