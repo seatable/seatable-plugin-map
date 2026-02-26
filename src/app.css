@@ -37,17 +37,8 @@
   font-weight: 600;
 }
 
-.plugin-map-dialog-en .plugin-logo {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+.plugin-map-dialog-en .dtable-plugin-logo {
   margin: 0 80px 0 0;
-}
-
-.plugin-map-dialog-en .plugin-logo .plugin-logo-icon {
-  width: 24px;
-  height: 24px;
-  margin-right: 8px;
 }
 
 .plugin-map-dialog-en .map-operators {

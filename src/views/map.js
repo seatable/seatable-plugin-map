@@ -433,8 +433,8 @@ class App extends React.Component {
     return (
       <div className="plugin-map-dialog-en" style={this.getDialogStyle()}>
         <div className={'dtable-map-plugin-title'}>
-          <div className='plugin-logo'>
-            <img className="plugin-logo-icon" src={logo} alt="" />
+          <div className='dtable-plugin-logo'>
+            <img className="dtable-plugin-logo-icon" src={logo} alt="" />
             <span className="dtable-map-plugin-name">{intl.get('Map_plugin')}</span>
           </div>
           <div className="map-plugin-en-tabs">
