@@ -1,13 +1,11 @@
-import { Loader } from '@googlemaps/js-api-loader';
-import L from 'leaflet';
+import { setOptions, importLibrary } from '@googlemaps/js-api-loader';
+import { MarkerClusterer } from '@googlemaps/markerclusterer';
 import {
   renderMarkByPosition, formatGeolocationValue, getInitialMapCenter, generateLabelContent, checkIsOverFreeCodingLocations, getRequiredCodingLocations, checkIsOverMaxCodingLocations,
 } from '../utils/location-utils';
-import 'leaflet.markercluster/dist/leaflet.markercluster-src';
 import { toaster } from 'dtable-ui-component';
 import { getTableColumnByName, isNumber } from 'dtable-utils';
 import {
-  IMAGE_PATH,
   GEOCODING_FORMAT,
   MAP_MODE,
   EVENT_BUS_TYPE,
@@ -19,12 +17,11 @@ import * as image from '../image/index';
 import intl from 'react-intl-universal';
 import { eventBus } from '../utils/event-bus';
 import pluginContext from '../plugin-context';
-import { createLeafletLocationControl } from './locate-control';
 import dtableWebProxyAPI from '../api/dtable-web-proxy-api';
 
 import './user-avatar.css';
 
-L.Icon.Default.imagePath = IMAGE_PATH;
+const APP_GOOGLE_MAP_ID = 'APP_GOOGLE_MAP_ID';
 
 export class GoogleMap {
 
@@ -43,18 +40,29 @@ export class GoogleMap {
     this.geocodingLocations = [];
     this.sameLocationList = {};
     this.userInfo = null;
+    this._infoWindow = null;
     this.cachedAddressGeocodingMap = {}; // { [address]: { lat, lng } }
     this.cachedLatLngGeocodingMap = {}; // { lat_lng: address }
+
+    this._Map = null;
+    this._InfoWindow = null;
+    this._ControlPosition = null;
+    this._AdvancedMarkerElement = null;
   }
 
   loadMap = async () => {
     if (!this.mapKey) return;
     try {
-      const loader = new Loader({
-        apiKey: this.mapKey,
+      setOptions({
+        key: this.mapKey,
         version: 'weekly',
       });
-      await loader.load();
+      const { Map, InfoWindow } = await importLibrary('maps');
+      const { AdvancedMarkerElement } = await importLibrary('marker');
+      this._Map = Map;
+      this._InfoWindow = InfoWindow;
+      this._ControlPosition = window.google.maps.ControlPosition;
+      this._AdvancedMarkerElement = AdvancedMarkerElement;
     } catch (err) {
       console.log(err);
       let errMessage;
@@ -66,34 +74,32 @@ export class GoogleMap {
   };
 
   async renderMap(locations, showUserLocation) {
-    const lang = pluginContext.getLanguage();
-    const url = `https://mt0.google.com/vt/lyrs=m@160000000&hl=${lang}&gl=${lang}&src=app&y={y}&x={x}&z={z}&s=Ga`;
-    if (!document.getElementsByClassName('map-container')) return;
+    const containerEl = document.getElementById('map-container');
+    if (!containerEl) return;
     const { position, zoom } = await getInitialMapCenter(locations);
-    if (!this.map) {
-      this.map = L
-        .map('map-container', {
-          center: position,
-          zoom: zoom,
-          maxBounds: [[-90, -180], [90, 180]],
-          maxBoundsViscosity: 1.0 // prevent the user from dragging outside the bounds
-        })
-        .invalidateSize();
-      L.tileLayer(url, {
-        maxZoom: 18,
-        minZoom: 2
-      }).addTo(this.map);
+    const center = { lat: position[0], lng: position[1] };
 
-      const handleLocate = (error, location) => {
-        if (error) {
-          this.errorHandler(error.message);
-          return;
-        }
-        this.map.flyTo(location, 7, { animiate: true, duration: 1 });
-      };
-      const GeolocationControl = createLeafletLocationControl(handleLocate);
-      const controller = new GeolocationControl();
-      controller.setPosition('bottomright').addTo(this.map);
+    if (!this.map) {
+      this.map = new this._Map(containerEl, {
+        center,
+        zoom,
+        mapId: APP_GOOGLE_MAP_ID,
+        minZoom: 2,
+        maxZoom: 18,
+        restriction: {
+          latLngBounds: { north: 85, south: -85, west: -180, east: 180 },
+          strictBounds: true,
+        },
+        mapTypeControl: false,
+        streetViewControl: false,
+        fullscreenControl: false,
+        zoomControl: false,
+        keyboardShortcuts: false,
+        disableDefaultUI: true,
+      });
+
+      this._infoWindow = new this._InfoWindow();
+      this._addGeolocationControl();
     }
 
     if (showUserLocation) {
@@ -104,6 +110,40 @@ export class GoogleMap {
       this.addPanByHandler();
     }
   }
+
+  _addGeolocationControl = () => {
+    const container = document.createElement('div');
+    container.className = 'plugin-leaflet-geolocation-control';
+    const icon = document.createElement('i');
+    icon.className = 'dtable-font dtable-icon-current-location';
+    container.appendChild(icon);
+    if (IS_MOBILE) {
+      container.style.cssText = 'height:35px;width:35px;line-height:35px;opacity:0.75;cursor:pointer;display:flex;align-items:center;justify-content:center;margin:10px';
+      icon.style.fontSize = '20px';
+    } else {
+      container.style.cssText = 'height:30px;width:30px;line-height:30px;cursor:pointer;display:flex;align-items:center;justify-content:center;margin:10px';
+    }
+    container.addEventListener('click', () => {
+      this.getLocationByGoogle()
+        .then((point) => {
+          if (point && typeof point.lat === 'number' && typeof point.lng === 'number') {
+            this.userLocationCoords = { ...point };
+            if (this.userAvatarMarker) {
+              this.userAvatarMarker.setMap(null);
+              this.userAvatarMarker = null;
+            }
+            if (this.userInfo) {
+              this.loadUserAvatarMarker();
+              this.addUserAvatarMarker();
+            }
+          }
+        })
+        .catch((e) => {
+          this.errorHandler(e.message);
+        });
+    });
+    this.map.controls[this._ControlPosition.RIGHT_BOTTOM].push(container);
+  };
 
   renderLocations = (locations, configSettings) => {
     // clear previous layers
@@ -125,6 +165,7 @@ export class GoogleMap {
     }
 
     this.geocodingLocations = [];
+    this.sameLocationList = {};
     const locationItem = locations[0] || {};
     const addressType = locationItem.type;
     if (!addressType) return;
@@ -141,35 +182,6 @@ export class GoogleMap {
   };
 
   createMarkerCluster = (locations, configSettings) => {
-    if (!this.clusterMarkers) {
-      this.clusterMarkers = L.markerClusterGroup({
-        iconCreateFunction: function (cluster) {
-          const markers = cluster.getAllChildMarkers();
-          let imgCount = 0, markerUrl = '';
-          markers.forEach((marker) => {
-            const icon = marker.options.icon;
-            const urls = icon.options.imgUrl;
-            imgCount += urls.length;
-            if (!markerUrl) {
-              markerUrl = urls[0];
-            }
-          });
-          const imageElement = `<img src=${markerUrl} width="72" height="72" />`;
-          return L.divIcon({
-            html: `
-            <div class="map-plugin-custom-image-container">
-              ${markerUrl ? imageElement : '<div class="map-plugin-empty-custom-image-wrapper"></div>'}
-              <span class="map-plugin-custom-image-number">${imgCount}</span>
-              <i class='plugin-map-image-label-arrow dtable-font dtable-icon-drop-down'></i>
-            </div>
-          `,
-            iconAnchor: [48, 55],
-          });
-        },
-        showCoverageOnHover: false
-      });
-    }
-    this.clusterMarkers.clearLayers();
     const list = [];
     const tableName = getConfigItemByType(configSettings, 'table').active;
     const currentTable = pluginContext.getTableByName(tableName);
@@ -181,25 +193,27 @@ export class GoogleMap {
       item.imgUrl = imageUrlList;
       const { location } = item;
       const { lat, lng } = location;
-      if (lng && lat) {
-        const imageElement = `<img src=${imageUrlList[0]} width="72" height="72" />`;
-        const htmlString = `
-          <div class="map-plugin-custom-image-container">
-            ${imageUrlList.length > 0 ? `<span class="map-plugin-custom-image-number">${imageUrlList.length}</span> ${imageElement}` : '<div class="map-plugin-empty-custom-image-wrapper"></div>'}
-            <i class='plugin-map-image-label-arrow dtable-font dtable-icon-drop-down'></i>
-          </div>
-        `;
-        let markIcon = L.divIcon({
-          html: htmlString,
-          imgUrl: imageUrlList,
-          iconAnchor: [48, 55],
-        });
-        let marker = new L.Marker([lat, lng], { icon: markIcon });
-        list.push(marker);
-      }
+      if (!lng || !lat) return;
+
+      const imgSrc = imageUrlList[0] || '';
+      const markerEl = document.createElement('div');
+      markerEl.className = 'map-plugin-custom-image-container';
+      markerEl.innerHTML = imgSrc
+        ? `<img src="${imgSrc}" width="72" height="72" /><span class="map-plugin-custom-image-number">${imageUrlList.length}</span><i class='plugin-map-image-label-arrow dtable-font dtable-icon-drop-down'></i>`
+        : '<div class="map-plugin-empty-custom-image-wrapper"></div><i class=\'plugin-map-image-label-arrow dtable-font dtable-icon-drop-down\'></i>';
+
+      const marker = new this._AdvancedMarkerElement({
+        position: { lat: Number(lat), lng: Number(lng) },
+        content: markerEl,
+        map: this.map,
+      });
+      list.push(marker);
+      this.markers.push(marker);
     });
-    this.clusterMarkers.addLayers(list);
-    this.map.addLayer(this.clusterMarkers);
+
+    if (list.length > 0) {
+      this.clusterMarkers = new MarkerClusterer({ map: this.map, markers: list });
+    }
   };
 
   geocodingCallback = ({ convertedLocation, mapMode, configSettings }) => {
@@ -272,7 +286,7 @@ export class GoogleMap {
   removeLayers = () => {
     if (this.markers.length > 0) {
       this.markers.forEach((m) => {
-        m.remove();
+        m.setMap(null);
       });
       this.markers = [];
     }
@@ -280,7 +294,8 @@ export class GoogleMap {
 
   clearClusterMarkers = () => {
     if (this.clusterMarkers) {
-      this.clusterMarkers.clearLayers();
+      this.clusterMarkers.clearMarkers();
+      this.clusterMarkers = null;
     }
   };
 
@@ -291,7 +306,7 @@ export class GoogleMap {
     return row;
   };
 
-  addMarker = (location, lat, lng, address, configSettings) => {
+  addMarker = (location, lat, lng, _address, configSettings) => {
     const { color, directShownLabel, mapMode } = location;
 
     const row = this.getRowByConfigSettings(configSettings, location.rowId);
@@ -307,67 +322,59 @@ export class GoogleMap {
     // create only one marker for same location
     if (existsPoint.length > 1) return;
 
+    if (mapMode !== MAP_MODE.DEFAULT && mapMode !== 'Default map') return;
+
     const tooltipLabelContent = generateLabelContent(location);
-    let myIcon;
-    if (mapMode === MAP_MODE.DEFAULT || mapMode === 'Default map') {
-      if (color) {
-        const colorIndex = COLORS.findIndex((item) => color === item.COLOR);
-        if (colorIndex > -1) {
-          myIcon = L.icon({
-            iconUrl: [image['image' + (colorIndex + 1)]],
-            iconSize: [25, 41],
-          });
-        } else {
-          myIcon = L.icon({
-            iconUrl: [image['marker']],
-            iconSize: [25, 41],
-          });
-        }
-      } else {
-        myIcon = L.icon({
-          iconUrl: [image['marker']],
-          iconSize: [25, 41],
-        });
-      }
-      let marker = new L.Marker([lat, lng], { icon: myIcon, riseOnHover: true });
-      if (!marker || !this.map) return;
 
-      if (directShownLabel) {
-        marker.bindTooltip(directShownLabel, {
-          direction: 'right',
-          permanent: true,
-          offset: L.point(14, 0),
-          opacity: 1,
-          className: 'plugin-en-tooltip'
-        }).openTooltip();
-      }
+    // Build marker icon element
+    const colorIndex = color ? COLORS.findIndex((item) => color === item.COLOR) : -1;
+    const iconUrl = colorIndex > -1 ? image['image' + (colorIndex + 1)] : image['marker'];
 
-      if (IS_MOBILE) {
-        marker.addEventListener('touchend', () => {
-          eventBus.dispatch(EVENT_BUS_TYPE.SHOW_LOCATION_DETAILS, marker.getLatLng());
-        });
-        marker.on('click', () => {
-          eventBus.dispatch(EVENT_BUS_TYPE.SHOW_LOCATION_DETAILS, marker.getLatLng());
-        });
-      } else {
-        marker.bindPopup(tooltipLabelContent);
-        marker.on('mouseover', () => {
-          marker.openPopup();
-        });
-        marker.on('mouseout', () => {
-          marker.closePopup();
-        });
-        marker.on('click', () => {
-          eventBus.dispatch(EVENT_BUS_TYPE.SHOW_LOCATION_DETAILS, marker.getLatLng());
-        });
-        this.map.addEventListener('click', () => {
-          eventBus.dispatch(EVENT_BUS_TYPE.CLOSE_LOCATION_DETAILS);
-        });
-      }
+    const markerEl = document.createElement('div');
+    markerEl.style.cssText = 'width:25px;height:41px;cursor:pointer';
+    const img = document.createElement('img');
+    img.src = Array.isArray(iconUrl) ? iconUrl[0] : iconUrl;
+    img.style.cssText = 'width:25px;height:41px';
+    markerEl.appendChild(img);
 
-      this.markers.push(marker);
-      this.map.addLayer(marker);
+    if (directShownLabel) {
+      const label = document.createElement('span');
+      label.className = 'plugin-en-tooltip googlemap-label-tooltip';
+      label.innerHTML = directShownLabel;
+      markerEl.style.position = 'relative';
+      markerEl.appendChild(label);
     }
+
+    const marker = new this._AdvancedMarkerElement({
+      position: { lat, lng },
+      content: markerEl,
+      map: this.map,
+    });
+
+    if (IS_MOBILE) {
+      marker.addListener('click', () => {
+        eventBus.dispatch(EVENT_BUS_TYPE.SHOW_LOCATION_DETAILS, { lng, lat });
+      });
+    } else {
+      marker.addListener('click', () => {
+        eventBus.dispatch(EVENT_BUS_TYPE.SHOW_LOCATION_DETAILS, { lng, lat });
+      });
+      img.addEventListener('mouseenter', () => {
+        const container = document.createElement('div');
+        container.innerHTML = tooltipLabelContent;
+        this._infoWindow.setContent(container);
+        this._infoWindow.open({ anchor: marker, map: this.map });
+      });
+      img.addEventListener('mouseleave', () => {
+        console.log('oout');
+        // this._infoWindow.close();
+      });
+      this.map.addListener('click', () => {
+        eventBus.dispatch(EVENT_BUS_TYPE.CLOSE_LOCATION_DETAILS);
+      });
+    }
+
+    this.markers.push(marker);
   };
 
   addPanByHandler = () => {
@@ -375,10 +382,10 @@ export class GoogleMap {
     const down = document.getElementsByClassName('down-hover')[0];
     const left = document.getElementsByClassName('left-hover')[0];
     const right = document.getElementsByClassName('right-hover')[0];
-    up.onclick = () => { this.map.panBy([0, -100]); };
-    down.onclick = () => this.map.panBy([0, 100]);
-    left.onclick = () => this.map.panBy([-100, 0]);
-    right.onclick = () => this.map.panBy([100, 0]);
+    up.onclick = () => { this.map.panBy(0, -100); };
+    down.onclick = () => this.map.panBy(0, 100);
+    left.onclick = () => this.map.panBy(-100, 0);
+    right.onclick = () => this.map.panBy(100, 0);
     this.handlerAdded = true;
   };
 
@@ -402,7 +409,6 @@ export class GoogleMap {
     } catch (err) {
       console.log('geocodeError: ', err);
     }
-    // call the cbs
     if (cb) {
       cb(address);
     }
@@ -410,22 +416,28 @@ export class GoogleMap {
   };
 
   addUserAvatarMarker = () => {
-    this.userAvatarMarker.addTo(this.map);
-    this.map.flyTo({ ...this.userLocationCoords }, 5, { animiate: true, duration: 1 });
+    this.userAvatarMarker.setMap(this.map);
+    this.map.panTo({ lat: this.userLocationCoords.lat, lng: this.userLocationCoords.lng });
   };
 
   removeUserAvatarMarker = () => {
-    this.map.removeLayer(this.userAvatarMarker);
+    if (this.userAvatarMarker) {
+      this.userAvatarMarker.setMap(null);
+    }
   };
 
   loadUserAvatarMarker = () => {
-    const customIcon = L.divIcon({
-      className: 'custom-marker',
-      html: `<div class="plugin-map-en-avatar-marker"><img class='plugin-map-en-avatar' src="${this.userInfo.avatar_url}"></div>`,
-      iconAnchor: [10, 10]
-    });
+    const el = document.createElement('div');
+    el.className = 'plugin-map-en-avatar-marker';
+    const img = document.createElement('img');
+    img.className = 'plugin-map-en-avatar';
+    img.src = this.userInfo.avatar_url;
+    el.appendChild(img);
 
-    this.userAvatarMarker = L.marker([this.userLocationCoords.lat, this.userLocationCoords.lng], { icon: customIcon });
+    this.userAvatarMarker = new this._AdvancedMarkerElement({
+      position: { lat: this.userLocationCoords.lat, lng: this.userLocationCoords.lng },
+      content: el,
+    });
   };
 
   getUserLocation = () => {
@@ -445,6 +457,25 @@ export class GoogleMap {
     });
   };
 
+  getLocationByGoogle = async () => {
+    const endpoint = `https://www.googleapis.com/geolocation/v1/geolocate?key=${this.mapKey}`;
+    const resp = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ considerIp: true })
+    });
+    if (!resp.ok) {
+      const text = await resp.text();
+      throw new Error(`Google Geolocation failed: ${resp.status} ${text}`);
+    }
+    const data = await resp.json();
+    const { location } = data || {};
+    if (!location || typeof location.lat !== 'number' || typeof location.lng !== 'number') {
+      throw new Error('Invalid geolocation response');
+    }
+    return { lat: location.lat, lng: location.lng };
+  };
+
   resetUserLocationMarker = async (isShowMarker) => {
     if (isShowMarker) {
       try {
@@ -452,7 +483,7 @@ export class GoogleMap {
           const result = await pluginContext.getUserCommonInfo();
           this.userInfo = result.data;
           await this.getUserLocation();
-          this.loadUserAvatarMarker(this.userInfo.avatar_url);
+          this.loadUserAvatarMarker();
         }
         this.addUserAvatarMarker();
       } catch (error) {
@@ -469,7 +500,7 @@ export class GoogleMap {
       const result = await pluginContext.getUserCommonInfo();
       this.userInfo = result.data;
       await this.getUserLocation();
-      this.loadUserAvatarMarker(this.userInfo.avatar_url);
+      this.loadUserAvatarMarker();
       this.addUserAvatarMarker();
     } catch (err) {
       let errMessage;

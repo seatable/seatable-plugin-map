@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import intl from 'react-intl-universal';
-import 'leaflet.markercluster/dist/leaflet.markercluster-src';
 import { toaster } from 'dtable-ui-component';
 import pluginContext from '../plugin-context';
 import LocationSettings from '../components/location-settings';
@@ -23,7 +22,6 @@ import LocationDetailList from '../components/location-detail-list';
 import { GoogleMap } from '../map/google-map';
 
 import '../app.css';
-import 'leaflet/dist/leaflet.css';
 
 class App extends React.Component {
 
@@ -42,10 +40,7 @@ class App extends React.Component {
       showLocationDetail: false,
       showUserLocationChecked: true,
     };
-    this.map = null;
-    this.markers = [];
     this.timer = null;
-    this.clusterMarkers = null;
     this.mapKey = pluginContext.getSetting('dtableGoogleMapKey');
     this.mapInstance = new GoogleMap({ mapKey: this.mapKey, errorHandler: toaster.danger });
   }
@@ -211,13 +206,13 @@ class App extends React.Component {
 
   toggle = () => {
     const center = {};
-    if (this.map) {
-      const position = this.map.getCenter();
+    if (this.mapInstance.map) {
+      const position = this.mapInstance.map.getCenter();
       center.position = { lat: position.lat, lng: position.lng };
-      center.zoom = this.map.getZoom();
+      center.zoom = this.mapInstance.map.getZoom();
       window.localStorage.setItem('dtable-map-plugin-center', JSON.stringify(center));
     }
-    this.map = null;
+    this.mapInstance.map = null;
     setTimeout(() => {
       this.setState({ showDialog: false });
     }, 500);
@@ -239,7 +234,6 @@ class App extends React.Component {
     this.setState({
       isFullScreen: !this.state.isFullScreen
     });
-    this.mapInstance.map.invalidateSize();
   };
 
   getDialogStyle = () => {
