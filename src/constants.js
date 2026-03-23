@@ -1,7 +1,6 @@
 import intl from 'react-intl-universal';
 
 import { CellType } from 'dtable-utils';
-export const IMAGE_PATH = '//cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.4/images/';
 
 export const UNKNOWN_TYPE = 'unknown';
 

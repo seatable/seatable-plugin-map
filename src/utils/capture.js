@@ -5,11 +5,6 @@ const onCapture = () => {
     allowTaint: true,
     taintTest: true,
     useCORS: true,
-    ignoreElements: (element) => {
-      if (element.className === 'leaflet-top leaflet-left') {
-        return true;
-      }
-    }
   }).then(canvas => {
     const captureContainer = document.createElement('div');
     captureContainer.className = 'map-capture';

@@ -1,12 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import intl from 'react-intl-universal';
-import L from 'leaflet';
-import 'leaflet.markercluster/dist/leaflet.markercluster-src';
 import pluginContext from '../plugin-context';
 import Settings from '../components/mobile/settings';
 import Loading from '../components/loading';
-import { getLocations, getInitialMapCenter } from '../utils/location-utils';
+import { getLocations } from '../utils/location-utils';
 import ViewTabs from '../components/view-tabs';
 import { generateSettingsByConfig } from '../utils/generate-settings-config';
 import { replaceSettingItem, setSelectedViewIds } from '../utils/common-utils';
@@ -14,7 +12,6 @@ import onCapture from '../utils/capture';
 import getConfigItemByType from '../utils/get-config-item-by-type';
 import { toaster } from 'dtable-ui-component';
 import {
-  IMAGE_PATH,
   PLUGIN_NAME,
   KEY_SELECTED_VIEW_IDS,
   EVENT_BUS_TYPE
@@ -26,9 +23,6 @@ import { GoogleMap } from '../map/google-map'; // Replace './path/to/GoogleMap' 
 import { eventBus } from '../utils/event-bus';
 
 import styles from '../css/mobile-en.module.css';
-import 'leaflet/dist/leaflet.css';
-
-L.Icon.Default.imagePath = IMAGE_PATH;
 
 class App extends React.Component {
 
@@ -48,10 +42,7 @@ class App extends React.Component {
       isShowSameLocationDetails: false,
       showUserLocationChecked: true,
     };
-    this.map = null;
-    this.markers = [];
     this.timer = null;
-    this.clusterMarkers = null;
     this.cellValueUtils = pluginContext.cellValueUtils;
     this.mapKey = pluginContext.getSetting('dtableGoogleMapKey');
     this.mapInstance = new GoogleMap({ mapKey: this.mapKey, errorHandler: toaster.danger });
@@ -137,27 +128,6 @@ class App extends React.Component {
     });
   }
 
-  async renderMap() {
-    const { locations } = this.state;
-    let lang = pluginContext.getLanguage();
-    let url = `https://mt0.google.com/vt/lyrs=m@160000000&hl=${lang}&gl=${lang}&src=app&y={y}&x={x}&z={z}&s=Ga`;
-    if (!document.getElementById('map-container')) return;
-    const { position, zoom } = await getInitialMapCenter(locations);
-    if (!this.map) {
-      this.map = L.map('map-container', {
-        center: position,
-        zoom: zoom,
-        maxBounds: [[-90, -180], [90, 180]],
-        maxBoundsViscosity: 1.0 // prevent the user from dragging outside the bounds
-      })
-        .invalidateSize();
-      L.tileLayer(url, {
-        maxZoom: 18,
-        minZoom: 2
-      }).addTo(this.map);
-    }
-  }
-
   onDTableConnect() {
     this.unsubscribeLocalDtableChanged = window.dtableSDK.subscribe('local-dtable-changed', () => { this.onDTableChanged(); });
     this.unsubscribeRemoteDtableChanged = window.dtableSDK.subscribe('remote-dtable-changed', () => { this.onDTableChanged(); });
@@ -168,8 +138,8 @@ class App extends React.Component {
       isDataLoaded: true,
       settings,
       selectedViewIdx
-    }, () => {
-      this.renderMap();
+    }, async () => {
+      await this.mapInstance.renderMap();
     });
   }
 
@@ -244,13 +214,13 @@ class App extends React.Component {
 
   toggle = () => {
     const center = {};
-    if (this.map) {
-      const position = this.map.getCenter();
+    if (this.mapInstance.map) {
+      const position = this.mapInstance.map.getCenter();
       center.position = { lat: position.lat, lng: position.lng };
-      center.zoom = this.map.getZoom();
+      center.zoom = this.mapInstance.map.getZoom();
       window.localStorage.setItem('dtable-map-plugin-center', JSON.stringify(center));
     }
-    this.map = null;
+    this.mapInstance.map = null;
     setTimeout(() => {
       this.setState({ showDialog: false });
     }, 500);
