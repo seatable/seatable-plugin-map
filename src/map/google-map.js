@@ -100,6 +100,7 @@ export class GoogleMap {
 
       this._infoWindow = new this._InfoWindow();
       this._addGeolocationControl();
+      this._addZoomControl();
     }
 
     if (showUserLocation) {
@@ -143,6 +144,35 @@ export class GoogleMap {
         });
     });
     this.map.controls[this._ControlPosition.RIGHT_BOTTOM].push(container);
+  };
+
+  _addZoomControl = () => {
+    const wrapper = document.createElement('div');
+    wrapper.style.cssText = 'display:flex;flex-direction:column;margin:0 10px 10px 0;background-color:#fff;box-shadow:0 0 4px rgb(0 0 0 / 12%);border-radius:4px;overflow:hidden;';
+
+    const btnStyle = 'width:30px;height:30px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:bold;user-select:none;color:#212529;';
+
+    const zoomIn = document.createElement('div');
+    zoomIn.style.cssText = btnStyle + 'border-bottom:1px solid #e0e0e0;';
+    zoomIn.textContent = '+';
+    zoomIn.addEventListener('click', () => {
+      this.map.setZoom(this.map.getZoom() + 1);
+    });
+    zoomIn.addEventListener('mouseenter', () => { zoomIn.style.backgroundColor = '#f5f5f5'; });
+    zoomIn.addEventListener('mouseleave', () => { zoomIn.style.backgroundColor = ''; });
+
+    const zoomOut = document.createElement('div');
+    zoomOut.style.cssText = btnStyle;
+    zoomOut.textContent = '−';
+    zoomOut.addEventListener('click', () => {
+      this.map.setZoom(this.map.getZoom() - 1);
+    });
+    zoomOut.addEventListener('mouseenter', () => { zoomOut.style.backgroundColor = '#f5f5f5'; });
+    zoomOut.addEventListener('mouseleave', () => { zoomOut.style.backgroundColor = ''; });
+
+    wrapper.appendChild(zoomIn);
+    wrapper.appendChild(zoomOut);
+    this.map.controls[this._ControlPosition.RIGHT_BOTTOM].push(wrapper);
   };
 
   renderLocations = (locations, configSettings) => {
@@ -366,8 +396,7 @@ export class GoogleMap {
         this._infoWindow.open({ anchor: marker, map: this.map });
       });
       img.addEventListener('mouseleave', () => {
-        console.log('oout');
-        // this._infoWindow.close();
+        this._infoWindow.close();
       });
       this.map.addListener('click', () => {
         eventBus.dispatch(EVENT_BUS_TYPE.CLOSE_LOCATION_DETAILS);
