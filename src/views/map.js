@@ -427,8 +427,8 @@ class App extends React.Component {
     return (
       <div className="plugin-map-dialog-en" style={this.getDialogStyle()}>
         <div className={'dtable-map-plugin-title'}>
-          <div className='plugin-logo'>
-            <img className="plugin-logo-icon" src={logo} alt="" />
+          <div className='dtable-plugin-logo'>
+            <img className="dtable-plugin-logo-icon" src={logo} alt="" />
             <span className="dtable-map-plugin-name">{intl.get('Map_plugin')}</span>
           </div>
           <div className="map-plugin-en-tabs">
@@ -447,7 +447,7 @@ class App extends React.Component {
           <div className="map-operators">
             <span className="map-operator dtable-font dtable-icon-download btn-margin-right" onClick={onCapture}></span>
             <span className={`map-operator dtable-font dtable-icon-full-screen btn-margin-right ${isFullScreen ? 'full-screen-active' : ''}`} onClick={this.toggleFullScreen}></span>
-            <span className="map-operator dtable-font dtable-icon-settings btn-margin-right" onClick={this.toggleSettingDialog}></span>
+            <span className="map-operator dtable-font dtable-icon-set-up btn-margin-right" onClick={this.toggleSettingDialog}></span>
             <span className="map-operator dtable-font dtable-icon-x btn-margin-right" onClick={this.toggle}></span>
           </div>
         </div>

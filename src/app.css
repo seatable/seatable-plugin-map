@@ -37,17 +37,8 @@
   font-weight: 600;
 }
 
-.plugin-map-dialog-en .plugin-logo {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+.plugin-map-dialog-en .dtable-plugin-logo {
   margin: 0 80px 0 0;
-}
-
-.plugin-map-dialog-en .plugin-logo .plugin-logo-icon {
-  width: 20px;
-  height: 20px;
-  margin-right: 4px;
 }
 
 .plugin-map-dialog-en .map-operators {
@@ -71,6 +62,7 @@
   display: inline-block;
   width: 24px;
   height: 24px;
+  font-size: 16px;
   color: #000;
   opacity: .5;
   text-align: center;

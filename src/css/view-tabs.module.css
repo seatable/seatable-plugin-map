@@ -35,7 +35,7 @@
 }
 
 .view-item .tab-item-active {
-  border-color: #3b88fd;
+  border-color: #21AD7E;
   color: #212529;
   cursor: default;
 }
@@ -47,7 +47,7 @@
   justify-content: center;
   width: 100%;
   height: 100%;
-  color: #999;
+  color: #666;
   border-bottom: 2px solid transparent;
 }
 
@@ -130,7 +130,7 @@
 }
 
 .view-item .view-item-content:hover {
-  border-color: #3b88fd;
+  border-color: #21AD7E;
   color: #212529;
   cursor: pointer;
 }
