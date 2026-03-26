@@ -11,14 +11,14 @@ class FileEnlargeFormatter extends Component {
 
   toggle = () => {
     this.props.closeEnlargeFormatter();
-  }
+  };
 
   downloadFile = (event, url) => {
     event.stopPropagation();
     let seafileFileIndex = url.indexOf('seafile-connector');
     if (seafileFileIndex > -1) return;
     window.location.href = url + '?dl=1';
-  }
+  };
 
   render() {
     const { value } = this.props;
@@ -26,7 +26,7 @@ class FileEnlargeFormatter extends Component {
     return (
       <Modal isOpen={true} toggle={this.toggle} className="file-enlarge-formatter-dialog">
         <ModalHeader toggle={this.toggle}>{intl.get('All_files')}</ModalHeader>
-        <ModalBody style={{padding: 0}} className="file-enlarge-formatter-body">
+        <ModalBody style={{ padding: 0 }} className="file-enlarge-formatter-body">
           {Array.isArray(value) && value.length > 0 && value.map((item, index) => {
             const { url, type, size, name } = item;
             return (

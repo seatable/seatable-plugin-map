@@ -357,17 +357,17 @@ export const generateLabelContent = (location) => {
     if (labelHtml) {
       return (`
         ${labelHtml}
-        <i class='plugin-label-arrow dtable-font dtable-icon-drop-down'></i>
+        <i class='plugin-label-arrow dtable-font dtable-icon-down3'></i>
       `);
     } else {
-      return '<p><span class=\'row-cell-empty\'></span></p> <i class=\'plugin-label-arrow dtable-font dtable-icon-drop-down\'></i>';
+      return '<p><span class=\'row-cell-empty\'></span></p> <i class=\'plugin-label-arrow dtable-font dtable-icon-down3\'></i>';
     }
   } else {
     const { detailLocation } = getFormattedLocation(location);
     return (`
       <p>${detailLocation}</p>
       ${labelHtml}
-      <i class='plugin-label-arrow dtable-font dtable-icon-drop-down'></i>
+      <i class='plugin-label-arrow dtable-font dtable-icon-down3'></i>
     `);
   }
 };
