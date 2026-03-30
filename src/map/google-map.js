@@ -229,8 +229,8 @@ export class GoogleMap {
       const markerEl = document.createElement('div');
       markerEl.className = 'map-plugin-custom-image-container';
       markerEl.innerHTML = imgSrc
-        ? `<img src="${imgSrc}" width="72" height="72" /><span class="map-plugin-custom-image-number">${imageUrlList.length}</span><i class='plugin-map-image-label-arrow dtable-font dtable-icon-drop-down'></i>`
-        : '<div class="map-plugin-empty-custom-image-wrapper"></div><i class=\'plugin-map-image-label-arrow dtable-font dtable-icon-drop-down\'></i>';
+        ? `<img src="${imgSrc}" width="72" height="72" /><span class="map-plugin-custom-image-number">${imageUrlList.length}</span><i class='plugin-map-image-label-arrow dtable-font dtable-icon-down3'></i>`
+        : '<div class="map-plugin-empty-custom-image-wrapper"></div><i class=\'plugin-map-image-label-arrow dtable-font dtable-icon-down3\'></i>';
 
       const marker = new this._AdvancedMarkerElement({
         position: { lat: Number(lat), lng: Number(lng) },
