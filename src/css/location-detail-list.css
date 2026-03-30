@@ -28,7 +28,7 @@
 }
 
 .location-detail-list .location-detail-header .dtable-font {
-  color: #999;
+  color: #666;
 }
 
 .location-detail-list .location-detail-address {
@@ -64,7 +64,7 @@
   align-items: center;
   justify-content: flex-end;
   font-size: 13px;
-  color: #aaa;
+  color: #666;
 }
 
 .location-detail-list .location-detail-header .change-detail-height:hover {
