@@ -1,12 +1,12 @@
 {
   "name": "seatable-plugin-map",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "private": true,
   "dependencies": {
     "@googlemaps/js-api-loader": "^2.0.1",
     "@googlemaps/markerclusterer": "^2.6.2",
     "axios": "~1.8.*",
-    "dtable-ui-component": "~6.0.*",
+    "dtable-ui-component": "6.0.110",
     "dtable-utils": "5.0.10",
     "html2canvas": "^1.4.1",
     "leaflet": "^1.6.0",
