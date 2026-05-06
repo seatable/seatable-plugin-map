@@ -218,8 +218,10 @@ export const renderMarkByPosition = (locations, renderer, start = 0, configSetti
   setTimeout(() => {
     stack.forEach((location) => {
       const position = location.location;
-      if (Number(position.lng) && Number(position.lat)) {
-        renderer(location, Number(position.lat), Number(position.lng), null, configSettings);
+      const lng = position.lngLat ? position.lngLat.lng : position.lng;
+      const lat = position.lngLat ? position.lngLat.lat : position.lat;
+      if (Number(lng) && Number(lat)) {
+        renderer(location, Number(lat), Number(lng), null, configSettings);
       }
     });
     renderMarkByPosition(locations, renderer, start, configSettings);
