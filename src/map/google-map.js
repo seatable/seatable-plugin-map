@@ -352,8 +352,6 @@ export class GoogleMap {
     // create only one marker for same location
     if (existsPoint.length > 1) return;
 
-    if (mapMode !== MAP_MODE.DEFAULT && mapMode !== 'Default map') return;
-
     const tooltipLabelContent = generateLabelContent(location);
 
     // Build marker icon element
@@ -528,7 +526,16 @@ export class GoogleMap {
     try {
       const result = await pluginContext.getUserCommonInfo();
       this.userInfo = result.data;
-      await this.getUserLocation();
+      try {
+        await this.getUserLocation();
+      } catch (gpsErr) {
+        const point = await this.getLocationByGoogle();
+        if (point && typeof point.lat === 'number' && typeof point.lng === 'number') {
+          this.userLocationCoords = { ...point };
+        } else {
+          throw gpsErr;
+        }
+      }
       this.loadUserAvatarMarker();
       this.addUserAvatarMarker();
     } catch (err) {
