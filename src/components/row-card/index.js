@@ -86,11 +86,11 @@ class RowCard extends PureComponent {
 
   render() {
     const { row, nameColumn, isShowRemoveCardItemBtn } = this.props;
-    const cardItemClass = classnames('row-card-item position-relative d-flex', { 'row-card-item-highlight': this.props.isHighlightRow });
+    const cardItemClass = classnames('plugin-map-row-card-item position-relative d-flex', { 'plugin-map-row-card-item-highlight': this.props.isHighlightRow });
     return (
       <div className={cardItemClass} onClick={this.onSelectRow}>
         <div className="row-card-item-container w-100">
-          <div className="plugin-map-row-card-item-header w-100 align-items-center">
+          <div className="row-card-item-header w-100 align-items-center">
             <div className="row-card-item-name seatable-row-card-name h-100">
               <Formatter
                 isRowExpand={false}

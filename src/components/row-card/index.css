@@ -1,4 +1,4 @@
-.plugin-map-dialog-en .row-card-item {
+.plugin-map-dialog-en .plugin-map-row-card-item {
   height: 88px;
   margin-top: 10px;
   background-color: #fff;
@@ -10,25 +10,25 @@
   align-items: flex-start;
 }
 
-.plugin-map-dialog-en .row-card-item:first-child {
+.plugin-map-dialog-en .plugin-map-row-card-item:first-child {
   margin-top: 0;
 }
 
-.plugin-map-dialog-en .row-card-item:hover {
+.plugin-map-dialog-en .plugin-map-row-card-item:hover {
   cursor: pointer;
   border-color: rgba(0, 0, 0, 0.3);
 }
 
-.plugin-map-dialog-en .row-card-item.row-card-item-highlight {
+.plugin-map-dialog-en .plugin-map-row-card-item.plugin-map-row-card-item-highlight {
   border-color: rgba(0, 0, 0, 0.3);
 }
 
-.plugin-map-dialog-en .row-card-item .row-card-item-container {
+.plugin-map-dialog-en .plugin-map-row-card-item .row-card-item-container {
   overflow: hidden;
   padding: 12px;
 }
 
-.plugin-map-dialog-en .row-card-item .plugin-map-row-card-item-header {
+.plugin-map-dialog-en .plugin-map-row-card-item .row-card-item-header {
   height: 24px;
   display: inline-flex;
   justify-content: space-between;
@@ -36,18 +36,18 @@
   z-index: 1;
 }
 
-.plugin-map-dialog-en .row-card-item .row-card-item-name {
+.plugin-map-dialog-en .plugin-map-row-card-item .row-card-item-name {
   flex: 1 1;
   font-weight: 400;
 }
 
-.plugin-map-dialog-en .row-card-item .row-card-item-remove {
+.plugin-map-dialog-en .plugin-map-row-card-item .row-card-item-remove {
   height: 24px;
   width: 24px;
   text-align: center;
 }
 
-.plugin-map-dialog-en .row-card-item .row-card-remove-icon {
+.plugin-map-dialog-en .plugin-map-row-card-item .row-card-remove-icon {
   font-size: 16px;
   color: #666;
 }
@@ -56,30 +56,30 @@
   color: #212529;
 }
 
-.plugin-map-dialog-en .row-card-item .row-card-item-content {
+.plugin-map-dialog-en .plugin-map-row-card-item .row-card-item-content {
   display: flex;
   width: 100%;
   overflow-x: scroll;
   height: 40px;
 }
 
-.plugin-map-dialog-en .row-card-item .row-card-item-content::-webkit-scrollbar {
+.plugin-map-dialog-en .plugin-map-row-card-item .row-card-item-content::-webkit-scrollbar {
   display: none;
 }
 
-.plugin-map-dialog-en .row-card-item .row-card-cell-value {
+.plugin-map-dialog-en .plugin-map-row-card-item .row-card-cell-value {
   justify-content: flex-start;
   flex-shrink: 0;
   text-align: left;
   margin: 0 8px;
 }
 
-.plugin-map-dialog-en .row-card-item .row-card-cell-value:first-child {
+.plugin-map-dialog-en .plugin-map-row-card-item .row-card-cell-value:first-child {
   justify-content: flex-start;
   margin: 0 8px 0 0;
 }
 
-.plugin-map-dialog-en .row-card-item .row-card-cell-value-empty {
+.plugin-map-dialog-en .plugin-map-row-card-item .row-card-cell-value-empty {
   display: inline-block;
   height: 8px;
   width: 20px;
@@ -88,7 +88,7 @@
 }
 
 .plugin-map-dialog-en
-  .row-card-item
+  .plugin-map-row-card-item
   .row-card-item-content
   .collaborator-formatter {
   width: 100%;
@@ -98,12 +98,12 @@
 }
 
 .plugin-map-dialog-en
-  .row-card-item
+  .plugin-map-row-card-item
   .row-card-item-content
   .collaborator-formatter
   .dtable-ui.collaborator-item,
 .plugin-map-dialog-en
-  .row-card-item
+  .plugin-map-row-card-item
   .row-card-item-content
   .collaborator-formatter
   .dtable-ui.collaborator-item
@@ -112,7 +112,7 @@
 }
 
 .plugin-map-dialog-en
-  .row-card-item
+  .plugin-map-row-card-item
   .row-card-item-content
   .multiple-select-formatter {
   width: 100%;
@@ -121,21 +121,21 @@
 }
 
 .plugin-map-dialog-en
-  .row-card-item
+  .plugin-map-row-card-item
   .multiple-select-formatter
   .grid_cell_type_multiple-select {
   margin-right: 10px;
 }
 
 .plugin-map-dialog-en
-  .row-card-item
+  .plugin-map-row-card-item
   .multiple-select-formatter
   .grid_cell_type_multiple-select:last-child {
   margin-right: 0;
 }
 
 .plugin-map-dialog-en
-  .row-card-item
+  .plugin-map-row-card-item
   .row-card-item-content
   .cell-value-ellipsis {
   display: inline-block;
@@ -143,7 +143,7 @@
   width: 100%;
 }
 
-.plugin-map-dialog-en .row-card-item .row-card-item-content .image-cell-value {
+.plugin-map-dialog-en .plugin-map-row-card-item .row-card-item-content .image-cell-value {
   height: 30px;
   width: 40px;
   position: relative;
@@ -153,9 +153,9 @@
 }
 
 .plugin-map-dialog-en
-  .row-card-item
-  .row-card-item-content
-  .image-cell-value
+.plugin-map-row-card-item
+.row-card-item-content
+.image-cell-value
   img {
   display: inline-block;
   max-height: 30px;
@@ -163,7 +163,7 @@
   border-radius: 3px;
 }
 
-.plugin-map-dialog-en .row-card-item .image-cell-value .cell-value-size {
+.plugin-map-dialog-en .plugin-map-row-card-item .image-cell-value .cell-value-size {
   position: absolute;
   bottom: -2px;
   right: -4px;
@@ -178,18 +178,18 @@
   color: #fff;
 }
 
-.plugin-map-dialog-en .row-card-item .number-formatter {
+.plugin-map-dialog-en .plugin-map-row-card-item .number-formatter {
   width: 100%;
   height: 100%;
   display: inline-flex;
   align-items: center;
 }
 
-.plugin-map-dialog-en .row-card-item .geolocation-formatter {
+.plugin-map-dialog-en .plugin-map-row-card-item .geolocation-formatter {
   width: 100%;
 }
 
-.plugin-map-dialog-en .row-card-item .geolocation-formatter div {
+.plugin-map-dialog-en .plugin-map-row-card-item .geolocation-formatter div {
   width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
