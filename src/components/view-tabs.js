@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { ModalPortal } from 'dtable-ui-component';
+import { ModalPortal, DTableToolTip, DtableIconButton } from 'dtable-ui-component';
 import NewViewDialog from './dialog/new-view-dialog';
 import RenameViewDialog from './dialog/rename-view-dialog';
 import DropdownMenu from './dropdownmenu';
@@ -383,8 +383,14 @@ class ViewTabs extends Component {
             </span>
           </div>
         }
-        <div className={tabStyles['btn-add-view']} key={'btn-add-view'} onClick={this.onNewViewToggle}>
-          <i className={`${tabStyles['add-map-view-icon']} dtable-font dtable-icon-add-table`}></i>
+        <div className={tabStyles['btn-add-view']} key={'btn-add-view'}>
+          <DtableIconButton
+            symbol='dtable-icon-add-table'
+            tooltip={intl.get('New_view')}
+            aria-label={intl.get('New_view')}
+            onClick={this.onNewViewToggle}
+            className="mt-5"
+          />
         </div>
         {isShowNewViewDialog &&
           <NewViewDialog

@@ -32,8 +32,11 @@ const zh_CN = {
   "Back": "返回",
   "Total_records": "总行数",
   "Exceeded_the_free_locations_limit": "地理位置超过 100 个限制，请升级到付费版本。",
-  "Exceeded_the_max_locations_limit": "地理位置超过 5000 个限制"
+  "Exceeded_the_max_locations_limit": "地理位置超过 5000 个限制",
+  "Close": "关闭",
+  "Download": "下载",
+  "Full_screen": "全屏"
 }
-;
+  ;
 
 export default zh_CN;
