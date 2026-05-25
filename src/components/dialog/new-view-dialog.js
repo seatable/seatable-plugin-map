@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Modal, ModalBody, ModalHeader, ModalFooter, Form, FormGroup, Label, Input, Alert, Button } from 'reactstrap';
+import { Modal, ModalBody, ModalFooter, Form, FormGroup, Label, Input, Alert } from 'reactstrap';
 import intl from 'react-intl-universal';
+import { DtableCustomButton, DTableModalHeader } from 'dtable-ui-component';
 
 const propTypes = {
   onNewViewConfirm: PropTypes.func,
@@ -44,7 +45,7 @@ class NewViewDialog extends React.Component {
   render() {
     return (
       <Modal isOpen={true} toggle={this.toggle} autoFocus={false}>
-        <ModalHeader toggle={this.toggle}>{intl.get('New_view')}</ModalHeader>
+        <DTableModalHeader toggle={this.toggle}>{intl.get('New_view')}</DTableModalHeader>
         <ModalBody>
           <Form>
             <FormGroup>
@@ -56,8 +57,8 @@ class NewViewDialog extends React.Component {
           {this.state.errMessage && <Alert color="danger" className="mt-2">{intl.get(this.state.errMessage)}</Alert>}
         </ModalBody>
         <ModalFooter>
-          <Button color="secondary" onClick={this.toggle}>{intl.get('Cancel')}</Button>
-          <Button color="primary" onClick={this.handleSubmit}>{intl.get('Submit')}</Button>
+          <DtableCustomButton variant="secondary" onClick={this.toggle}>{intl.get('Cancel')}</DtableCustomButton>
+          <DtableCustomButton variant="primary" onClick={this.handleSubmit}>{intl.get('Submit')}</DtableCustomButton>
         </ModalFooter>
       </Modal>
     );
