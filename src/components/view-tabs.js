@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { ModalPortal } from 'dtable-ui-component';
+import { DTableDropdownItem, ModalPortal } from 'dtable-ui-component';
 import NewViewDialog from './dialog/new-view-dialog';
 import RenameViewDialog from './dialog/rename-view-dialog';
 import DropdownMenu from './dropdownmenu';
@@ -161,18 +161,10 @@ class ViewTab extends Component {
                   <DropdownMenu
                     dropdownMenuPosition={dropdownMenuPosition}
                     options={
-                      <React.Fragment>
-                        <button className="dropdown-item" onClick={this.props.onRenameViewToggle}>
-                          <i className="item-icon dtable-font dtable-icon-rename"></i>
-                          <span className="item-text">{(intl.get('Rename_view'))}</span>
-                        </button>
-                        {canDelete &&
-                          <button className="dropdown-item" onClick={() => this.props.onDeleteView(index)}>
-                            <i className="item-icon dtable-font dtable-icon-delete"></i>
-                            <span className="item-text">{intl.get('Delete_view')}</span>
-                          </button>
-                        }
-                      </React.Fragment>
+                      <>
+                        <DTableDropdownItem toggle={false} onClick={this.props.onRenameViewToggle} icon={<i className="dtable-font dtable-icon-rename"></i>} content={(intl.get('Rename_view'))} />
+                        {canDelete && (<DTableDropdownItem toggle={false} onClick={() => this.props.onDeleteView(index)} icon={<i className="dtable-font dtable-icon-delete"></i>} content={(intl.get('Delete_view'))} />)}
+                      </>
                     }
                   />
                 </ModalPortal>

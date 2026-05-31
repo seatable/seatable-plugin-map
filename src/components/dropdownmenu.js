@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { DTableDropdownMenu } from 'dtable-ui-component';
 
 const propTypes = {
   dropdownMenuPosition: PropTypes.object,
@@ -17,9 +18,9 @@ class DropdownMenu extends React.Component {
       ...dropdownMenuPosition,
     };
     return (
-      <div className="dtable-dropdown-menu dropdown-menu large show" style={dropdownMenuStyle}>
+      <DTableDropdownMenu className="show" style={dropdownMenuStyle}>
         {options || <div className="no-options">{'No_options'}</div>}
-      </div>
+      </DTableDropdownMenu>
     );
   }
 }
