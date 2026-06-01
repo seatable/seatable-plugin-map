@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import LocationSettingsItem from './local-settings-widgets/location-settings-item';
 import intl from 'react-intl-universal';
 import { getTableByName, getViewByName, getViewShownColumns } from 'dtable-utils';
-import { FieldDisplaySetting, DTableSwitch } from 'dtable-ui-component';
+import { FieldDisplaySetting, DTableSwitch, IconButton } from 'dtable-ui-component';
 import { MAP_MODE, SETTING_TITLE } from '../constants.js';
 import getConfigItemByType from '../utils/get-config-item-by-type';
 
@@ -123,7 +123,7 @@ class LocationSettings extends Component {
         <div className="dtable-plugin-location-settings-header">
           <div className="location-settings-header-container align-items-center">
             <h3 className="m-0 setting-header-title h5">{intl.get('Settings')}</h3>
-            <i className="dtable-font dtable-icon-x" onClick={onHideMapSettings}></i>
+            <IconButton icon='x'title={intl.get('Close')} onClick={onHideMapSettings}/>
           </div>
         </div>
         <div className="dtable-plugin-location-settings-parameter">

@@ -19,11 +19,10 @@
   border-bottom: 1px solid #e7eaec;
   border-radius: 12px 12px 0 0;
 }
-
-.plugin-map-dialog-en .full-screen-active {
-  background-color: #e0e0e0;
-  border-radius: 2px;
-  color: #404040;
+.full-screen-active {
+  background-color: rgba(0, 0, 0, 0.04) !important;
+  border-radius: 4px;
+  color: #666;
 }
 
 .plugin-map-dialog-en .dtable-map-plugin-title .modal-title {
@@ -63,14 +62,14 @@
   width: 24px;
   height: 24px;
   font-size: 16px;
-  color: #000;
-  opacity: .5;
+  color: #666;
   text-align: center;
   cursor: pointer;
+  border-radius: 4px;
 }
 
 .plugin-map-dialog-en .dtable-map-plugin-title .map-operator:hover {
-  opacity: .75;
+  background-color: rgba(0, 0, 0, 0.04) !important;
 }
 
 .plugin-map-dialog-en .btn-margin-right {

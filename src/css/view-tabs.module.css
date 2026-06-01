@@ -108,7 +108,7 @@
   display: flex;
   align-items: center;
   width: 24px;
-  height: 100%; 
+  height: 24px; 
 }
 
 .add-map-view-icon {
@@ -117,15 +117,15 @@
   margin-left: 4px;
   text-align: center;
   cursor: pointer;
-  color: #000;
-  opacity: .5;
-  font-size: 14px;
-  font-weight: 500;
+  color: #666;
+  font-size: 16px;
+  font-weight: normal;
   line-height: 24px;
+  border-radius: 4px;
 }
 
 .add-map-view-icon:hover {
-  opacity: .75;
+  background-color: rgba(0, 0, 0, 0.04) !important;
 }
 
 .view-item .view-item-content:hover {

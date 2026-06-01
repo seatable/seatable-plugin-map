@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import intl from 'react-intl-universal';
-import { toaster } from 'dtable-ui-component';
+import { toaster, IconButton } from 'dtable-ui-component';
 import pluginContext from '../plugin-context';
 import LocationSettings from '../components/location-settings';
 import Loading from '../components/loading';
@@ -445,10 +445,30 @@ class App extends React.Component {
             />
           </div>
           <div className="map-operators">
-            <span className="map-operator dtable-font dtable-icon-download btn-margin-right" onClick={onCapture}></span>
-            <span className={`map-operator dtable-font dtable-icon-full-screen btn-margin-right ${isFullScreen ? 'full-screen-active' : ''}`} onClick={this.toggleFullScreen}></span>
-            <span className="map-operator dtable-font dtable-icon-set-up btn-margin-right" onClick={this.toggleSettingDialog}></span>
-            <span className="map-operator dtable-font dtable-icon-x btn-margin-right" onClick={this.toggle}></span>
+            <IconButton
+              icon='download'
+              title={intl.get('Download')}
+              onClick={onCapture}
+              className="btn-margin-right"
+            />
+            <IconButton
+              icon='full-screen'
+              title={intl.get('Full_screen')}
+              onClick={this.toggleFullScreen}
+              className={`btn-margin-right  ${isFullScreen ? 'full-screen-active' : ''}`}
+            />
+            <IconButton
+              icon='set-up'
+              title={intl.get('Settings')}
+              onClick={this.toggleSettingDialog}
+              className="btn-margin-right"
+            />
+            <IconButton
+              icon='x'
+              title={intl.get('Close')}
+              onClick={this.toggle}
+              className="btn-margin-right"
+            />
           </div>
         </div>
         <div className={'flex-fill map-plugin-modal-body ' + (isFullScreen ? 'map-plugin-modal-body-full-screen' : '')}>
