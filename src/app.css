@@ -21,9 +21,9 @@
 }
 
 .plugin-map-dialog-en .full-screen-active {
-  background-color: #e0e0e0;
+  background-color: rgba(0,0,0,.04);
   border-radius: 2px;
-  color: #404040;
+  color: #404040 !important;
 }
 
 .plugin-map-dialog-en .dtable-map-plugin-title .modal-title {
@@ -63,14 +63,14 @@
   width: 24px;
   height: 24px;
   font-size: 16px;
-  color: #000;
-  opacity: .5;
+  color: #666;
   text-align: center;
   cursor: pointer;
+  border-radius: 4px;
 }
 
 .plugin-map-dialog-en .dtable-map-plugin-title .map-operator:hover {
-  opacity: .75;
+  background-color: rgba(0,0,0,.04);
 }
 
 .plugin-map-dialog-en .btn-margin-right {
@@ -117,19 +117,6 @@
   width: 100%;
   padding: 10px 0;
   border-bottom: 1px solid #e4e4e4;
-}
-
-.plugin-map-dialog-en .dtable-icon-x {
-  font-weight: 700;
-}
-
-.plugin-map-dialog-en .dtable-plugin-location-settings-header .dtable-icon-x:hover {
-  opacity: .8;
-}
-
-.plugin-map-dialog-en .location-settings-header-container .dtable-font {
-  color: #000;
-  opacity: 0.5;
 }
 
 .plugin-map-dialog-en .setting-header-title {

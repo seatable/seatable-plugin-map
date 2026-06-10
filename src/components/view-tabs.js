@@ -360,20 +360,20 @@ class ViewTabs extends Component {
           {this.renderTabs()}
         </div>
         {(!isMobile && (canScrollPrev || canScrollNext)) &&
-          <div className={tabStyles['views-scroll-control']}>
-            <span
-              className={`${tabStyles['scroll-control-btn']} ${tabStyles['scroll-prev']} ${canScrollPrev && tabStyles['scroll-active']}`}
-              onClick={this.onScrollWithControl.bind(this, SCROLL_TYPE.PREV)}
-            >
-              <i className={`dtable-font dtable-icon-left-slide ${tabStyles['btn-scroll-icon']}`} />
-            </span>
-            <span
-              className={`${tabStyles['scroll-control-btn']} ${tabStyles['scroll-next']} ${canScrollNext && tabStyles['scroll-active']}`}
-              onClick={this.onScrollWithControl.bind(this, SCROLL_TYPE.NEXT)}
-            >
-              <i className={`dtable-font dtable-icon-right-slide ${tabStyles['btn-scroll-icon']}`} />
-            </span>
-          </div>
+        <div className={tabStyles['views-scroll-control']}>
+          <span
+            className={`seatable-icon-btn ${tabStyles['scroll-control-btn']} ${tabStyles['scroll-prev']} ${ tabStyles['scroll-active']}`}
+            onClick={this.onScrollWithControl.bind(this, SCROLL_TYPE.PREV)}
+          >
+            <i className={`dtable-font dtable-icon-left-slide ${tabStyles['btn-scroll-icon']}`} />
+          </span>
+          <span
+            className={`seatable-icon-btn ${tabStyles['scroll-control-btn']} ${tabStyles['scroll-next']} ${canScrollNext && tabStyles['scroll-active']}`}
+            onClick={this.onScrollWithControl.bind(this, SCROLL_TYPE.NEXT)}
+          >
+            <i className={`dtable-font dtable-icon-right-slide ${tabStyles['btn-scroll-icon']}`} />
+          </span>
+        </div>
         }
         <div className={tabStyles['btn-add-view']} key={'btn-add-view'} onClick={this.onNewViewToggle}>
           <i className={`${tabStyles['add-map-view-icon']} dtable-font dtable-icon-add-table`}></i>
