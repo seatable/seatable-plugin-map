@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import { Modal, ModalBody } from 'reactstrap';
 import intl from 'react-intl-universal';
 import PropTypes from 'prop-types';
-import { FileItemFormatter, ModalHeader } from 'dtable-ui-component';
+import { FileItemFormatter, DTableModalHeader } from 'dtable-ui-component';
+
 import { bytesToSize } from '../../../utils/common-utils';
 
 import '../../../assets/css/file-enlarge-formatter.css';
@@ -25,7 +26,7 @@ class FileEnlargeFormatter extends Component {
 
     return (
       <Modal isOpen={true} toggle={this.toggle} className="file-enlarge-formatter-dialog">
-        <ModalHeader toggle={this.toggle}>{intl.get('All_files')}</ModalHeader>
+        <DTableModalHeader toggle={this.toggle}>{intl.get('All_files')}</DTableModalHeader>
         <ModalBody style={{ padding: 0 }} className="file-enlarge-formatter-body">
           {Array.isArray(value) && value.length > 0 && value.map((item, index) => {
             const { url, type, size, name } = item;
@@ -46,7 +47,7 @@ class FileEnlargeFormatter extends Component {
                   }
                 </div>
                 {(type === 'file' && url.indexOf('seafile-connector') === -1) && (
-                  <div className="enlarge-file-item-operation" onClick={(event) => this.downloadFile(event, url)}>
+                  <div className="enlarge-file-item-operation seatable-icon-btn" onClick={(event) => this.downloadFile(event, url)}>
                     <i className="dtable-font dtable-icon-download file-download-icon"></i>
                   </div>
                 )}
