@@ -63,7 +63,7 @@
   width: 24px;
   height: 24px;
   font-size: 16px;
-  color: #666;
+  color: var(--bs-icon-color);
   text-align: center;
   cursor: pointer;
   border-radius: 4px;
