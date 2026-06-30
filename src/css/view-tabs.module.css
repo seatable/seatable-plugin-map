@@ -109,7 +109,7 @@
 }
 
 .add-map-view-icon:hover {
-  background-color: rgba(0,0,0,.04);
+  background-color: var(--bs-btn-background-hover);
 }
 
 .view-item .view-item-content:hover {
