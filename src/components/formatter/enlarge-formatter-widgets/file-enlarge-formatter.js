@@ -3,7 +3,6 @@ import { Modal, ModalBody } from 'reactstrap';
 import intl from 'react-intl-universal';
 import PropTypes from 'prop-types';
 import { FileItemFormatter, DTableModalHeader } from 'dtable-ui-component';
-
 import { bytesToSize } from '../../../utils/common-utils';
 
 import '../../../assets/css/file-enlarge-formatter.css';
