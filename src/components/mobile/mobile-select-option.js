@@ -57,7 +57,7 @@ class MobileSelectOption extends Component {
     return (
       <div className={styles['setting']}>
         <div className={styles['dtable-map-plugin-title']}>
-          <span onClick={hideSelectConfig} className={`seatable-icon-btn ${styles['dtable-map-plugin-header-btn']}`}><i className='dtable-font dtable-icon-return'></i></span>
+          <span onClick={hideSelectConfig} className={styles['dtable-map-plugin-header-btn']}><i className='dtable-font dtable-icon-return'></i></span>
           <h4 className={styles['dtable-map-plugin-header-title']}>{selectedConfig.name}</h4>
           <span className={`${styles['dtable-map-plugin-header-btn-highlight']} ${styles['dtable-map-plugin-header-btn']}`}></span>
         </div>
