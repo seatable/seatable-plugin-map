@@ -458,13 +458,13 @@ class App extends React.Component {
           </div>
           <div className={styles['map-tool-container']}>
             <span className={`close ${styles['title-button']}`} onClick={this.toggle}>
-              <i className="dtable-font dtable-icon-x" style={{ fontSize: '16px' }}></i>
+              <i className={'dtable-font dtable-icon-x'}></i>
             </span>
             <span onClick={this.toggleSettingDialog} className={`close ${styles['title-button']}`}>
-              <i className={'dtable-font dtable-icon-settings'} style={{ fontSize: '16px' }}></i>
+              <i className={'dtable-font dtable-icon-settings'}></i>
             </span>
             <span className={`close ${styles['title-button']}`} onTouchEnd={onCapture}>
-              <i className={'dtable-font dtable-icon-download'} style={{ fontSize: '16px' }}></i>
+              <i className={'dtable-font dtable-icon-download'}></i>
             </span>
           </div>
         </div>
