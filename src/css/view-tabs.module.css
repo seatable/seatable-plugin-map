@@ -99,6 +99,7 @@
   align-items: center;
   width: 24px;
   height: 100%; 
+  margin-left: 4px;
 }
 
 .add-map-view-icon {
