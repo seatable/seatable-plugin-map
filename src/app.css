@@ -123,6 +123,10 @@
   font-weight: 600;
 }
 
+.plugin-map-dialog-en .dtable-icon-x {
+  font-weight: 700;
+}
+
 .plugin-map-dialog-en .dtable-plugin-location-settings-parameter {
   border-bottom: 1px solid #e4e4e4;
   height: 100%;

@@ -89,6 +89,11 @@
   cursor: pointer;
 }
 
+.views-scroll-control .btn-scroll-icon {
+  font-size: 12px;
+  line-height: 24px;
+}
+
 .btn-add-view { 
   display: flex;
   align-items: center;
@@ -102,8 +107,8 @@
   text-align: center;
   cursor: pointer;
   color: var(--bs-icon-color);
-  font-size: 16px;
-  font-weight: normal;
+  font-size: 14px;
+  font-weight: 500;
   line-height: 24px;
   border-radius: 4px;
 }
