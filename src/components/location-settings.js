@@ -123,7 +123,9 @@ class LocationSettings extends Component {
         <div className="dtable-plugin-location-settings-header">
           <div className="location-settings-header-container align-items-center">
             <h3 className="m-0 setting-header-title h5">{intl.get('Settings')}</h3>
-            <i className="dtable-font dtable-icon-x" onClick={onHideMapSettings}></i>
+            <span className='seatable-icon-btn'>
+              <i className="dtable-font dtable-icon-x" onClick={onHideMapSettings}/>
+            </span>
           </div>
         </div>
         <div className="dtable-plugin-location-settings-parameter">

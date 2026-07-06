@@ -131,7 +131,9 @@ class LocationDetailList extends React.Component {
             <span className="location-detail-address" title={address}>{address}</span>
             <span className="locatuon-detail-records">{(rows.length + ' ' + intl.get('Records'))}</span>
           </div>
-          <i className={`dtable-font dtable-icon-${isWillHide ? 'up' : 'down'} change-detail-height`} onClick={this.onChangeDeitailHeight}></i>
+          <span className='seatable-icon-btn'>
+            <i className={`dtable-font dtable-icon-${isWillHide ? 'up' : 'down'} change-detail-height`} onClick={this.onChangeDeitailHeight}/>
+          </span>
         </div>
         <div className={classnames(
           'location-detail-container',
