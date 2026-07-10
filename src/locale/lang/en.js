@@ -32,7 +32,12 @@ const en = {
   "Back": "Back",
   "Total_records": "Total records",
   "Exceeded_the_free_locations_limit": "You've exceeded the limit of 100 locations. Please upgrade to a paid plan.",
-  "Exceeded_the_max_locations_limit": "You've exceeded the limit of 5000 locations"
+  "Exceeded_the_max_locations_limit": "You've exceeded the limit of 5000 locations",
+  "Browser_geolocation_not_supported": "Browser geolocation is not supported.",
+  "Location_permission_denied": "Location permission denied.",
+  "Current_location_unavailable": "Current location is unavailable.",
+  "Geolocation_request_timed_out": "Geolocation request timed out.",
+  "Get_current_location_failed": "Failed to get current location."
 }
 ;
 

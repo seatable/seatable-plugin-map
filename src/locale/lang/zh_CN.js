@@ -32,7 +32,12 @@ const zh_CN = {
   "Back": "返回",
   "Total_records": "总行数",
   "Exceeded_the_free_locations_limit": "地理位置超过 100 个限制，请升级到付费版本。",
-  "Exceeded_the_max_locations_limit": "地理位置超过 5000 个限制"
+  "Exceeded_the_max_locations_limit": "地理位置超过 5000 个限制",
+  "Browser_geolocation_not_supported": "浏览器不支持定位。",
+  "Location_permission_denied": "未授予定位权限。",
+  "Current_location_unavailable": "当前位置信息不可用。",
+  "Geolocation_request_timed_out": "定位超时。",
+  "Get_current_location_failed": "获取当前位置失败。"
 }
 ;
 

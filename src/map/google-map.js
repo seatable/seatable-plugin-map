@@ -4,6 +4,7 @@ import {
   renderMarkByPosition, formatGeolocationValue, getInitialMapCenter, generateLabelContent, checkIsOverFreeCodingLocations, getRequiredCodingLocations, checkIsOverMaxCodingLocations,
 } from '../utils/location-utils';
 import { toaster } from 'dtable-ui-component';
+import { getCurrentBrowserPosition } from '../utils/browser-geolocation';
 import { getTableColumnByName, isNumber } from 'dtable-utils';
 import {
   GEOCODING_FORMAT,
@@ -125,23 +126,21 @@ export class GoogleMap {
       container.style.cssText = 'height:30px;width:30px;line-height:30px;cursor:pointer;display:flex;align-items:center;justify-content:center;margin:10px';
     }
     container.addEventListener('click', () => {
-      this.getLocationByGoogle()
-        .then((point) => {
-          if (point && typeof point.lat === 'number' && typeof point.lng === 'number') {
-            this.userLocationCoords = { ...point };
-            if (this.userAvatarMarker) {
-              this.userAvatarMarker.setMap(null);
-              this.userAvatarMarker = null;
-            }
-            if (this.userInfo) {
-              this.loadUserAvatarMarker();
-              this.addUserAvatarMarker();
-            }
+      getCurrentBrowserPosition().then((point) => {
+        if (point && typeof point.lat === 'number' && typeof point.lng === 'number') {
+          this.userLocationCoords = { ...point };
+          if (this.userAvatarMarker) {
+            this.userAvatarMarker.setMap(null);
+            this.userAvatarMarker = null;
           }
-        })
-        .catch((e) => {
-          this.errorHandler(e.message);
-        });
+          if (this.userInfo) {
+            this.loadUserAvatarMarker();
+            this.addUserAvatarMarker();
+          }
+        }
+      }).catch((e) => {
+        this.errorHandler(e.message);
+      });
     });
     this.map.controls[this._ControlPosition.RIGHT_BOTTOM].push(container);
   };
@@ -470,39 +469,9 @@ export class GoogleMap {
   };
 
   getUserLocation = () => {
-    if (!navigator.geolocation) return Promise.reject(intl.get('Not_support_geo'));
-    // use GPS
-    const getOptions = { enableHighAccuracy: true };
-    return new Promise((resolve, reject) => {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { longitude, latitude } = position.coords;
-          this.userLocationCoords = { lng: longitude, lat: latitude };
-          resolve();
-        },
-        reject,
-        getOptions
-      );
+    return getCurrentBrowserPosition().then((point) => {
+      this.userLocationCoords = { ...point };
     });
-  };
-
-  getLocationByGoogle = async () => {
-    const endpoint = `https://www.googleapis.com/geolocation/v1/geolocate?key=${this.mapKey}`;
-    const resp = await fetch(endpoint, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ considerIp: true })
-    });
-    if (!resp.ok) {
-      const text = await resp.text();
-      throw new Error(`Google Geolocation failed: ${resp.status} ${text}`);
-    }
-    const data = await resp.json();
-    const { location } = data || {};
-    if (!location || typeof location.lat !== 'number' || typeof location.lng !== 'number') {
-      throw new Error('Invalid geolocation response');
-    }
-    return { lat: location.lat, lng: location.lng };
   };
 
   resetUserLocationMarker = async (isShowMarker) => {
