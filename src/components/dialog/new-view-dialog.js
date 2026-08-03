@@ -27,6 +27,10 @@ class NewViewDialog extends React.Component {
     this.setState({ viewName: value });
   };
 
+  clearViewName = () => {
+    this.setState({ viewName: '' });
+  };
+
   toggle = () => {
     this.props.onNewViewCancel();
   };
@@ -50,7 +54,18 @@ class NewViewDialog extends React.Component {
           <Form>
             <FormGroup>
               <Label for="viewName">{intl.get('Name')}</Label>
-              <Input id="viewName" value={this.state.viewName} innerRef={input => {this.newInput = input;}} onChange={this.handleChange} autoFocus={true} />
+              <div className="seatable-input-wrapper">
+                <Input id="viewName" className='form-control-clear-icon' value={this.state.viewName} innerRef={input => {this.newInput = input;}} onChange={this.handleChange} autoFocus={true} />
+                {this.state.viewName && (
+                  <div className='search-icon-right'>
+                    <span
+                      className=" dtable-font dtable-icon-x"
+                      aria-hidden="true"
+                      onClick={this.clearViewName}
+                    />
+                  </div>
+                )}
+              </div>
               <Input style={{ display: 'none' }} />
             </FormGroup>
           </Form>

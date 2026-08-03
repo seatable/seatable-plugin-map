@@ -29,6 +29,10 @@ class RenameViewDialog extends Component {
     }
   };
 
+  clearViewName = () => {
+    this.setState({ viewName: '' });
+  };
+
   handleKeyDown = (e) => {
     if (e.keyCode === 13) {
       e.preventDefault();
@@ -60,8 +64,24 @@ class RenameViewDialog extends Component {
           <Form>
             <FormGroup>
               <Label>{intl.get('Name')}</Label>
-              <Input id="viewName" autoFocus={true} value={this.state.viewName}
-                onChange={this.handleChange} onKeyDown={this.handleKeyDown} />
+              <div className="seatable-input-wrapper">
+                <Input
+                  id="viewName"
+                  autoFocus={true}
+                  value={this.state.viewName}
+                  onChange={this.handleChange}
+                  onKeyDown={this.handleKeyDown}
+                  className='form-control-clear-icon'
+                />
+                {this.state.viewName && (
+                  <div className='search-icon-right'>
+                    <span
+                      className=" dtable-font dtable-icon-x"
+                      onClick={this.clearViewName}
+                    />
+                  </div>
+                )}
+              </div>
             </FormGroup>
           </Form>
           {this.state.errMessage && <Alert color="danger" className="mt-2">{(this.state.errMessage)}</Alert>}
