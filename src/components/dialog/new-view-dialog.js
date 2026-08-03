@@ -55,7 +55,7 @@ class NewViewDialog extends React.Component {
             <FormGroup>
               <Label for="viewName">{intl.get('Name')}</Label>
               <div className="seatable-input-wrapper">
-                <Input id="viewName" value={this.state.viewName} innerRef={input => {this.newInput = input;}} onChange={this.handleChange} autoFocus={true} />
+                <Input id="viewName" className='form-control-clear-icon' value={this.state.viewName} innerRef={input => {this.newInput = input;}} onChange={this.handleChange} autoFocus={true} />
                 {this.state.viewName && (
                   <div className='search-icon-right'>
                     <span
