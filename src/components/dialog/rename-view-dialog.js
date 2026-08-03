@@ -77,7 +77,6 @@ class RenameViewDialog extends Component {
                   <div className='search-icon-right'>
                     <span
                       className=" dtable-font dtable-icon-x"
-                      aria-hidden="true"
                       onClick={this.clearViewName}
                     />
                   </div>
