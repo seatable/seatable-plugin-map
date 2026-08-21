@@ -56,21 +56,6 @@
   background: #f2f2f2;
 }
 
-.location-detail-list .location-detail-header .change-detail-height {
-  display: flex;
-  width: 24px;
-  height: 24px;
-  cursor: pointer;
-  align-items: center;
-  justify-content: flex-end;
-  font-size: 13px;
-  color: #666;
-}
-
-.location-detail-list .location-detail-header .change-detail-height:hover {
-  color: #666;
-}
-
 .location-detail-list .location-detail-list .row-cell-empty {
   height: 8px;
   width: 20px;
