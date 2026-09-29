@@ -250,34 +250,47 @@ const getRowColor = (rowsColors, row) => {
   return rowsColors[row._id] || '';
 };
 
+const getStoredMapCenter = () => {
+  const center = localStorage.getItem('dtable-map-plugin-center');
+  if (!center) return null;
+  try {
+    const { position, zoom } = JSON.parse(center) || {};
+    const { lat, lng } = position || {};
+    if (isNumber(lat) && isNumber(lng)) {
+      return { position: [lat, lng], zoom: isNumber(zoom) ? zoom : 2 };
+    }
+  } catch (err) {
+    // ignore broken value
+  }
+  // remove invalid value, e.g. saved without coordinates by older versions
+  localStorage.removeItem('dtable-map-plugin-center');
+  return null;
+};
+
 export const getInitialMapCenter = async (locations) => {
   let position = [32, 166];
   let zoom = 2;
-  let center = localStorage.getItem('dtable-map-plugin-center');
-  if (!center) {
-    const location = locations[0] || {};
-    const address = location.location;
-    if (location.type === 'text' && typeof address === 'string' && address) {
-      return await new Promise(resolve => {
-        dtableWebProxyAPI.addressConvert([address]).then((res) => {
-          const { result } = (res && res.data) || {};
-          if (Array.isArray(result) && result.length > 0) {
-            const { lat, lng } = result[0] || {};
-            if (isNumber(lat) && isNumber(lng)) {
-              position = [lat, lng];
-            }
-            resolve({ position, zoom });
-          }
-        });
-      });
-    } else {
-      position = location.position || position;
-      position = [position[1], position[0]];
+  const storedCenter = getStoredMapCenter();
+  if (storedCenter) return storedCenter;
+
+  const location = locations[0] || {};
+  const address = location.location;
+  if (location.type === 'text' && typeof address === 'string' && address) {
+    try {
+      const res = await dtableWebProxyAPI.addressConvert([address]);
+      const { result } = (res && res.data) || {};
+      const { lat, lng } = (Array.isArray(result) && result[0]) || {};
+      if (isNumber(lat) && isNumber(lng)) {
+        position = [lat, lng];
+      }
+    } catch (err) {
+      // use default position
     }
-  } else {
-    center = JSON.parse(center);
-    position = [center.position.lat, center.position.lng];
-    zoom = center.zoom;
+  } else if (location.position) {
+    const [lng, lat] = location.position;
+    if (isNumber(lat) && isNumber(lng)) {
+      position = [lat, lng];
+    }
   }
   return { position, zoom };
 };

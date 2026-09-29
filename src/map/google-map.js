@@ -506,7 +506,6 @@ export class GoogleMap {
         errMessage = err.message || JSON.stringify(err);
       }
       this.errorHandler(errMessage);
-      throw err;
     }
   }
 

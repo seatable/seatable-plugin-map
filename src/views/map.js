@@ -208,7 +208,7 @@ class App extends React.Component {
     const center = {};
     if (this.mapInstance.map) {
       const position = this.mapInstance.map.getCenter();
-      center.position = { lat: position.lat, lng: position.lng };
+      center.position = { lat: position.lat(), lng: position.lng() };
       center.zoom = this.mapInstance.map.getZoom();
       window.localStorage.setItem('dtable-map-plugin-center', JSON.stringify(center));
     }
