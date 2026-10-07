@@ -604,9 +604,6 @@ module.exports = function (webpackEnv) {
         },
       ].filter(Boolean),
     },
-    externals: {
-      fs,
-    },
     plugins: [
       new CircularDependencyPlugin({
         exclude: /node_modules/,
